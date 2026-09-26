@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -43,7 +44,7 @@ class DownloadsActivity : AppCompatActivity() {
         fetchFilesFromSupabase()
 
         // Chat button
-        val chatBtn = findViewById<Button>(R.id.chat_btn)
+        val chatBtn = findViewById<ImageButton>(R.id.chat_btn)
         chatBtn.setOnClickListener {
             Toast.makeText(this, "Opening chat support", Toast.LENGTH_SHORT).show()
         }
