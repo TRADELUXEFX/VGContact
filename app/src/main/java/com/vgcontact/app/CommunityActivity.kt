@@ -1,4 +1,4 @@
-package com.vgkontact.app
+package com.vgcontact.app
 
 import android.content.Intent
 import android.net.Uri
