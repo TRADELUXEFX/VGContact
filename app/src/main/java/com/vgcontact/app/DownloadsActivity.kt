@@ -27,7 +27,7 @@ class DownloadsActivity : AppCompatActivity() {
         sessionManager = SessionManager(this)
 
         if (!sessionManager.isLoggedIn()) {
-            startActivity(Intent(this, LoginActivity::class.java))
+            startActivity(Intent(this, RegisterActivity::class.java))
             finish()
             return
         }
