@@ -21,7 +21,7 @@ class HomeActivity : AppCompatActivity() {
 
         // Check login
         if (!sessionManager.isLoggedIn()) {
-            startActivity(Intent(this, LoginActivity::class.java))
+            startActivity(Intent(this, RegisterActivity::class.java))
             finish()
             return
         }
