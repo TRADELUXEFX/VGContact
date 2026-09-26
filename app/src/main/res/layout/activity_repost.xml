@@ -36,7 +36,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Share VGKontact on WhatsApp to unlock a bonus code."
+                    android:text="Share VGContact on WhatsApp to unlock a bonus code."
                     android:textColor="@color/text_primary"
                     android:layout_marginBottom="16dp" />
 
