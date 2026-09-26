@@ -1,0 +1,118 @@
+package com.vgcontact.app
+
+import android.content.Intent
+import android.os.Build
+import android.os.Bundle
+import android.widget.Button
+import android.widget.Switch
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import java.text.SimpleDateFormat
+import java.util.*
+
+class ProfileActivity : AppCompatActivity() {
+
+    private lateinit var sessionManager: SessionManager
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_profile)
+
+        sessionManager = SessionManager(this)
+
+        if (!sessionManager.isLoggedIn()) {
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
+        }
+
+        // Header
+        val headerTitle = findViewById<TextView>(R.id.header_title)
+        headerTitle.text = "Your Profile"
+
+        // Profile Info
+        val emailText = findViewById<TextView>(R.id.profile_email)
+        val downloadsText = findViewById<TextView>(R.id.profile_downloads)
+        val repostsText = findViewById<TextView>(R.id.profile_reposts)
+        val createdText = findViewById<TextView>(R.id.profile_created)
+        val androidIdText = findViewById<TextView>(R.id.profile_android_id)
+
+        emailText.text = "Email: ${sessionManager.getEmail()}"
+        downloadsText.text = "Total Downloaded: ${sessionManager.getTotalDownloads()}"
+        repostsText.text = "Total Reposts: ${sessionManager.getTotalReposts()}"
+
+        val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+        createdText.text = "Account Created: ${dateFormat.format(Date())}"
+
+        val androidId = Build.ID
+        androidIdText.text = "Android ID: $androidId"
+
+        // Settings
+        val notificationsSwitch = findViewById<Switch>(R.id.notifications_switch)
+        val darkModeSwitch = findViewById<Switch>(R.id.dark_mode_switch)
+
+        notificationsSwitch.isChecked = true
+        darkModeSwitch.isChecked = false
+
+        notificationsSwitch.setOnCheckedChangeListener { _, isChecked ->
+            Toast.makeText(this, if (isChecked) "Notifications enabled" else "Notifications disabled", Toast.LENGTH_SHORT).show()
+        }
+
+        darkModeSwitch.setOnCheckedChangeListener { _, isChecked ->
+            Toast.makeText(this, if (isChecked) "Dark mode enabled" else "Dark mode disabled", Toast.LENGTH_SHORT).show()
+        }
+
+        // Clear cache button
+        val clearCacheBtn = findViewById<Button>(R.id.clear_cache_btn)
+        clearCacheBtn.setOnClickListener {
+            Toast.makeText(this, "Cache cleared", Toast.LENGTH_SHORT).show()
+        }
+
+        // Logout button
+        val logoutBtn = findViewById<Button>(R.id.logout_btn)
+        logoutBtn.setOnClickListener {
+            sessionManager.logout()
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+        }
+
+        // Chat button
+        val chatBtn = findViewById<Button>(R.id.chat_btn)
+        chatBtn.setOnClickListener {
+            Toast.makeText(this, "Opening chat support", Toast.LENGTH_SHORT).show()
+        }
+
+        // Bottom Navigation
+        setupBottomNav()
+    }
+
+    private fun setupBottomNav() {
+        val navView = findViewById<BottomNavigationView>(R.id.bottom_nav)
+        navView.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> {
+                    startActivity(Intent(this, HomeActivity::class.java))
+                    false
+                }
+                R.id.nav_repost -> {
+                    startActivity(Intent(this, RepostActivity::class.java))
+                    false
+                }
+                R.id.nav_downloads -> {
+                    startActivity(Intent(this, DownloadsActivity::class.java))
+                    false
+                }
+                R.id.nav_community -> {
+                    startActivity(Intent(this, CommunityActivity::class.java))
+                    false
+                }
+                R.id.nav_profile -> true
+                else -> false
+            }
+        }
+        navView.selectedItemId = R.id.nav_profile
+    }
+
+}
