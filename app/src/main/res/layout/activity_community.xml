@@ -97,18 +97,6 @@
                     android:layout_marginTop="16dp" />
             </LinearLayout>
         </ScrollView>
-        <ImageButton
-            android:id="@+id/floating_chat_btn"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="16dp"
-            android:background="@drawable/row_icon_circle_background"
-            android:src="@drawable/ic_chat"
-            app:tint="@color/vg_green_dark"
-            android:padding="14dp"
-            android:elevation="4dp"
-            android:contentDescription="Chat support" />
     </LinearLayout>
 
     <include layout="@layout/bottom_nav_bar" />
