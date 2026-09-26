@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/nav_home" android:title="@string/nav_home" />
+    <item android:id="@+id/nav_repost" android:title="@string/nav_repost" />
+    <item android:id="@+id/nav_downloads" android:title="@string/nav_downloads" />
+    <item android:id="@+id/nav_community" android:title="@string/nav_community" />
+    <item android:id="@+id/nav_profile" android:title="@string/nav_profile" />
+</menu>
