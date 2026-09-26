@@ -9,6 +9,24 @@
         <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:statusBarColor">@color/vg_green_dark</item>
         <item name="android:windowLightStatusBar">false</item>
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="fontFamily">@font/poppins</item>
+    </style>
+
+    <!-- Text Appearance Styles for other Poppins weights -->
+    <style name="TextAppearance.Poppins.Medium" parent="android:TextAppearance">
+        <item name="android:fontFamily">@font/poppins_medium</item>
+        <item name="fontFamily">@font/poppins_medium</item>
+    </style>
+
+    <style name="TextAppearance.Poppins.SemiBold" parent="android:TextAppearance">
+        <item name="android:fontFamily">@font/poppins_semibold</item>
+        <item name="fontFamily">@font/poppins_semibold</item>
+    </style>
+
+    <style name="TextAppearance.Poppins.Bold" parent="android:TextAppearance">
+        <item name="android:fontFamily">@font/poppins_bold</item>
+        <item name="fontFamily">@font/poppins_bold</item>
     </style>
 
     <!-- Button Styles -->
