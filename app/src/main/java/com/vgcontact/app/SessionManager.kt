@@ -14,6 +14,14 @@ class SessionManager(context: Context) {
         return prefs.getString("username", null)
     }
 
+    fun saveUserId(userId: String) {
+        prefs.edit().putString("user_id", userId).apply()
+    }
+
+    fun getUserId(): String? {
+        return prefs.getString("user_id", null)
+    }
+
     fun savePhone(phone: String) {
         prefs.edit().putString("phone", phone).apply()
     }
