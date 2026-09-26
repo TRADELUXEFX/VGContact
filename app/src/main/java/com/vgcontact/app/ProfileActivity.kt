@@ -39,7 +39,7 @@ class ProfileActivity : AppCompatActivity() {
         val createdText = findViewById<TextView>(R.id.profile_created)
         val androidIdText = findViewById<TextView>(R.id.profile_android_id)
 
-        emailText.text = "Email: ${sessionManager.getEmail()}"
+        emailText.text = "Username: ${sessionManager.getUsername()} · ${sessionManager.getPhone()}"
         downloadsText.text = "Total Downloaded: ${sessionManager.getTotalDownloads()}"
         repostsText.text = "Total Reposts: ${sessionManager.getTotalReposts()}"
 
