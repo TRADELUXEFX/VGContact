@@ -13,11 +13,11 @@ def supabaseUrl = localProps.getProperty('SUPABASE_URL') ?: System.getenv('SUPAB
 def supabaseAnonKey = localProps.getProperty('SUPABASE_ANON_KEY') ?: System.getenv('SUPABASE_ANON_KEY') ?: ''
 
 android {
-    namespace 'com.vgkontact.app'
+    namespace 'com.vgcontact.app'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.vgkontact.app"
+        applicationId "com.vgcontact.app"
         minSdk 24
         targetSdk 34
         versionCode 1
