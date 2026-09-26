@@ -17,73 +17,64 @@ object SupabaseClient {
         anonKey = BuildConfig.SUPABASE_ANON_KEY
     }
 
-    fun authSignUp(email: String, password: String, callback: (Boolean, String) -> Unit) {
-        val url = "$supabaseUrl/auth/v1/signup"
-        val body = JSONObject().apply {
-            put("email", email)
-            put("password", password)
-        }
-
-        val request = Request.Builder()
-            .url(url)
+    // No password, no Supabase auth session. Identity is the android_id;
+    // registering just upserts a row in `users` keyed on it (anon key + RLS,
+    // same pattern as the rest of the app's writes).
+    fun registerOrFetchUser(
+        androidId: String,
+        username: String,
+        phone: String,
+        referredBy: String?,
+        callback: (Boolean, JSONObject?) -> Unit
+    ) {
+        // 1. Check if this android_id is already registered.
+        val lookupUrl = "$supabaseUrl/rest/v1/users?android_id=eq.$androidId&select=*"
+        val lookupRequest = Request.Builder()
+            .url(lookupUrl)
             .addHeader("apikey", anonKey)
-            .addHeader("Content-Type", "application/json")
-            .post(body.toString().toRequestBody("application/json".toMediaType()))
-            .build()
-
-        try {
-            client.newCall(request).execute().use { response ->
-                callback(response.isSuccessful, response.body?.string() ?: "")
-            }
-        } catch (e: Exception) {
-            callback(false, e.message ?: "Error")
-        }
-    }
-
-    fun authSignIn(email: String, password: String, callback: (Boolean, String) -> Unit) {
-        val url = "$supabaseUrl/auth/v1/token?grant_type=password"
-        val body = JSONObject().apply {
-            put("email", email)
-            put("password", password)
-        }
-
-        val request = Request.Builder()
-            .url(url)
-            .addHeader("apikey", anonKey)
-            .addHeader("Content-Type", "application/json")
-            .post(body.toString().toRequestBody("application/json".toMediaType()))
-            .build()
-
-        try {
-            client.newCall(request).execute().use { response ->
-                if (response.isSuccessful) {
-                    val respBody = response.body?.string() ?: ""
-                    val json = JSONObject(respBody)
-                    val token = json.optString("access_token", "")
-                    callback(true, token)
-                } else {
-                    callback(false, "Login failed")
-                }
-            }
-        } catch (e: Exception) {
-            callback(false, e.message ?: "Error")
-        }
-    }
-
-    fun getUser(token: String, callback: (Boolean, JSONObject?) -> Unit) {
-        val url = "$supabaseUrl/auth/v1/user"
-        val request = Request.Builder()
-            .url(url)
-            .addHeader("Authorization", "Bearer $token")
-            .addHeader("apikey", anonKey)
+            .addHeader("Authorization", "Bearer $anonKey")
             .get()
             .build()
 
         try {
-            client.newCall(request).execute().use { response ->
+            client.newCall(lookupRequest).execute().use { response ->
                 if (response.isSuccessful) {
-                    val json = JSONObject(response.body?.string() ?: "{}")
-                    callback(true, json)
+                    val body = response.body?.string() ?: "[]"
+                    val arr = org.json.JSONArray(body)
+                    if (arr.length() > 0) {
+                        callback(true, arr.getJSONObject(0))
+                        return
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            callback(false, null)
+            return
+        }
+
+        // 2. Not found - create it.
+        val insertUrl = "$supabaseUrl/rest/v1/users"
+        val body = JSONObject().apply {
+            put("android_id", androidId)
+            put("username", username)
+            put("phone", phone)
+            if (!referredBy.isNullOrBlank()) put("referred_by", referredBy)
+        }
+
+        val insertRequest = Request.Builder()
+            .url(insertUrl)
+            .addHeader("apikey", anonKey)
+            .addHeader("Authorization", "Bearer $anonKey")
+            .addHeader("Content-Type", "application/json")
+            .addHeader("Prefer", "return=representation")
+            .post(body.toString().toRequestBody("application/json".toMediaType()))
+            .build()
+
+        try {
+            client.newCall(insertRequest).execute().use { response ->
+                if (response.isSuccessful) {
+                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
+                    callback(true, if (arr.length() > 0) arr.getJSONObject(0) else null)
                 } else {
                     callback(false, null)
                 }
