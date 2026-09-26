@@ -55,6 +55,7 @@ class LoginActivity : AppCompatActivity() {
                         if (success && user != null) {
                             sessionManager.saveUsername(user.optString("username", username))
                             sessionManager.savePhone(user.optString("phone", phone))
+                            sessionManager.saveUserId(user.optString("id", ""))
                             startActivity(Intent(this, HomeActivity::class.java))
                             finish()
                         } else {
