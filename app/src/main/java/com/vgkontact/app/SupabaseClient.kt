@@ -1,10 +1,10 @@
 package com.vgkontact.app
 
 import android.content.Context
-import com.squareup.okhttp3.OkHttpClient
-import com.squareup.okhttp3.Request
-import com.squareup.okhttp3.MediaType.Companion.toMediaType
-import com.squareup.okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 
 object SupabaseClient {
