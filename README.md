@@ -1,6 +1,6 @@
-# VGKontact MVP
+# VGContact MVP
 
-A clean, minimal Android MVP for the VGKontact repost-to-unlock contact platform.
+A clean, minimal Android MVP for the VGContact repost-to-unlock contact platform.
 
 ## Tech Stack
 - Kotlin + XML layouts
