@@ -8,21 +8,25 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-        <FrameLayout
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:background="@color/vg_green">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/header_gradient"
+            android:paddingTop="24dp"
+            android:paddingBottom="16dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
             <TextView
                 android:id="@+id/header_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:gravity="center_vertical"
-                android:layout_gravity="center_vertical"
-                android:paddingStart="16dp" />
-        </FrameLayout>
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -33,102 +37,152 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <TextView
-                    android:id="@+id/profile_email"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/text_primary"
-                    android:layout_marginBottom="6dp" />
-                <TextView
-                    android:id="@+id/profile_downloads"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/text_primary"
-                    android:layout_marginBottom="6dp" />
-                <TextView
-                    android:id="@+id/profile_reposts"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/text_primary"
-                    android:layout_marginBottom="6dp" />
-                <TextView
-                    android:id="@+id/profile_created"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/text_primary"
-                    android:layout_marginBottom="6dp" />
-                <TextView
-                    android:id="@+id/profile_android_id"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/text_muted"
-                    android:textSize="12sp"
-                    android:layout_marginBottom="20dp" />
-
+                <!-- Account info card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="12dp">
+                    android:orientation="vertical"
+                    android:background="@drawable/card_background"
+                    android:padding="20dp"
+                    android:layout_marginBottom="16dp">
+
                     <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Notifications"
-                        android:textColor="@color/text_primary" />
-                    <Switch
-                        android:id="@+id/notifications_switch"
+                        android:id="@+id/profile_email"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/vg_dark"
+                        android:layout_marginBottom="10dp" />
+                    <TextView
+                        android:id="@+id/profile_downloads"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp"
+                        android:layout_marginBottom="6dp" />
+                    <TextView
+                        android:id="@+id/profile_reposts"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp"
+                        android:layout_marginBottom="6dp" />
+                    <TextView
+                        android:id="@+id/profile_created"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp"
+                        android:layout_marginBottom="6dp" />
+                    <TextView
+                        android:id="@+id/profile_android_id"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_muted"
+                        android:textSize="11sp" />
                 </LinearLayout>
 
+                <!-- Settings card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="20dp">
-                    <TextView
-                        android:layout_width="0dp"
+                    android:orientation="vertical"
+                    android:background="@drawable/card_background"
+                    android:padding="20dp"
+                    android:layout_marginBottom="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Dark Mode"
-                        android:textColor="@color/text_primary" />
-                    <Switch
-                        android:id="@+id/dark_mode_switch"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_bell"
+                            app:tint="@color/vg_green_dark"
+                            android:layout_marginEnd="10dp"
+                            android:contentDescription="@null" />
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Notifications"
+                            android:textSize="14sp"
+                            android:textColor="@color/vg_dark" />
+                        <Switch
+                            android:id="@+id/notifications_switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_moon"
+                            app:tint="@color/vg_green_dark"
+                            android:layout_marginEnd="10dp"
+                            android:contentDescription="@null" />
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Dark Mode"
+                            android:textSize="14sp"
+                            android:textColor="@color/vg_dark" />
+                        <Switch
+                            android:id="@+id/dark_mode_switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
                 </LinearLayout>
 
                 <Button
                     android:id="@+id/clear_cache_btn"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/button_height"
+                    android:layout_height="56dp"
                     android:text="Clear Cache"
+                    android:textAllCaps="false"
                     android:backgroundTint="@color/vg_green_tint"
                     android:textColor="@color/vg_green_dark"
+                    app:icon="@drawable/ic_trash"
+                    app:iconTint="@color/vg_green_dark"
+                    app:iconGravity="textStart"
+                    app:cornerRadius="16dp"
                     android:layout_marginBottom="12dp" />
 
                 <Button
                     android:id="@+id/logout_btn"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/button_height"
+                    android:layout_height="56dp"
                     android:text="Log Out"
+                    android:textAllCaps="false"
                     android:backgroundTint="@color/vg_red"
-                    android:textColor="@color/white" />
+                    android:textColor="@color/white"
+                    app:icon="@drawable/ic_logout"
+                    app:iconTint="@color/white"
+                    app:iconGravity="textStart"
+                    app:cornerRadius="16dp" />
             </LinearLayout>
         </ScrollView>
         <ImageButton
             android:id="@+id/chat_btn"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
             android:layout_gravity="bottom|end"
             android:layout_margin="16dp"
-            android:background="@color/vg_green"
+            android:background="@drawable/row_icon_circle_background"
             android:src="@drawable/ic_chat"
-            app:tint="@color/white"
-            android:padding="12dp"
+            app:tint="@color/vg_green_dark"
+            android:padding="14dp"
+            android:elevation="4dp"
             android:contentDescription="Chat support" />
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_nav"
