@@ -113,8 +113,8 @@
             android:textColor="@color/vg_green_dark"
             app:backgroundTint="@color/white"
             app:cornerRadius="14dp"
-            app:insetTop="0dp"
-            app:insetBottom="0dp" />
+            android:insetTop="0dp"
+            android:insetBottom="0dp" />
     </LinearLayout>
 
 </LinearLayout>
