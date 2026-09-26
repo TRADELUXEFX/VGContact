@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
-import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -48,17 +47,10 @@ class HomeActivity : AppCompatActivity() {
             }
         }
 
-        // Chat button
-        val chatBtn = findViewById<ImageButton>(R.id.chat_btn)
-        chatBtn.setOnClickListener {
-            Toast.makeText(this, "Opening chat support", Toast.LENGTH_SHORT).show()
-        }
-
-        // Bottom Navigation
-
-        // Shared profile header (username, phone/referral row, bell, trash)
+        // Shared profile header (username, phone/referral row, bell)
         setupProfileHeader()
         setupBottomNav()
+        ChatSupportHelper.attach(this)
     }
 
 
@@ -67,7 +59,6 @@ class HomeActivity : AppCompatActivity() {
         val phoneText = findViewById<TextView>(R.id.headerPhoneText)
         val copyBtn = findViewById<Button>(R.id.headerCopyBtn)
         val bellIcon = findViewById<ImageView>(R.id.headerBellIcon)
-        val trashIcon = findViewById<ImageView>(R.id.headerTrashIcon)
 
         usernameText.text = sessionManager.getUsername() ?: "VGContact User"
         val phone = sessionManager.getPhone() ?: ""
@@ -81,11 +72,7 @@ class HomeActivity : AppCompatActivity() {
         }
 
         bellIcon.setOnClickListener {
-            Toast.makeText(this, "No new notifications", Toast.LENGTH_SHORT).show()
-        }
-
-        trashIcon.setOnClickListener {
-            Toast.makeText(this, "Cache cleared", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, NotificationsActivity::class.java))
         }
     }
 
