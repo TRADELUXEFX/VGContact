@@ -8,6 +8,9 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.widget.ImageView
 
 class HomeActivity : AppCompatActivity() {
 
@@ -52,7 +55,38 @@ class HomeActivity : AppCompatActivity() {
         }
 
         // Bottom Navigation
+
+        // Shared profile header (username, phone/referral row, bell, trash)
+        setupProfileHeader()
         setupBottomNav()
+    }
+
+
+    private fun setupProfileHeader() {
+        val usernameText = findViewById<TextView>(R.id.headerUsernameText)
+        val phoneText = findViewById<TextView>(R.id.headerPhoneText)
+        val copyBtn = findViewById<Button>(R.id.headerCopyBtn)
+        val bellIcon = findViewById<ImageView>(R.id.headerBellIcon)
+        val trashIcon = findViewById<ImageView>(R.id.headerTrashIcon)
+
+        usernameText.text = sessionManager.getUsername() ?: "VGContact User"
+        val phone = sessionManager.getPhone() ?: ""
+        phoneText.text = "Referral code: $phone"
+
+        copyBtn.setOnClickListener {
+            val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("referral_code", phone)
+            clipboard.setPrimaryClip(clip)
+            Toast.makeText(this, "Copied!", Toast.LENGTH_SHORT).show()
+        }
+
+        bellIcon.setOnClickListener {
+            Toast.makeText(this, "No new notifications", Toast.LENGTH_SHORT).show()
+        }
+
+        trashIcon.setOnClickListener {
+            Toast.makeText(this, "Cache cleared", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun setupBottomNav() {
