@@ -71,4 +71,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.0'
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
+
+    // Downloadable Google Fonts (Poppins) — supplies the fonts provider cert array
+    implementation 'com.google.android.gms:play-services-basement:18.4.0'
 }
