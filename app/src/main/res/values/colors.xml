@@ -12,6 +12,7 @@
 
     <!-- Text -->
     <color name="text_primary">#555555</color>
+    <color name="text_secondary">#7A8580</color>
     <color name="text_muted">#8A928C</color>
 
     <!-- Cards & Borders -->
