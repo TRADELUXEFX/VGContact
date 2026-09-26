@@ -69,81 +69,6 @@
                         android:textSize="11sp" />
                 </LinearLayout>
 
-                <!-- Settings card -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/card_background"
-                    android:padding="20dp"
-                    android:layout_marginBottom="16dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="16dp">
-                        <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@drawable/ic_bell"
-                            app:tint="@color/vg_green_dark"
-                            android:layout_marginEnd="10dp"
-                            android:contentDescription="@null" />
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Notifications"
-                            android:textSize="14sp"
-                            android:textColor="@color/vg_dark" />
-                        <Switch
-                            android:id="@+id/notifications_switch"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
-                        <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@drawable/ic_moon"
-                            app:tint="@color/vg_green_dark"
-                            android:layout_marginEnd="10dp"
-                            android:contentDescription="@null" />
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Dark Mode"
-                            android:textSize="14sp"
-                            android:textColor="@color/vg_dark" />
-                        <Switch
-                            android:id="@+id/dark_mode_switch"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/clear_cache_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:text="Clear Cache"
-                    android:textAllCaps="false"
-                    android:backgroundTint="@color/vg_green_tint"
-                    android:textColor="@color/vg_green_dark"
-                    app:icon="@drawable/ic_trash"
-                    app:iconTint="@color/vg_green_dark"
-                    app:iconGravity="textStart"
-                    app:cornerRadius="16dp"
-                    android:layout_marginBottom="12dp" />
-
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/logout_btn"
                     android:layout_width="match_parent"
@@ -158,18 +83,6 @@
                     app:cornerRadius="16dp" />
             </LinearLayout>
         </ScrollView>
-        <ImageButton
-            android:id="@+id/chat_btn"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="16dp"
-            android:background="@drawable/row_icon_circle_background"
-            android:src="@drawable/ic_chat"
-            app:tint="@color/vg_green_dark"
-            android:padding="14dp"
-            android:elevation="4dp"
-            android:contentDescription="Chat support" />
     </LinearLayout>
 
     <include layout="@layout/bottom_nav_bar" />
