@@ -6,20 +6,20 @@ import android.content.SharedPreferences
 class SessionManager(context: Context) {
     private val prefs: SharedPreferences = context.getSharedPreferences("vgkontact_session", Context.MODE_PRIVATE)
 
-    fun saveToken(token: String) {
-        prefs.edit().putString("auth_token", token).apply()
+    fun saveUsername(username: String) {
+        prefs.edit().putString("username", username).apply()
     }
 
-    fun getToken(): String? {
-        return prefs.getString("auth_token", null)
+    fun getUsername(): String? {
+        return prefs.getString("username", null)
     }
 
-    fun saveEmail(email: String) {
-        prefs.edit().putString("user_email", email).apply()
+    fun savePhone(phone: String) {
+        prefs.edit().putString("phone", phone).apply()
     }
 
-    fun getEmail(): String? {
-        return prefs.getString("user_email", null)
+    fun getPhone(): String? {
+        return prefs.getString("phone", null)
     }
 
     fun saveTotalDownloads(count: Int) {
@@ -43,7 +43,7 @@ class SessionManager(context: Context) {
     }
 
     fun isLoggedIn(): Boolean {
-        return getToken() != null
+        return getUsername() != null
     }
 
 }
