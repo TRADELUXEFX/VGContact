@@ -8,21 +8,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:background="@color/vg_green">
-            <TextView
-                android:id="@+id/header_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:gravity="center_vertical"
-                android:layout_gravity="center_vertical"
-                android:paddingStart="16dp" />
-        </FrameLayout>
 
         <HorizontalScrollView
             android:layout_width="match_parent"
@@ -101,7 +86,9 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingBottom="88dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -125,11 +112,7 @@
             app:tint="@color/white"
             android:padding="12dp"
             android:contentDescription="Chat support" />
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/bottom_nav"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/vg_dark"
-            app:menu="@menu/bottom_nav_menu" />
     </LinearLayout>
+
+    <include layout="@layout/bottom_nav_bar" />
 </FrameLayout>
