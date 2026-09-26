@@ -18,6 +18,7 @@
     <!-- Cards & Borders -->
     <color name="card_border">#DCEEE1</color>
     <color name="stats_card_fill">#F5FAF6</color>
+    <color name="stats_card_border">#DCEEE1</color>
 
     <!-- Status -->
     <color name="success_bg">#E1F5EB</color>
