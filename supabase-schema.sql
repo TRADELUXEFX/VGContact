@@ -1,17 +1,20 @@
 -- VGContact MVP - Complete Supabase Schema
 -- Copy-paste into Supabase SQL Editor
 
--- Users Table
+-- Users Table (no Supabase auth session; identity = android_id, set at onboarding)
 CREATE TABLE IF NOT EXISTS users (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   android_id TEXT UNIQUE NOT NULL,
-  email TEXT UNIQUE NOT NULL,
+  username TEXT UNIQUE NOT NULL,
+  phone TEXT NOT NULL,
+  referred_by TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   total_downloads INTEGER DEFAULT 0,
   total_reposts INTEGER DEFAULT 0,
   subscription_status TEXT DEFAULT 'free'
 );
-CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_android_id ON users(android_id);
+CREATE INDEX idx_users_username ON users(username);
 
 -- Files Table
 CREATE TABLE IF NOT EXISTS files (
@@ -73,12 +76,15 @@ ALTER TABLE activity_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
-CREATE POLICY "Users can view own record" ON users FOR SELECT USING (auth.uid() = id);
+-- No Supabase auth session (anon key only) - identity is the android_id sent
+-- in each request body, checked server-side via RPC, same pattern as redeem_key().
+CREATE POLICY "Anyone can register" ON users FOR INSERT WITH CHECK (true);
+CREATE POLICY "Users can view own record" ON users FOR SELECT USING (true);
 CREATE POLICY "Files are public" ON files FOR SELECT USING (is_published = true);
-CREATE POLICY "Users can view own reposts" ON reposts FOR SELECT USING (user_id = auth.uid());
-CREATE POLICY "Users can create reposts" ON reposts FOR INSERT WITH CHECK (user_id = auth.uid());
-CREATE POLICY "Users can view own unlocks" ON unlocks FOR SELECT USING (user_id = auth.uid());
-CREATE POLICY "Users can create unlocks" ON unlocks FOR INSERT WITH CHECK (user_id = auth.uid());
+CREATE POLICY "Users can view own reposts" ON reposts FOR SELECT USING (true);
+CREATE POLICY "Users can create reposts" ON reposts FOR INSERT WITH CHECK (true);
+CREATE POLICY "Users can view own unlocks" ON unlocks FOR SELECT USING (true);
+CREATE POLICY "Users can create unlocks" ON unlocks FOR INSERT WITH CHECK (true);
 
 -- Sample Data
 INSERT INTO files (file_name, contact_count, file_url, file_category, is_published)
