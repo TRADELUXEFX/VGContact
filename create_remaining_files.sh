@@ -99,7 +99,7 @@ ITEM
 
 # Create proguard rules
 cat > app/proguard-rules.pro << 'PROGUARD'
--keep class com.vgkontact.app.** { *; }
+-keep class com.vgcontact.app.** { *; }
 -keep class org.json.** { *; }
 -keepattributes SourceFile,LineNumberTable
 PROGUARD
@@ -110,7 +110,7 @@ keytool -genkey -v -keystore app/debug.keystore \
     -alias vgkontactdebugkey \
     -storepass vgkontactdebug \
     -keypass vgkontactdebug \
-    -dname "CN=VGKontact,O=VGKontact,C=US" 2>/dev/null || echo "Keystore already exists"
+    -dname "CN=VGContact,O=VGContact,C=US" 2>/dev/null || echo "Keystore already exists"
 
 # Create gradle.properties
 cat > gradle.properties << 'GRADLE_PROPS'
