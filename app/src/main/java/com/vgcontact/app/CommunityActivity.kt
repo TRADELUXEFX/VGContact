@@ -8,7 +8,6 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class CommunityActivity : AppCompatActivity() {
 
@@ -25,10 +24,6 @@ class CommunityActivity : AppCompatActivity() {
             finish()
             return
         }
-
-        // Header
-        val headerTitle = findViewById<TextView>(R.id.header_title)
-        headerTitle.text = "Our Community"
 
         // Join WhatsApp button
         val joinBtn = findViewById<Button>(R.id.join_whatsapp_btn)
@@ -59,30 +54,7 @@ class CommunityActivity : AppCompatActivity() {
     }
 
     private fun setupBottomNav() {
-        val navView = findViewById<BottomNavigationView>(R.id.bottom_nav)
-        navView.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_home -> {
-                    startActivity(Intent(this, HomeActivity::class.java))
-                    false
-                }
-                R.id.nav_repost -> {
-                    startActivity(Intent(this, RepostActivity::class.java))
-                    false
-                }
-                R.id.nav_downloads -> {
-                    startActivity(Intent(this, DownloadsActivity::class.java))
-                    false
-                }
-                R.id.nav_community -> true
-                R.id.nav_profile -> {
-                    startActivity(Intent(this, ProfileActivity::class.java))
-                    false
-                }
-                else -> false
-            }
-        }
-        navView.selectedItemId = R.id.nav_community
+        BottomNavHelper.setup(this, BottomNavHelper.Tab.COMMUNITY)
     }
 
 }
