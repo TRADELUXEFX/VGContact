@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">VGKontact</string>
+
+    <!-- Login -->
+    <string name="login_title">VGKontact</string>
+    <string name="login_email">Email</string>
+    <string name="login_password">Password</string>
+    <string name="login_button">Login</string>
+    <string name="login_signup">Create Account</string>
+    <string name="signup_create">Create Account</string>
+
+    <!-- Home -->
+    <string name="home_title">VGKontact</string>
+    <string name="home_total_downloads">Total Downloads</string>
+    <string name="home_total_reposts">Total Reposts</string>
+    <string name="home_join_community">🔗 JOIN COMMUNITY</string>
+    <string name="home_how_it_works">How It Works</string>
+
+    <!-- Repost -->
+    <string name="repost_title">Repost to Unlock</string>
+    <string name="repost_instructions">Repost this to unlock today\'s contacts</string>
+    <string name="repost_button">🔵 REPOST TO UNLOCK</string>
+    <string name="repost_waiting">⏳ Waiting for verification...</string>
+    <string name="repost_unlocked">📋 Unlock Code: %s</string>
+    <string name="repost_copy">Copy Code</string>
+
+    <!-- Downloads -->
+    <string name="downloads_title">Contact Files</string>
+    <string name="downloads_all">All</string>
+    <string name="downloads_business">Business</string>
+    <string name="downloads_social">Social</string>
+    <string name="downloads_other">Other</string>
+    <string name="downloads_locked">🔒 Locked</string>
+    <string name="downloads_unlocked">🔓 Unlocked</string>
+    <string name="downloads_downloaded">✅ Downloaded</string>
+    <string name="downloads_download">⬇️ DOWNLOAD</string>
+    <string name="downloads_reimport">↺ REIMPORT</string>
+
+    <!-- Community -->
+    <string name="community_title">Our Community</string>
+    <string name="community_description">We discuss new features, get help, and stay connected!</string>
+    <string name="community_members">👥 2,450 members online</string>
+    <string name="community_join">🔵 JOIN WHATSAPP GROUP</string>
+    <string name="community_chat">🔵 OPEN CHAT SUPPORT</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Your Profile</string>
+    <string name="profile_email">Email</string>
+    <string name="profile_downloaded">Total Downloaded</string>
+    <string name="profile_reposts">Total Reposts</string>
+    <string name="profile_created">Account Created</string>
+    <string name="profile_android_id">Android ID</string>
+    <string name="profile_notifications">🔔 Notifications</string>
+    <string name="profile_dark_mode">🌙 Dark Mode</string>
+    <string name="profile_clear_cache">🗑️ Clear Cache</string>
+    <string name="profile_logout">🔴 LOGOUT</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_repost">Repost</string>
+    <string name="nav_downloads">Downloads</string>
+    <string name="nav_community">Community</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Chat -->
+    <string name="chat_button">Contact Us</string>
+
+</resources>
