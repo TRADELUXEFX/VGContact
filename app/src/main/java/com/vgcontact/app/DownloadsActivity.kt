@@ -11,7 +11,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlin.concurrent.thread
 
 class DownloadsActivity : AppCompatActivity() {
@@ -32,10 +31,6 @@ class DownloadsActivity : AppCompatActivity() {
             finish()
             return
         }
-
-        // Header
-        val headerTitle = findViewById<TextView>(R.id.header_title)
-        headerTitle.text = "Contact Files"
 
         // Category filters
         setupCategoryFilters()
@@ -173,30 +168,7 @@ class DownloadsActivity : AppCompatActivity() {
     }
 
     private fun setupBottomNav() {
-        val navView = findViewById<BottomNavigationView>(R.id.bottom_nav)
-        navView.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_home -> {
-                    startActivity(Intent(this, HomeActivity::class.java))
-                    false
-                }
-                R.id.nav_repost -> {
-                    startActivity(Intent(this, RepostActivity::class.java))
-                    false
-                }
-                R.id.nav_downloads -> true
-                R.id.nav_community -> {
-                    startActivity(Intent(this, CommunityActivity::class.java))
-                    false
-                }
-                R.id.nav_profile -> {
-                    startActivity(Intent(this, ProfileActivity::class.java))
-                    false
-                }
-                else -> false
-            }
-        }
-        navView.selectedItemId = R.id.nav_downloads
+        BottomNavHelper.setup(this, BottomNavHelper.Tab.DOWNLOADS)
     }
 
 }
