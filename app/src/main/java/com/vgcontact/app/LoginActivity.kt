@@ -43,6 +43,11 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            if (!SupabaseClient.isOnline(this)) {
+                Toast.makeText(this, "No internet connection. Check your network and try again.", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
             loginBtn.isEnabled = false
             loginBtn.text = "Setting up..."
 
