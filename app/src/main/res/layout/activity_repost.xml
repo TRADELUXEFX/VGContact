@@ -54,7 +54,7 @@
                         android:lineSpacingMultiplier="1.3"
                         android:layout_marginBottom="16dp" />
 
-                    <Button
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/repost_btn"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
@@ -120,7 +120,7 @@
                         app:layout_constraintStart_toEndOf="@id/unlocked_code_icon"
                         android:layout_marginStart="8dp" />
 
-                    <Button
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/copy_code_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="48dp"
