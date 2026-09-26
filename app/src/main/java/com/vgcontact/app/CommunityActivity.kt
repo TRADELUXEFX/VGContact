@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -48,7 +49,7 @@ class CommunityActivity : AppCompatActivity() {
         }
 
         // Floating chat button
-        val floatingChatBtn = findViewById<Button>(R.id.floating_chat_btn)
+        val floatingChatBtn = findViewById<ImageButton>(R.id.floating_chat_btn)
         floatingChatBtn.setOnClickListener {
             Toast.makeText(this, "Opening chat support", Toast.LENGTH_SHORT).show()
         }
