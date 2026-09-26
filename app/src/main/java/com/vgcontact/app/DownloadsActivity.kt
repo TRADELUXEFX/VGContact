@@ -1,6 +1,7 @@
 package com.vgcontact.app
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
@@ -10,11 +11,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlin.concurrent.thread
 
 class DownloadsActivity : AppCompatActivity() {
 
     private lateinit var sessionManager: SessionManager
     private var selectedCategory = "All"
+    private var allFiles: List<org.json.JSONObject> = emptyList()
+    private var unlockedFileIds: Set<String> = emptySet()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,8 +40,7 @@ class DownloadsActivity : AppCompatActivity() {
         setupCategoryFilters()
 
         // File list container
-        val fileListContainer = findViewById<LinearLayout>(R.id.file_list_container)
-        loadFiles("All")
+        fetchFilesFromSupabase()
 
         // Chat button
         val chatBtn = findViewById<Button>(R.id.chat_btn)
@@ -81,49 +84,86 @@ class DownloadsActivity : AppCompatActivity() {
         loadFiles(category)
     }
 
+    private fun fetchFilesFromSupabase() {
+        val userId = sessionManager.getUserId()
+
+        thread {
+            SupabaseClient.fetchFiles { filesSuccess, filesArr ->
+                if (!filesSuccess || filesArr == null) {
+                    runOnUiThread {
+                        Toast.makeText(this, "Couldn't load files. Check your connection.", Toast.LENGTH_SHORT).show()
+                    }
+                    return@fetchFiles
+                }
+
+                val files = mutableListOf<org.json.JSONObject>()
+                for (i in 0 until filesArr.length()) {
+                    files.add(filesArr.getJSONObject(i))
+                }
+
+                if (userId.isNullOrBlank()) {
+                    allFiles = files
+                    unlockedFileIds = emptySet()
+                    runOnUiThread { loadFiles(selectedCategory) }
+                    return@fetchFiles
+                }
+
+                SupabaseClient.fetchUnlockedFileIds(userId) { _, ids ->
+                    allFiles = files
+                    unlockedFileIds = ids
+                    runOnUiThread { loadFiles(selectedCategory) }
+                }
+            }
+        }
+    }
+
     private fun loadFiles(category: String) {
         val fileListContainer = findViewById<LinearLayout>(R.id.file_list_container)
         fileListContainer.removeAllViews()
 
-        // Sample files (in real app, fetch from Supabase)
-        val files = listOf(
-            mapOf(
-                "name" to "Business_Contacts_Sept26.vcf",
-                "count" to "150 Contacts",
-                "category" to "Business",
-                "status" to "Locked"
-            ),
-            mapOf(
-                "name" to "Social_Influencers_Sept26.vcf",
-                "count" to "250 Contacts",
-                "category" to "Social",
-                "status" to "Unlocked"
-            )
-        )
+        allFiles.forEach { file ->
+            val fileCategory = file.optString("file_category", "Other")
+            if (category == "All" || fileCategory == category) {
+                val fileId = file.optString("id")
+                val fileName = file.optString("file_name")
+                val contactCount = file.optInt("contact_count", 0)
+                val fileUrl = file.optString("file_url")
+                val isLocked = !unlockedFileIds.contains(fileId)
 
-        files.forEach { file ->
-            if (category == "All" || file["category"] == category) {
                 val fileView = layoutInflater.inflate(R.layout.item_file, fileListContainer, false)
-                val fileName = fileView.findViewById<TextView>(R.id.file_name)
-                val fileCount = fileView.findViewById<TextView>(R.id.file_count)
+                val fileNameView = fileView.findViewById<TextView>(R.id.file_name)
+                val fileCountView = fileView.findViewById<TextView>(R.id.file_count)
                 val statusPill = fileView.findViewById<LinearLayout>(R.id.file_status_pill)
                 val statusIconView = fileView.findViewById<ImageView>(R.id.file_status_icon)
-                val fileStatus = fileView.findViewById<TextView>(R.id.file_status)
+                val fileStatusView = fileView.findViewById<TextView>(R.id.file_status)
                 val downloadBtn = fileView.findViewById<Button>(R.id.download_btn)
 
-                fileName.text = file["name"]
-                fileCount.text = file["count"]
-                fileStatus.text = file["status"]
+                fileNameView.text = fileName
+                fileCountView.text = "$contactCount Contacts"
+                fileStatusView.text = if (isLocked) "Locked" else "Unlocked"
 
-                val isLocked = file["status"] == "Locked"
                 statusIconView.setImageResource(if (isLocked) R.drawable.ic_lock else R.drawable.ic_unlock)
                 val statusColor = ContextCompat.getColor(this, if (isLocked) R.color.locked_text else R.color.success_text)
                 statusIconView.setColorFilter(statusColor)
-                fileStatus.setTextColor(statusColor)
+                fileStatusView.setTextColor(statusColor)
                 statusPill.setBackgroundResource(if (isLocked) R.drawable.pill_locked_background else R.drawable.pill_unlocked_background)
 
+                downloadBtn.text = if (isLocked) "Repost to Unlock" else "Download"
                 downloadBtn.setOnClickListener {
-                    Toast.makeText(this, "Downloading ${file["name"]}", Toast.LENGTH_SHORT).show()
+                    if (isLocked) {
+                        val intent = Intent(this, RepostActivity::class.java)
+                        intent.putExtra("file_id", fileId)
+                        intent.putExtra("file_name", fileName)
+                        startActivity(intent)
+                    } else if (fileUrl.isNotBlank()) {
+                        try {
+                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(fileUrl)))
+                        } catch (e: Exception) {
+                            Toast.makeText(this, "Couldn't open file link", Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        Toast.makeText(this, "No file link available", Toast.LENGTH_SHORT).show()
+                    }
                 }
 
                 fileListContainer.addView(fileView)
