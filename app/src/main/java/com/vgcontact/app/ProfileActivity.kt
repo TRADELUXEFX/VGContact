@@ -9,7 +9,6 @@ import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -28,10 +27,6 @@ class ProfileActivity : AppCompatActivity() {
             finish()
             return
         }
-
-        // Header
-        val headerTitle = findViewById<TextView>(R.id.header_title)
-        headerTitle.text = "Your Profile"
 
         // Profile Info
         val emailText = findViewById<TextView>(R.id.profile_email)
@@ -90,30 +85,7 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun setupBottomNav() {
-        val navView = findViewById<BottomNavigationView>(R.id.bottom_nav)
-        navView.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_home -> {
-                    startActivity(Intent(this, HomeActivity::class.java))
-                    false
-                }
-                R.id.nav_repost -> {
-                    startActivity(Intent(this, RepostActivity::class.java))
-                    false
-                }
-                R.id.nav_downloads -> {
-                    startActivity(Intent(this, DownloadsActivity::class.java))
-                    false
-                }
-                R.id.nav_community -> {
-                    startActivity(Intent(this, CommunityActivity::class.java))
-                    false
-                }
-                R.id.nav_profile -> true
-                else -> false
-            }
-        }
-        navView.selectedItemId = R.id.nav_profile
+        BottomNavHelper.setup(this, BottomNavHelper.Tab.PROFILE)
     }
 
 }
