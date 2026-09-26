@@ -1,13 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="12dp"
-    android:layout_marginBottom="8dp"
-    android:background="@color/white">
-    <TextView android:id="@+id/file_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold" />
-    <TextView android:id="@+id/file_count" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="12sp" />
-    <TextView android:id="@+id/file_status" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="12sp" />
-    <Button android:id="@+id/download_btn" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Download" android:layout_marginTop="8dp" />
+    android:background="@drawable/card_background"
+    android:padding="16dp"
+    android:layout_marginBottom="12dp">
+
+    <TextView
+        android:id="@+id/file_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:textColor="@color/vg_dark" />
+
+    <TextView
+        android:id="@+id/file_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="13sp"
+        android:textColor="@color/text_muted"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="10dp" />
+
+    <LinearLayout
+        android:id="@+id/file_status_pill"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="10dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:layout_marginBottom="12dp">
+
+        <ImageView
+            android:id="@+id/file_status_icon"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_marginEnd="6dp"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:id="@+id/file_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/download_btn"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Download"
+        android:textAllCaps="false"
+        android:backgroundTint="@color/vg_green"
+        android:textColor="@color/white"
+        app:cornerRadius="12dp" />
+
 </LinearLayout>
