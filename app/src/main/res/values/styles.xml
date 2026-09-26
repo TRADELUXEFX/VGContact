@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.VGKontact" parent="Theme.MaterialComponents.Light">
+    <style name="Theme.VGContact" parent="Theme.MaterialComponents.Light">
         <item name="colorPrimary">@color/vg_green</item>
         <item name="colorPrimaryVariant">@color/vg_green_dark</item>
         <item name="colorSecondary">@color/vg_green</item>
