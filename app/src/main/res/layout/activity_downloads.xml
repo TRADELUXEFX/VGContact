@@ -41,9 +41,14 @@
                     android:id="@+id/filter_all"
                     style="?android:attr/borderlessButtonStyle"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
+                    android:minWidth="0dp"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
                     android:text="All"
-                    android:backgroundTint="@color/vg_green"
+                    android:textAllCaps="false"
+                    android:textSize="13sp"
+                    android:background="@drawable/filter_chip_selected_background"
                     android:textColor="@color/white"
                     android:layout_marginEnd="8dp" />
 
@@ -51,9 +56,14 @@
                     android:id="@+id/filter_business"
                     style="?android:attr/borderlessButtonStyle"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
+                    android:minWidth="0dp"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
                     android:text="Business"
-                    android:backgroundTint="@color/vg_green_tint"
+                    android:textAllCaps="false"
+                    android:textSize="13sp"
+                    android:background="@drawable/filter_chip_default_background"
                     android:textColor="@color/vg_green_dark"
                     android:layout_marginEnd="8dp" />
 
@@ -61,9 +71,14 @@
                     android:id="@+id/filter_social"
                     style="?android:attr/borderlessButtonStyle"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
+                    android:minWidth="0dp"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
                     android:text="Social"
-                    android:backgroundTint="@color/vg_green_tint"
+                    android:textAllCaps="false"
+                    android:textSize="13sp"
+                    android:background="@drawable/filter_chip_default_background"
                     android:textColor="@color/vg_green_dark"
                     android:layout_marginEnd="8dp" />
 
@@ -71,9 +86,14 @@
                     android:id="@+id/filter_other"
                     style="?android:attr/borderlessButtonStyle"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
+                    android:minWidth="0dp"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
                     android:text="Other"
-                    android:backgroundTint="@color/vg_green_tint"
+                    android:textAllCaps="false"
+                    android:textSize="13sp"
+                    android:background="@drawable/filter_chip_default_background"
                     android:textColor="@color/vg_green_dark" />
             </LinearLayout>
         </HorizontalScrollView>
