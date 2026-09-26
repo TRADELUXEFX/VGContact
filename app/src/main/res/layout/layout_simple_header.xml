@@ -12,7 +12,7 @@
         android:id="@+id/headerTitleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="VGContact"
+        android:text=""
         android:textColor="@color/white"
         android:textSize="19sp"
         android:textStyle="bold" />
