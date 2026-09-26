@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.VGKontact" parent="Theme.MaterialComponents.Light">
+        <item name="colorPrimary">@color/vg_green</item>
+        <item name="colorPrimaryVariant">@color/vg_green_dark</item>
+        <item name="colorSecondary">@color/vg_green</item>
+        <item name="colorSecondaryVariant">@color/vg_green_dark</item>
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+    </style>
+
+    <!-- Button Styles -->
+    <style name="ButtonPrimary" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/vg_green</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="ButtonOutlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="strokeColor">@color/vg_green</item>
+        <item name="android:textColor">@color/vg_green</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+
+    <style name="ButtonDestructive" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="strokeColor">@color/vg_red</item>
+        <item name="android:textColor">@color/vg_red</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+
+    <!-- Card Styles -->
+    <style name="CardStyle" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/white</item>
+        <item name="cardCornerRadius">16dp</item>
+        <item name="strokeColor">@color/card_border</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+</resources>
