@@ -4,14 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Button
-import android.widget.ImageButton
-import android.widget.Switch
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import java.text.SimpleDateFormat
 import java.util.*
-import android.widget.ImageView
 
 class ProfileActivity : AppCompatActivity() {
 
@@ -46,27 +42,6 @@ class ProfileActivity : AppCompatActivity() {
         val androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
         androidIdText.text = "Android ID: $androidId"
 
-        // Settings
-        val notificationsSwitch = findViewById<Switch>(R.id.notifications_switch)
-        val darkModeSwitch = findViewById<Switch>(R.id.dark_mode_switch)
-
-        notificationsSwitch.isChecked = true
-        darkModeSwitch.isChecked = false
-
-        notificationsSwitch.setOnCheckedChangeListener { _, isChecked ->
-            Toast.makeText(this, if (isChecked) "Notifications enabled" else "Notifications disabled", Toast.LENGTH_SHORT).show()
-        }
-
-        darkModeSwitch.setOnCheckedChangeListener { _, isChecked ->
-            Toast.makeText(this, if (isChecked) "Dark mode enabled" else "Dark mode disabled", Toast.LENGTH_SHORT).show()
-        }
-
-        // Clear cache button
-        val clearCacheBtn = findViewById<Button>(R.id.clear_cache_btn)
-        clearCacheBtn.setOnClickListener {
-            Toast.makeText(this, "Cache cleared", Toast.LENGTH_SHORT).show()
-        }
-
         // Logout button
         val logoutBtn = findViewById<Button>(R.id.logout_btn)
         logoutBtn.setOnClickListener {
@@ -75,17 +50,10 @@ class ProfileActivity : AppCompatActivity() {
             finish()
         }
 
-        // Chat button
-        val chatBtn = findViewById<ImageButton>(R.id.chat_btn)
-        chatBtn.setOnClickListener {
-            Toast.makeText(this, "Opening chat support", Toast.LENGTH_SHORT).show()
-        }
-
-        // Bottom Navigation
-
         // Simple title header (this screen doesn't show the full profile header)
         findViewById<TextView>(R.id.headerTitleText).text = "Profile"
         setupBottomNav()
+        ChatSupportHelper.attach(this)
     }
 
     private fun setupBottomNav() {
