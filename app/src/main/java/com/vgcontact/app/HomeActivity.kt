@@ -8,7 +8,6 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class HomeActivity : AppCompatActivity() {
 
@@ -26,10 +25,6 @@ class HomeActivity : AppCompatActivity() {
             finish()
             return
         }
-
-        // Header
-        val headerTitle = findViewById<TextView>(R.id.header_title)
-        headerTitle.text = "VGContact"
 
         // Stats
         val downloadsCount = findViewById<TextView>(R.id.downloads_count)
@@ -61,30 +56,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setupBottomNav() {
-        val navView = findViewById<BottomNavigationView>(R.id.bottom_nav)
-        navView.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_home -> true
-                R.id.nav_repost -> {
-                    startActivity(Intent(this, RepostActivity::class.java))
-                    false
-                }
-                R.id.nav_downloads -> {
-                    startActivity(Intent(this, DownloadsActivity::class.java))
-                    false
-                }
-                R.id.nav_community -> {
-                    startActivity(Intent(this, CommunityActivity::class.java))
-                    false
-                }
-                R.id.nav_profile -> {
-                    startActivity(Intent(this, ProfileActivity::class.java))
-                    false
-                }
-                else -> false
-            }
-        }
-        navView.selectedItemId = R.id.nav_home
+        BottomNavHelper.setup(this, BottomNavHelper.Tab.HOME)
     }
 
 }
