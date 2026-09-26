@@ -23,7 +23,7 @@ class ProfileActivity : AppCompatActivity() {
         sessionManager = SessionManager(this)
 
         if (!sessionManager.isLoggedIn()) {
-            startActivity(Intent(this, LoginActivity::class.java))
+            startActivity(Intent(this, RegisterActivity::class.java))
             finish()
             return
         }
@@ -74,7 +74,7 @@ class ProfileActivity : AppCompatActivity() {
         val logoutBtn = findViewById<Button>(R.id.logout_btn)
         logoutBtn.setOnClickListener {
             sessionManager.logout()
-            startActivity(Intent(this, LoginActivity::class.java))
+            startActivity(Intent(this, RegisterActivity::class.java))
             finish()
         }
 
