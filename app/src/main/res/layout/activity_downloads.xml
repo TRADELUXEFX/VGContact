@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background">
@@ -22,6 +23,61 @@
                 android:layout_gravity="center_vertical"
                 android:paddingStart="16dp" />
         </FrameLayout>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="12dp"
+            android:paddingBottom="4dp"
+            android:scrollbars="none">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp">
+
+                <Button
+                    android:id="@+id/filter_all"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="All"
+                    android:backgroundTint="@color/vg_green"
+                    android:textColor="@color/white"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/filter_business"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Business"
+                    android:backgroundTint="@color/vg_green_tint"
+                    android:textColor="@color/vg_green_dark"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/filter_social"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Social"
+                    android:backgroundTint="@color/vg_green_tint"
+                    android:textColor="@color/vg_green_dark"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/filter_other"
+                    style="?android:attr/borderlessButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Other"
+                    android:backgroundTint="@color/vg_green_tint"
+                    android:textColor="@color/vg_green_dark" />
+            </LinearLayout>
+        </HorizontalScrollView>
+
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -32,27 +88,28 @@
                 android:orientation="vertical"
                 android:padding="16dp">
                 <LinearLayout
-                    android:id="@+id/content_container"
+                    android:id="@+id/file_list_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical" />
             </LinearLayout>
         </ScrollView>
-        <Button
+        <ImageButton
             android:id="@+id/chat_btn"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_gravity="bottom|end"
             android:layout_margin="16dp"
             android:background="@color/vg_green"
-            android:text="💬"
-            android:textSize="24sp" />
+            android:src="@drawable/ic_chat"
+            app:tint="@color/white"
+            android:padding="12dp"
+            android:contentDescription="Chat support" />
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_nav"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/vg_dark"
-            app:menu="@menu/bottom_nav_menu"
-            xmlns:app="http://schemas.android.com/apk/res-auto" />
+            app:menu="@menu/bottom_nav_menu" />
     </LinearLayout>
 </FrameLayout>
