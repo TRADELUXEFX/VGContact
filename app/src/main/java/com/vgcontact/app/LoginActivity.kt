@@ -59,7 +59,7 @@ class LoginActivity : AppCompatActivity() {
                             startActivity(Intent(this, HomeActivity::class.java))
                             finish()
                         } else {
-                            Toast.makeText(this, "That username may already be taken", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "Couldn't sign up — check your connection, or that username may be taken", Toast.LENGTH_LONG).show()
                         }
                     }
                 }
