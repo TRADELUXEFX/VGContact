@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">VGKontact</string>
+    <string name="app_name">VGContact</string>
 
     <!-- Login -->
-    <string name="login_title">VGKontact</string>
+    <string name="login_title">VGContact</string>
     <string name="login_email">Email</string>
     <string name="login_password">Password</string>
     <string name="login_button">Login</string>
@@ -11,7 +11,7 @@
     <string name="signup_create">Create Account</string>
 
     <!-- Home -->
-    <string name="home_title">VGKontact</string>
+    <string name="home_title">VGContact</string>
     <string name="home_total_downloads">Total Downloads</string>
     <string name="home_total_reposts">Total Reposts</string>
     <string name="home_join_community">🔗 JOIN COMMUNITY</string>
