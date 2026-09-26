@@ -1,6 +1,5 @@
 package com.vgcontact.app
 
-import android.content.Context
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.MediaType.Companion.toMediaType
@@ -8,14 +7,9 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 
 object SupabaseClient {
-    private lateinit var supabaseUrl: String
-    private lateinit var anonKey: String
+    private val supabaseUrl = BuildConfig.SUPABASE_URL
+    private val anonKey = BuildConfig.SUPABASE_ANON_KEY
     private val client = OkHttpClient()
-
-    fun initialize(context: Context) {
-        supabaseUrl = BuildConfig.SUPABASE_URL
-        anonKey = BuildConfig.SUPABASE_ANON_KEY
-    }
 
     // No password, no Supabase auth session. Identity is the android_id;
     // registering just upserts a row in `users` keyed on it (anon key + RLS,
