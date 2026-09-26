@@ -8,21 +8,25 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-        <FrameLayout
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:background="@color/vg_green">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/header_gradient"
+            android:paddingTop="24dp"
+            android:paddingBottom="16dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
             <TextView
                 android:id="@+id/header_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:gravity="center_vertical"
-                android:layout_gravity="center_vertical"
-                android:paddingStart="16dp" />
-        </FrameLayout>
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -45,15 +49,15 @@
                         android:layout_weight="1"
                         android:orientation="vertical"
                         android:gravity="center"
-                        android:background="@color/stats_card_fill"
-                        android:padding="12dp"
+                        android:background="@drawable/card_background"
+                        android:padding="16dp"
                         android:layout_marginEnd="8dp">
                         <TextView
                             android:id="@+id/downloads_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="0"
-                            android:textSize="20sp"
+                            android:textSize="22sp"
                             android:textStyle="bold"
                             android:textColor="@color/vg_green_dark" />
                         <TextView
@@ -61,7 +65,8 @@
                             android:layout_height="wrap_content"
                             android:text="Downloads"
                             android:textSize="12sp"
-                            android:textColor="@color/text_muted" />
+                            android:textColor="@color/text_muted"
+                            android:layout_marginTop="2dp" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -70,15 +75,15 @@
                         android:layout_weight="1"
                         android:orientation="vertical"
                         android:gravity="center"
-                        android:background="@color/stats_card_fill"
-                        android:padding="12dp"
+                        android:background="@drawable/card_background"
+                        android:padding="16dp"
                         android:layout_marginStart="8dp">
                         <TextView
                             android:id="@+id/reposts_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="0"
-                            android:textSize="20sp"
+                            android:textSize="22sp"
                             android:textStyle="bold"
                             android:textColor="@color/vg_green_dark" />
                         <TextView
@@ -86,17 +91,23 @@
                             android:layout_height="wrap_content"
                             android:text="Reposts"
                             android:textSize="12sp"
-                            android:textColor="@color/text_muted" />
+                            android:textColor="@color/text_muted"
+                            android:layout_marginTop="2dp" />
                     </LinearLayout>
                 </LinearLayout>
 
                 <Button
                     android:id="@+id/join_community_btn"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/button_height"
+                    android:layout_height="56dp"
                     android:text="Join Our Community"
+                    android:textAllCaps="false"
                     android:backgroundTint="@color/vg_green"
                     android:textColor="@color/white"
+                    app:icon="@drawable/ic_link"
+                    app:iconTint="@color/white"
+                    app:iconGravity="textStart"
+                    app:cornerRadius="16dp"
                     android:layout_marginBottom="16dp" />
 
                 <LinearLayout
@@ -108,14 +119,15 @@
         </ScrollView>
         <ImageButton
             android:id="@+id/chat_btn"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
             android:layout_gravity="bottom|end"
             android:layout_margin="16dp"
-            android:background="@color/vg_green"
+            android:background="@drawable/row_icon_circle_background"
             android:src="@drawable/ic_chat"
-            app:tint="@color/white"
-            android:padding="12dp"
+            app:tint="@color/vg_green_dark"
+            android:padding="14dp"
+            android:elevation="4dp"
             android:contentDescription="Chat support" />
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_nav"
