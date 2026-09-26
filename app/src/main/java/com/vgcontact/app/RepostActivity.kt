@@ -10,6 +10,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlin.concurrent.thread
 
 class RepostActivity : AppCompatActivity() {
 
@@ -28,9 +29,13 @@ class RepostActivity : AppCompatActivity() {
             return
         }
 
+        val fileId = intent.getStringExtra("file_id")
+        val fileName = intent.getStringExtra("file_name") ?: "this file"
+        val userId = sessionManager.getUserId()
+
         // Header
         val headerTitle = findViewById<TextView>(R.id.header_title)
-        headerTitle.text = "Repost to Unlock"
+        headerTitle.text = if (fileId.isNullOrBlank()) "Repost to Unlock" else "Unlock $fileName"
 
         val statusText = findViewById<TextView>(R.id.repost_status)
         val repostBtn = findViewById<Button>(R.id.repost_btn)
@@ -40,35 +45,57 @@ class RepostActivity : AppCompatActivity() {
 
         // Repost button
         repostBtn.setOnClickListener {
+            if (fileId.isNullOrBlank() || userId.isNullOrBlank()) {
+                Toast.makeText(this, "Pick a file from Downloads first", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             try {
                 val intent = Intent(Intent.ACTION_VIEW)
                 intent.data = Uri.parse("https://wa.me/?text=Check%20out%20VGContact")
                 startActivity(intent)
-
-                // Simulate verification after 5 seconds
-                statusText.text = "⏳ Waiting for verification..."
-                repostBtn.isEnabled = false
-
-                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                    if (!isUnlocked) {
-                        isUnlocked = true
-                        statusText.visibility = android.view.View.GONE
-                        unlockedCodeLayout?.visibility = android.view.View.VISIBLE
-                        
-                        val code = "ABC123"
-                        unlockedCode.text = code
-
-                        copyCodeBtn.setOnClickListener {
-                            val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-                            val clip = ClipData.newPlainText("unlock_code", code)
-                            clipboard.setPrimaryClip(clip)
-                            Toast.makeText(this, "Code copied!", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }, 5000)
-
             } catch (e: Exception) {
                 Toast.makeText(this, "Error opening WhatsApp", Toast.LENGTH_SHORT).show()
+            }
+
+            statusText.text = "⏳ Verifying your repost..."
+            repostBtn.isEnabled = false
+
+            thread {
+                SupabaseClient.createRepost(userId, fileId) { repostSuccess, code ->
+                    if (!repostSuccess || code == null) {
+                        runOnUiThread {
+                            statusText.text = "Repost to Unlock"
+                            repostBtn.isEnabled = true
+                            Toast.makeText(this, "Couldn't verify repost. Try again.", Toast.LENGTH_SHORT).show()
+                        }
+                        return@createRepost
+                    }
+
+                    SupabaseClient.unlockFile(userId, fileId) { unlockSuccess ->
+                        runOnUiThread {
+                            repostBtn.isEnabled = true
+                            if (unlockSuccess) {
+                                isUnlocked = true
+                                statusText.visibility = android.view.View.GONE
+                                unlockedCodeLayout?.visibility = android.view.View.VISIBLE
+                                unlockedCode.text = code
+
+                                sessionManager.saveTotalReposts(sessionManager.getTotalReposts() + 1)
+
+                                copyCodeBtn.setOnClickListener {
+                                    val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+                                    val clip = ClipData.newPlainText("unlock_code", code)
+                                    clipboard.setPrimaryClip(clip)
+                                    Toast.makeText(this, "Code copied!", Toast.LENGTH_SHORT).show()
+                                }
+                            } else {
+                                statusText.text = "Repost to Unlock"
+                                Toast.makeText(this, "Repost saved, but unlock failed. Try again.", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }
             }
         }
 
