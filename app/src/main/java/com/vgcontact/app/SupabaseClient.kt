@@ -1,5 +1,8 @@
 package com.vgcontact.app
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.MediaType.Companion.toMediaType
@@ -17,6 +20,15 @@ object SupabaseClient {
     // through this check instead of crashing on a malformed URL.
     private fun isConfigured(): Boolean {
         return supabaseUrl.isNotBlank() && anonKey.isNotBlank() && supabaseUrl.startsWith("http")
+    }
+
+    // Cheap connectivity check before spending a request on a device
+    // that's plainly offline (e.g. airplane mode).
+    fun isOnline(context: Context): Boolean {
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager ?: return false
+        val network = cm.activeNetwork ?: return false
+        val capabilities = cm.getNetworkCapabilities(network) ?: return false
+        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
     // No password, no Supabase auth session. Identity is the android_id;
