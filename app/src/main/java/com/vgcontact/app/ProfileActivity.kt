@@ -1,9 +1,10 @@
 package com.vgcontact.app
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
@@ -46,7 +47,7 @@ class ProfileActivity : AppCompatActivity() {
         val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
         createdText.text = "Account Created: ${dateFormat.format(Date())}"
 
-        val androidId = Build.ID
+        val androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
         androidIdText.text = "Android ID: $androidId"
 
         // Settings
@@ -79,7 +80,7 @@ class ProfileActivity : AppCompatActivity() {
         }
 
         // Chat button
-        val chatBtn = findViewById<Button>(R.id.chat_btn)
+        val chatBtn = findViewById<ImageButton>(R.id.chat_btn)
         chatBtn.setOnClickListener {
             Toast.makeText(this, "Opening chat support", Toast.LENGTH_SHORT).show()
         }
