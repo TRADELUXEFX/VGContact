@@ -4,11 +4,9 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
-import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import android.widget.ImageView
 
 class CommunityActivity : AppCompatActivity() {
 
@@ -41,20 +39,13 @@ class CommunityActivity : AppCompatActivity() {
         // Chat support button
         val chatBtn = findViewById<Button>(R.id.chat_support_btn)
         chatBtn.setOnClickListener {
-            Toast.makeText(this, "Opening chat support", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(this, ChatSupportActivity::class.java))
         }
-
-        // Floating chat button
-        val floatingChatBtn = findViewById<ImageButton>(R.id.floating_chat_btn)
-        floatingChatBtn.setOnClickListener {
-            Toast.makeText(this, "Opening chat support", Toast.LENGTH_SHORT).show()
-        }
-
-        // Bottom Navigation
 
         // Simple title header (this screen doesn't show the full profile header)
         findViewById<TextView>(R.id.headerTitleText).text = "Community"
         setupBottomNav()
+        ChatSupportHelper.attach(this)
     }
 
 
