@@ -14,9 +14,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.VGContact">
 
-        <!-- Launcher: Login Screen -->
+        <!-- Launcher: Onboarding / Registration Screen -->
         <activity
-            android:name=".LoginActivity"
+            android:name=".RegisterActivity"
             android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -24,6 +24,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Login: only reached via the "Already have an account?" link -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- Permissions: shown once after register/login, before Home -->
+        <activity
+            android:name=".PermissionsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
 
         <!-- Home Screen -->
         <activity
