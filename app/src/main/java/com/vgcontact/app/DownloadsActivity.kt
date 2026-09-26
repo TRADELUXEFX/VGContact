@@ -3,6 +3,7 @@ package com.vgcontact.app
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -62,10 +63,21 @@ class DownloadsActivity : AppCompatActivity() {
 
     private fun selectFilter(category: String, vararg buttons: Button) {
         selectedCategory = category
-        buttons.forEach {
-            it.alpha = 0.5f
+        val selectedIndex = when (category) {
+            "All" -> 0
+            "Business" -> 1
+            "Social" -> 2
+            else -> 3
         }
-        buttons[0].alpha = 1f
+        buttons.forEachIndexed { index, button ->
+            if (index == selectedIndex) {
+                button.setBackgroundResource(R.drawable.filter_chip_selected_background)
+                button.setTextColor(ContextCompat.getColor(this, R.color.white))
+            } else {
+                button.setBackgroundResource(R.drawable.filter_chip_default_background)
+                button.setTextColor(ContextCompat.getColor(this, R.color.vg_green_dark))
+            }
+        }
         loadFiles(category)
     }
 
@@ -94,16 +106,21 @@ class DownloadsActivity : AppCompatActivity() {
                 val fileView = layoutInflater.inflate(R.layout.item_file, fileListContainer, false)
                 val fileName = fileView.findViewById<TextView>(R.id.file_name)
                 val fileCount = fileView.findViewById<TextView>(R.id.file_count)
+                val statusPill = fileView.findViewById<LinearLayout>(R.id.file_status_pill)
+                val statusIconView = fileView.findViewById<ImageView>(R.id.file_status_icon)
                 val fileStatus = fileView.findViewById<TextView>(R.id.file_status)
                 val downloadBtn = fileView.findViewById<Button>(R.id.download_btn)
 
                 fileName.text = file["name"]
                 fileCount.text = file["count"]
                 fileStatus.text = file["status"]
-                val statusIcon = if (file["status"] == "Locked") R.drawable.ic_lock else R.drawable.ic_unlock
-                fileStatus.setCompoundDrawablesWithIntrinsicBounds(
-                    ContextCompat.getDrawable(this, statusIcon), null, null, null
-                )
+
+                val isLocked = file["status"] == "Locked"
+                statusIconView.setImageResource(if (isLocked) R.drawable.ic_lock else R.drawable.ic_unlock)
+                val statusColor = ContextCompat.getColor(this, if (isLocked) R.color.locked_text else R.color.success_text)
+                statusIconView.setColorFilter(statusColor)
+                fileStatus.setTextColor(statusColor)
+                statusPill.setBackgroundResource(if (isLocked) R.drawable.pill_locked_background else R.drawable.pill_unlocked_background)
 
                 downloadBtn.setOnClickListener {
                     Toast.makeText(this, "Downloading ${file["name"]}", Toast.LENGTH_SHORT).show()
