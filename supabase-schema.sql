@@ -1,4 +1,4 @@
--- VGKontact MVP - Complete Supabase Schema
+-- VGContact MVP - Complete Supabase Schema
 -- Copy-paste into Supabase SQL Editor
 
 -- Users Table
