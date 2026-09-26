@@ -14,6 +14,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.VGContact">
 
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
+
         <!-- Launcher: Onboarding / Registration Screen -->
         <activity
             android:name=".RegisterActivity"
