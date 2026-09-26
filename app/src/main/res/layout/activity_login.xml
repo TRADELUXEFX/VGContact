@@ -11,7 +11,6 @@
         android:orientation="vertical">
 
         <!-- ==== GREEN HEADER ==== -->
-        <!-- KEPT: Original VGContact header style -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -26,7 +25,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Welcome to"
+                android:text="Welcome back to"
                 android:textSize="15sp"
                 android:alpha="0.92"
                 android:gravity="center"
@@ -45,7 +44,6 @@
         </LinearLayout>
 
         <!-- ==== WHITE BODY ==== -->
-        <!-- CHANGED: Using layout_weight="1" with layout_height="0dp" instead of ScrollView -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -58,44 +56,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="USERNAME"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.05"
+                android:text="Enter the phone number you registered with. If this is the same device, you'll be logged in automatically."
+                android:textSize="13sp"
                 android:textColor="@color/text_muted"
-                android:layout_marginBottom="8dp" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/login_username"
-                android:textColorHint="@color/text_muted"
-                app:hintTextColor="@color/vg_green_dark"
-                app:boxBackgroundMode="outline"
-                app:boxBackgroundColor="@color/field_bg"
-                app:boxStrokeColor="@color/vg_green"
-                app:boxStrokeWidth="1.5dp"
-                app:boxCornerRadiusTopStart="14dp"
-                app:boxCornerRadiusTopEnd="14dp"
-                app:boxCornerRadiusBottomStart="14dp"
-                app:boxCornerRadiusBottomEnd="14dp"
-                android:layout_marginBottom="16dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/username_input"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:textSize="15sp"
-                    android:textColor="@color/vg_dark"
-                    android:includeFontPadding="false"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp"
-                    android:paddingTop="14dp"
-                    android:paddingBottom="14dp" />
-
-            </com.google.android.material.textfield.TextInputLayout>
+                android:layout_marginBottom="20dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -125,7 +89,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/phone_input"
+                    android:id="@+id/login_phone_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="phone"
@@ -139,51 +103,9 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="REFERRAL USERNAME (OPTIONAL)"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.05"
-                android:textColor="@color/text_muted"
-                android:layout_marginBottom="8dp" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/login_referral"
-                android:textColorHint="@color/text_muted"
-                app:hintTextColor="@color/vg_green_dark"
-                app:boxBackgroundMode="outline"
-                app:boxBackgroundColor="@color/field_bg"
-                app:boxStrokeColor="@color/vg_green"
-                app:boxStrokeWidth="1.5dp"
-                app:boxCornerRadiusTopStart="14dp"
-                app:boxCornerRadiusTopEnd="14dp"
-                app:boxCornerRadiusBottomStart="14dp"
-                app:boxCornerRadiusBottomEnd="14dp"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/referral_input"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:textSize="15sp"
-                    android:textColor="@color/vg_dark"
-                    android:includeFontPadding="false"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp"
-                    android:paddingTop="14dp"
-                    android:paddingBottom="14dp" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
         </LinearLayout>
 
         <!-- ==== BUTTON + PROGRESS FOOTER ==== -->
-        <!-- CHANGED: Added ProgressBar alongside button -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -194,7 +116,7 @@
                 android:id="@+id/login_btn"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="@string/login_button"
+                android:text="Log In"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textAllCaps="false"
@@ -203,7 +125,6 @@
                 android:gravity="center"
                 app:cornerRadius="16dp" />
 
-            <!-- ADDED: ProgressBar for loading state -->
             <ProgressBar
                 android:id="@+id/progressBar"
                 android:layout_width="24dp"
