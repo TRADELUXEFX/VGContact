@@ -71,16 +71,6 @@
             android:src="@drawable/ic_bell"
             app:tint="@color/white"
             android:contentDescription="Notifications" />
-
-        <ImageView
-            android:id="@+id/headerTrashIcon"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:padding="8dp"
-            android:background="@drawable/header_icon_circle_background"
-            android:src="@drawable/ic_trash"
-            app:tint="@color/white"
-            android:contentDescription="Clear cache" />
     </LinearLayout>
 
     <LinearLayout
@@ -106,7 +96,7 @@
             android:maxLines="1"
             android:ellipsize="end" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/headerCopyBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -121,9 +111,10 @@
             android:textSize="11sp"
             android:textStyle="bold"
             android:textColor="@color/vg_green_dark"
-            android:backgroundTint="@color/white"
-            android:insetTop="0dp"
-            android:insetBottom="0dp" />
+            app:backgroundTint="@color/white"
+            app:cornerRadius="14dp"
+            app:insetTop="0dp"
+            app:insetBottom="0dp" />
     </LinearLayout>
 
 </LinearLayout>
