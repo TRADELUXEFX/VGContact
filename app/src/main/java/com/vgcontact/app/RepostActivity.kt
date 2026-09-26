@@ -6,12 +6,10 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
-import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlin.concurrent.thread
-import android.widget.ImageView
 
 class RepostActivity : AppCompatActivity() {
 
@@ -55,14 +53,14 @@ class RepostActivity : AppCompatActivity() {
                 Toast.makeText(this, "Error opening WhatsApp", Toast.LENGTH_SHORT).show()
             }
 
-            statusText.text = "⏳ Verifying your repost..."
+            statusText.text = "⏳ Verifying your repost — this can take a few seconds"
             repostBtn.isEnabled = false
 
             thread {
                 SupabaseClient.createRepost(userId, fileId) { repostSuccess, code ->
                     if (!repostSuccess || code == null) {
                         runOnUiThread {
-                            statusText.text = "Repost to Unlock"
+                            statusText.text = "Couldn't verify that repost. Send the WhatsApp message again, then tap the button once more."
                             repostBtn.isEnabled = true
                             Toast.makeText(this, "Couldn't verify repost. Try again.", Toast.LENGTH_SHORT).show()
                         }
@@ -87,7 +85,7 @@ class RepostActivity : AppCompatActivity() {
                                     Toast.makeText(this, "Code copied!", Toast.LENGTH_SHORT).show()
                                 }
                             } else {
-                                statusText.text = "Repost to Unlock"
+                                statusText.text = "Repost saved, but we couldn't unlock the file. Tap the button above to try again."
                                 Toast.makeText(this, "Repost saved, but unlock failed. Try again.", Toast.LENGTH_SHORT).show()
                             }
                         }
@@ -96,17 +94,10 @@ class RepostActivity : AppCompatActivity() {
             }
         }
 
-        // Chat button
-        val chatBtn = findViewById<ImageButton>(R.id.chat_btn)
-        chatBtn.setOnClickListener {
-            Toast.makeText(this, "Opening chat support", Toast.LENGTH_SHORT).show()
-        }
-
-        // Bottom Navigation
-
         // Simple title header (this screen doesn't show the full profile header)
         findViewById<TextView>(R.id.headerTitleText).text = "Repost"
         setupBottomNav()
+        ChatSupportHelper.attach(this)
     }
 
     private fun setupBottomNav() {
