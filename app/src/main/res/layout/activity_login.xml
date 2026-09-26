@@ -190,7 +190,7 @@
                 android:orientation="vertical"
                 android:padding="20dp">
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/login_btn"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
