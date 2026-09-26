@@ -1,5 +1,6 @@
 package com.vgcontact.app
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
@@ -39,40 +40,72 @@ class LoginActivity : AppCompatActivity() {
         val androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
 
         loginBtn.setOnClickListener {
-            val username = usernameInput.text.toString().trim()
-            val phone = phoneInput.text.toString().trim()
-            val referral = referralInput.text.toString().trim()
+            // ← ADDED: try/catch that shows the REAL crash reason in a
+            // popup on screen, so we can see exactly what's failing
+            // without needing Android Studio or a logcat app. Remove
+            // this wrapper once the real bug is found and fixed.
+            try {
+                val username = usernameInput.text.toString().trim()
+                val phone = phoneInput.text.toString().trim()
+                val referral = referralInput.text.toString().trim()
 
-            if (username.isEmpty() || phone.isEmpty()) {
-                Toast.makeText(this, "Enter your username and phone number", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
+                if (username.isEmpty() || phone.isEmpty()) {
+                    Toast.makeText(this, "Enter your username and phone number", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
 
-            if (!SupabaseClient.isOnline(this)) {
-                Toast.makeText(this, "No internet connection. Check your network and try again.", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
+                if (!SupabaseClient.isOnline(this)) {
+                    Toast.makeText(this, "No internet connection. Check your network and try again.", Toast.LENGTH_LONG).show()
+                    return@setOnClickListener
+                }
 
-            setLoading(true)  // ← CHANGED: Use proper loading state function
+                setLoading(true)
 
-            thread {
-                SupabaseClient.registerOrFetchUser(androidId, username, phone, referral.ifEmpty { null }) { success, user ->
-                    runOnUiThread {
-                        setLoading(false)  // ← CHANGED: Properly clear loading state
+                thread {
+                    try {
+                        SupabaseClient.registerOrFetchUser(androidId, username, phone, referral.ifEmpty { null }) { success, user ->
+                            runOnUiThread {
+                                try {
+                                    setLoading(false)
 
-                        if (success && user != null) {
-                            sessionManager.saveUsername(user.optString("username", username))
-                            sessionManager.savePhone(user.optString("phone", phone))
-                            sessionManager.saveUserId(user.optString("id", ""))
-                            startActivity(Intent(this, HomeActivity::class.java))
-                            finish()
-                        } else {
-                            Toast.makeText(this, "Couldn't sign up — check your connection, or that username may be taken", Toast.LENGTH_LONG).show()
+                                    if (success && user != null) {
+                                        sessionManager.saveUsername(user.optString("username", username))
+                                        sessionManager.savePhone(user.optString("phone", phone))
+                                        sessionManager.saveUserId(user.optString("id", ""))
+                                        startActivity(Intent(this, HomeActivity::class.java))
+                                        finish()
+                                    } else {
+                                        Toast.makeText(this, "Couldn't sign up — check your connection, or that username may be taken", Toast.LENGTH_LONG).show()
+                                    }
+                                } catch (e: Exception) {
+                                    showCrashDialog(e, "callback (UI thread)")
+                                }
+                            }
+                        }
+                    } catch (e: Exception) {
+                        runOnUiThread {
+                            setLoading(false)
+                            showCrashDialog(e, "background thread")
                         }
                     }
                 }
+            } catch (e: Exception) {
+                setLoading(false)
+                showCrashDialog(e, "button click")
             }
         }
+    }
+
+    // ← ADDED: Shows the exact exception type, message, and top of the
+    // stack trace in a dialog so we can read it straight off the phone
+    // screen — no computer or extra app needed.
+    private fun showCrashDialog(e: Exception, where: String) {
+        val trace = e.stackTrace.take(10).joinToString("\n") { "at $it" }
+        AlertDialog.Builder(this)
+            .setTitle("Error in: $where")
+            .setMessage("${e.javaClass.simpleName}: ${e.message}\n\n$trace")
+            .setPositiveButton("OK", null)
+            .show()
     }
 
     // ← ADDED: Proper loading state management function
