@@ -92,7 +92,7 @@ class RegisterActivity : AppCompatActivity() {
                             sessionManager.saveUsername(user.optString("username", username))
                             sessionManager.savePhone(user.optString("phone", phone))
                             sessionManager.saveUserId(user.optString("id", ""))
-                            startActivity(Intent(this, HomeActivity::class.java))
+                            startActivity(Intent(this, PermissionsActivity::class.java))
                             finish()
                         } else {
                             // Most likely cause: this username or phone is
