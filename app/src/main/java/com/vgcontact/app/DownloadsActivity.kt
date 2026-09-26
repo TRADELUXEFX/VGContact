@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class DownloadsActivity : AppCompatActivity() {
@@ -78,13 +79,13 @@ class DownloadsActivity : AppCompatActivity() {
                 "name" to "Business_Contacts_Sept26.vcf",
                 "count" to "150 Contacts",
                 "category" to "Business",
-                "status" to "🔒 Locked"
+                "status" to "Locked"
             ),
             mapOf(
                 "name" to "Social_Influencers_Sept26.vcf",
                 "count" to "250 Contacts",
                 "category" to "Social",
-                "status" to "🔓 Unlocked"
+                "status" to "Unlocked"
             )
         )
 
@@ -99,6 +100,10 @@ class DownloadsActivity : AppCompatActivity() {
                 fileName.text = file["name"]
                 fileCount.text = file["count"]
                 fileStatus.text = file["status"]
+                val statusIcon = if (file["status"] == "Locked") R.drawable.ic_lock else R.drawable.ic_unlock
+                fileStatus.setCompoundDrawablesWithIntrinsicBounds(
+                    ContextCompat.getDrawable(this, statusIcon), null, null, null
+                )
 
                 downloadBtn.setOnClickListener {
                     Toast.makeText(this, "Downloading ${file["name"]}", Toast.LENGTH_SHORT).show()
