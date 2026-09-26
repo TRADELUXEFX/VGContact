@@ -98,6 +98,53 @@ object SupabaseClient {
         }
     }
 
+    // Looks an account up by phone number and confirms this device's
+    // android_id matches the one on file - that's what makes login
+    // "seamless" (no OTP, no password): if the phone number was
+    // registered from *this* physical device, we trust it and log
+    // them straight in. If the numbers match but the android_id
+    // doesn't (different phone), we refuse and report a mismatch so
+    // the caller can show the right message instead of silently
+    // logging in the wrong device.
+    fun fetchUserByPhone(
+        phone: String,
+        androidId: String,
+        callback: (found: Boolean, deviceMatches: Boolean, user: JSONObject?) -> Unit
+    ) {
+        if (!isConfigured()) {
+            callback(false, false, null)
+            return
+        }
+
+        try {
+            val url = "$supabaseUrl/rest/v1/users?phone=eq.$phone&select=*"
+            val request = Request.Builder()
+                .url(url)
+                .addHeader("apikey", anonKey)
+                .addHeader("Authorization", "Bearer $anonKey")
+                .get()
+                .build()
+
+            client.newCall(request).execute().use { response ->
+                if (response.isSuccessful) {
+                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
+                    if (arr.length() > 0) {
+                        val user = arr.getJSONObject(0)
+                        val storedAndroidId = user.optString("android_id", "")
+                        val matches = storedAndroidId.isNotBlank() && storedAndroidId == androidId
+                        callback(true, matches, user)
+                    } else {
+                        callback(false, false, null)
+                    }
+                } else {
+                    callback(false, false, null)
+                }
+            }
+        } catch (e: Exception) {
+            callback(false, false, null)
+        }
+    }
+
     // Published files, newest first.
     fun fetchFiles(callback: (Boolean, org.json.JSONArray?) -> Unit) {
         if (!isConfigured()) {
