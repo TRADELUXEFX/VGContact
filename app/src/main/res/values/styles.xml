@@ -13,6 +13,11 @@
         <item name="fontFamily">@font/poppins</item>
     </style>
 
+    <style name="Theme.VGContact.Splash" parent="Theme.VGContact">
+        <item name="android:statusBarColor">@color/vg_dark</item>
+        <item name="android:windowBackground">@color/vg_dark</item>
+    </style>
+
     <!-- Text Appearance Styles for other Poppins weights -->
     <style name="TextAppearance.Poppins.Medium" parent="android:TextAppearance">
         <item name="android:fontFamily">@font/poppins_medium</item>

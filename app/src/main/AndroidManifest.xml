@@ -18,16 +18,23 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-        <!-- Launcher: Onboarding / Registration Screen -->
+        <!-- Launcher: brief dark splash while we check session state -->
         <activity
-            android:name=".RegisterActivity"
+            android:name=".SplashActivity"
             android:exported="true"
+            android:theme="@style/Theme.VGContact.Splash"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Onboarding / Registration Screen -->
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
 
         <!-- Login: only reached via the "Already have an account?" link -->
         <activity
@@ -82,6 +89,19 @@
             android:name=".ChatSupportActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+
+        <!-- Serves generated .vcf files (see DownloadsActivity) out to the
+             device's contacts app via a content:// URI, since Android 7+
+             blocks passing raw file:// paths between apps. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 

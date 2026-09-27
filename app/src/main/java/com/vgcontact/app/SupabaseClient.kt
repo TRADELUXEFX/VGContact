@@ -88,13 +88,64 @@ object SupabaseClient {
             client.newCall(insertRequest).execute().use { response ->
                 if (response.isSuccessful) {
                     val arr = org.json.JSONArray(response.body?.string() ?: "[]")
-                    callback(true, if (arr.length() > 0) arr.getJSONObject(0) else null)
+                    val newUser = if (arr.length() > 0) arr.getJSONObject(0) else null
+
+                    // Drop the brand-new user into a contact group. Best-effort:
+                    // if this fails, registration still succeeded and the user
+                    // just won't be grouped yet - not worth failing signup over.
+                    val newUserId = newUser?.optString("id")
+                    if (!newUserId.isNullOrBlank()) {
+                        addUserToGroup(newUserId) { _, _ -> }
+                    }
+
+                    callback(true, newUser)
                 } else {
                     callback(false, null)
                 }
             }
         } catch (e: Exception) {
             callback(false, null)
+        }
+    }
+
+    // Places a just-registered user into the oldest open contact group
+    // (or a fresh one) via the add_user_to_group RPC. Fire-and-forget from
+    // registerOrFetchUser; called synchronously (same thread) since
+    // registerOrFetchUser already runs off the UI thread.
+    fun addUserToGroup(userId: String, callback: (Boolean, Int) -> Unit) {
+        if (!isConfigured()) {
+            callback(false, 0)
+            return
+        }
+
+        try {
+            val url = "$supabaseUrl/rest/v1/rpc/add_user_to_group"
+            val body = JSONObject().apply {
+                put("p_user_id", userId)
+            }
+
+            val request = Request.Builder()
+                .url(url)
+                .addHeader("apikey", anonKey)
+                .addHeader("Authorization", "Bearer $anonKey")
+                .addHeader("Content-Type", "application/json")
+                .post(body.toString().toRequestBody("application/json".toMediaType()))
+                .build()
+
+            client.newCall(request).execute().use { response ->
+                if (response.isSuccessful) {
+                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
+                    if (arr.length() > 0) {
+                        callback(true, arr.getJSONObject(0).optInt("member_position", 0))
+                    } else {
+                        callback(false, 0)
+                    }
+                } else {
+                    callback(false, 0)
+                }
+            }
+        } catch (e: Exception) {
+            callback(false, 0)
         }
     }
 
@@ -145,15 +196,15 @@ object SupabaseClient {
         }
     }
 
-    // Published files, newest first.
-    fun fetchFiles(callback: (Boolean, org.json.JSONArray?) -> Unit) {
+    // Published (full) contact groups, newest-filled first.
+    fun fetchGroups(callback: (Boolean, org.json.JSONArray?) -> Unit) {
         if (!isConfigured()) {
             callback(false, null)
             return
         }
 
         try {
-            val url = "$supabaseUrl/rest/v1/files?is_published=eq.true&select=*&order=created_at.desc"
+            val url = "$supabaseUrl/rest/v1/contact_groups?is_published=eq.true&select=*&order=filled_at.desc"
             val request = Request.Builder()
                 .url(url)
                 .addHeader("apikey", anonKey)
@@ -174,15 +225,15 @@ object SupabaseClient {
         }
     }
 
-    // Set of file_ids this user has already unlocked.
-    fun fetchUnlockedFileIds(userId: String, callback: (Boolean, Set<String>) -> Unit) {
+    // Set of group_ids this user has already unlocked.
+    fun fetchUnlockedGroupIds(userId: String, callback: (Boolean, Set<String>) -> Unit) {
         if (!isConfigured()) {
             callback(false, emptySet())
             return
         }
 
         try {
-            val url = "$supabaseUrl/rest/v1/unlocks?user_id=eq.$userId&select=file_id"
+            val url = "$supabaseUrl/rest/v1/group_unlocks?user_id=eq.$userId&select=group_id"
             val request = Request.Builder()
                 .url(url)
                 .addHeader("apikey", anonKey)
@@ -195,7 +246,7 @@ object SupabaseClient {
                     val arr = org.json.JSONArray(response.body?.string() ?: "[]")
                     val ids = mutableSetOf<String>()
                     for (i in 0 until arr.length()) {
-                        ids.add(arr.getJSONObject(i).optString("file_id"))
+                        ids.add(arr.getJSONObject(i).optString("group_id"))
                     }
                     callback(true, ids)
                 } else {
@@ -204,6 +255,49 @@ object SupabaseClient {
             }
         } catch (e: Exception) {
             callback(false, emptySet())
+        }
+    }
+
+    // The 3 members (username + phone) of an unlocked group, in position
+    // order, via the get_group_contacts RPC. Server re-checks the unlock
+    // itself (SECURITY DEFINER), so this fails with NOT_UNLOCKED if called
+    // for a group this user hasn't paid for.
+    fun getGroupContacts(userId: String, groupId: String, callback: (Boolean, List<Pair<String, String>>) -> Unit) {
+        if (!isConfigured()) {
+            callback(false, emptyList())
+            return
+        }
+
+        try {
+            val url = "$supabaseUrl/rest/v1/rpc/get_group_contacts"
+            val body = JSONObject().apply {
+                put("p_user_id", userId)
+                put("p_group_id", groupId)
+            }
+
+            val request = Request.Builder()
+                .url(url)
+                .addHeader("apikey", anonKey)
+                .addHeader("Authorization", "Bearer $anonKey")
+                .addHeader("Content-Type", "application/json")
+                .post(body.toString().toRequestBody("application/json".toMediaType()))
+                .build()
+
+            client.newCall(request).execute().use { response ->
+                if (response.isSuccessful) {
+                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
+                    val contacts = mutableListOf<Pair<String, String>>()
+                    for (i in 0 until arr.length()) {
+                        val row = arr.getJSONObject(i)
+                        contacts.add(row.optString("username") to row.optString("phone"))
+                    }
+                    callback(true, contacts)
+                } else {
+                    callback(false, emptyList())
+                }
+            }
+        } catch (e: Exception) {
+            callback(false, emptyList())
         }
     }
 
@@ -290,23 +384,23 @@ object SupabaseClient {
         }
     }
 
-    // Spends one key to unlock a file, via the spend_key_unlock RPC so the
-    // balance check and the deduction happen atomically on the server -
-    // two rapid taps can't both succeed off a stale balance read.
+    // Spends one key to unlock a contact group, via the spend_key_unlock_group
+    // RPC so the balance check and the deduction happen atomically on the
+    // server - two rapid taps can't both succeed off a stale balance read.
     //
     // message is one of: "OK", "NO_KEYS", "ALREADY_UNLOCKED",
-    // "USER_NOT_FOUND", or a raw error.
-    fun spendKeyToUnlock(userId: String, fileId: String, callback: (Boolean, String, Int) -> Unit) {
+    // "GROUP_NOT_FULL", "GROUP_NOT_FOUND", "USER_NOT_FOUND", or a raw error.
+    fun spendKeyToUnlockGroup(userId: String, groupId: String, callback: (Boolean, String, Int) -> Unit) {
         if (!isConfigured()) {
             callback(false, "NOT_CONFIGURED", 0)
             return
         }
 
         try {
-            val url = "$supabaseUrl/rest/v1/rpc/spend_key_unlock"
+            val url = "$supabaseUrl/rest/v1/rpc/spend_key_unlock_group"
             val body = JSONObject().apply {
                 put("p_user_id", userId)
-                put("p_file_id", fileId)
+                put("p_group_id", groupId)
             }
 
             val request = Request.Builder()

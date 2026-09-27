@@ -1,7 +1,6 @@
 package com.vgcontact.app
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -10,13 +9,15 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import java.io.File
 import kotlin.concurrent.thread
 
 class DownloadsActivity : AppCompatActivity() {
 
     private lateinit var sessionManager: SessionManager
-    private var allFiles: List<org.json.JSONObject> = emptyList()
-    private var unlockedFileIds: Set<String> = emptySet()
+    private var allGroups: List<org.json.JSONObject> = emptyList()
+    private var unlockedGroupIds: Set<String> = emptySet()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,69 +31,68 @@ class DownloadsActivity : AppCompatActivity() {
             return
         }
 
-        // File list container
-        fetchFilesFromSupabase()
+        // Group list container
+        fetchGroupsFromSupabase()
 
         setupBottomNav()
         ChatSupportHelper.attach(this)
     }
 
-    private fun fetchFilesFromSupabase() {
+    private fun fetchGroupsFromSupabase() {
         val userId = sessionManager.getUserId()
 
         thread {
-            SupabaseClient.fetchFiles { filesSuccess, filesArr ->
-                if (!filesSuccess || filesArr == null) {
+            SupabaseClient.fetchGroups { groupsSuccess, groupsArr ->
+                if (!groupsSuccess || groupsArr == null) {
                     runOnUiThread {
-                        Toast.makeText(this, "Couldn't load files. Check your connection.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Couldn't load contact lists. Check your connection.", Toast.LENGTH_SHORT).show()
                     }
-                    return@fetchFiles
+                    return@fetchGroups
                 }
 
-                val files = mutableListOf<org.json.JSONObject>()
-                for (i in 0 until filesArr.length()) {
-                    files.add(filesArr.getJSONObject(i))
+                val groups = mutableListOf<org.json.JSONObject>()
+                for (i in 0 until groupsArr.length()) {
+                    groups.add(groupsArr.getJSONObject(i))
                 }
 
                 if (userId.isNullOrBlank()) {
-                    allFiles = files
-                    unlockedFileIds = emptySet()
-                    runOnUiThread { loadFiles() }
-                    return@fetchFiles
+                    allGroups = groups
+                    unlockedGroupIds = emptySet()
+                    runOnUiThread { loadGroups() }
+                    return@fetchGroups
                 }
 
-                SupabaseClient.fetchUnlockedFileIds(userId) { _, ids ->
-                    allFiles = files
-                    unlockedFileIds = ids
-                    runOnUiThread { loadFiles() }
+                SupabaseClient.fetchUnlockedGroupIds(userId) { _, ids ->
+                    allGroups = groups
+                    unlockedGroupIds = ids
+                    runOnUiThread { loadGroups() }
                 }
             }
         }
     }
 
-    private fun loadFiles() {
+    private fun loadGroups() {
         val fileListContainer = findViewById<LinearLayout>(R.id.file_list_container)
         fileListContainer.removeAllViews()
 
-        allFiles.forEach { file ->
-            val fileId = file.optString("id")
-            val fileName = file.optString("file_name")
-            val contactCount = file.optInt("contact_count", 0)
-            val fileUrl = file.optString("file_url")
-            val isLocked = !unlockedFileIds.contains(fileId)
+        allGroups.forEach { group ->
+            val groupId = group.optString("id")
+            val groupNumber = group.optInt("group_number", 0)
+            val memberCount = group.optInt("member_count", 0)
+            val isLocked = !unlockedGroupIds.contains(groupId)
 
-            val fileView = layoutInflater.inflate(R.layout.item_file, fileListContainer, false)
-            val fileIconView = fileView.findViewById<ImageView>(R.id.file_icon)
-            val fileNameView = fileView.findViewById<TextView>(R.id.file_name)
-            val fileCountView = fileView.findViewById<TextView>(R.id.file_count)
-            val statusDot = fileView.findViewById<android.view.View>(R.id.file_status_dot)
-            val downloadBtn = fileView.findViewById<FrameLayout>(R.id.download_btn)
-            val downloadBtnIcon = fileView.findViewById<ImageView>(R.id.download_btn_icon)
+            val groupView = layoutInflater.inflate(R.layout.item_file, fileListContainer, false)
+            val groupIconView = groupView.findViewById<ImageView>(R.id.file_icon)
+            val groupNameView = groupView.findViewById<TextView>(R.id.file_name)
+            val groupCountView = groupView.findViewById<TextView>(R.id.file_count)
+            val statusDot = groupView.findViewById<android.view.View>(R.id.file_status_dot)
+            val downloadBtn = groupView.findViewById<FrameLayout>(R.id.download_btn)
+            val downloadBtnIcon = groupView.findViewById<ImageView>(R.id.download_btn_icon)
 
-            fileNameView.text = fileName
-            fileCountView.text = if (isLocked) "Locked, $contactCount contacts" else "Verified, $contactCount contacts"
+            groupNameView.text = "Contact List #$groupNumber"
+            groupCountView.text = if (isLocked) "Locked, $memberCount contacts" else "Verified, $memberCount contacts"
 
-            fileIconView.setImageResource(if (isLocked) R.drawable.ic_lock else R.drawable.ic_unlock)
+            groupIconView.setImageResource(if (isLocked) R.drawable.ic_lock else R.drawable.ic_unlock)
             statusDot.setBackgroundResource(if (isLocked) R.drawable.status_dot_locked else R.drawable.status_dot_unlocked)
 
             downloadBtn.setBackgroundResource(if (isLocked) R.drawable.file_row_action_locked_background else R.drawable.file_row_action_background)
@@ -103,35 +103,106 @@ class DownloadsActivity : AppCompatActivity() {
 
             downloadBtn.setOnClickListener {
                 if (isLocked) {
-                    unlockWithKey(fileId, fileIconView, statusDot, fileCountView, downloadBtn, downloadBtnIcon, fileUrl)
-                } else if (fileUrl.isNotBlank()) {
-                    try {
-                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(fileUrl)))
-                    } catch (e: Exception) {
-                        Toast.makeText(this, "Couldn't open file link", Toast.LENGTH_SHORT).show()
-                    }
+                    unlockWithKey(groupId, groupIconView, statusDot, groupCountView, downloadBtn, downloadBtnIcon)
                 } else {
-                    Toast.makeText(this, "No file link available", Toast.LENGTH_SHORT).show()
+                    generateVcfAndImport(downloadBtn, downloadBtnIcon, groupId)
                 }
             }
 
-            fileListContainer.addView(fileView)
+            fileListContainer.addView(groupView)
         }
     }
 
+    // Pulls the group's 3 members (username + phone, only reachable because
+    // this group is unlocked - see get_group_contacts RPC), builds a .vcf
+    // on device, and hands it to Android's native "save contact" screen.
+    // Keeps the same visible spinner/disable feedback as before so the tap
+    // never looks unresponsive while the RPC call is in flight.
+    private fun generateVcfAndImport(downloadBtn: FrameLayout, downloadBtnIcon: ImageView, groupId: String) {
+        val userId = sessionManager.getUserId()
+        if (userId.isNullOrBlank()) {
+            Toast.makeText(this, "Couldn't verify your account. Please restart the app.", Toast.LENGTH_SHORT).show()
+            return
+        }
 
-    // Spends one key (via the spend_key_unlock RPC, atomic on the server -
-    // see SupabaseClient.spendKeyToUnlock) to unlock this specific file.
-    // On success, flips this row to "Unlocked" in place rather than
-    // re-fetching the whole list.
+        downloadBtn.isEnabled = false
+        downloadBtnIcon.visibility = android.view.View.INVISIBLE
+
+        val spinner = android.widget.ProgressBar(this).apply {
+            isIndeterminate = true
+            indeterminateTintList = android.content.res.ColorStateList.valueOf(
+                ContextCompat.getColor(this@DownloadsActivity, R.color.white)
+            )
+        }
+        val spinnerParams = FrameLayout.LayoutParams(16.dpToPx(), 16.dpToPx())
+        spinnerParams.gravity = android.view.Gravity.CENTER
+        downloadBtn.addView(spinner, spinnerParams)
+
+        thread {
+            SupabaseClient.getGroupContacts(userId, groupId) { success, contacts ->
+                runOnUiThread {
+                    downloadBtn.removeView(spinner)
+                    downloadBtnIcon.visibility = android.view.View.VISIBLE
+                    downloadBtn.isEnabled = true
+
+                    if (!success || contacts.isEmpty()) {
+                        Toast.makeText(this, "Couldn't load this contact list. Try again.", Toast.LENGTH_SHORT).show()
+                        return@runOnUiThread
+                    }
+
+                    try {
+                        val vcfFile = writeVcfFile(groupId, contacts)
+                        val uri = FileProvider.getUriForFile(
+                            this,
+                            "$packageName.fileprovider",
+                            vcfFile
+                        )
+                        val intent = Intent(Intent.ACTION_VIEW).apply {
+                            setDataAndType(uri, "text/x-vcard")
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                        startActivity(intent)
+                    } catch (e: Exception) {
+                        Toast.makeText(this, "Couldn't open the save contact screen", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+    }
+
+    // Builds "FN:{username} VGC" / "TEL:{phone}" cards for each of the
+    // group's 3 members and writes them to one .vcf in the app's cache dir
+    // (served back out via FileProvider - see generateVcfAndImport).
+    private fun writeVcfFile(groupId: String, contacts: List<Pair<String, String>>): File {
+        val vcfDir = File(cacheDir, "vcf").apply { mkdirs() }
+        val vcfFile = File(vcfDir, "contact_list_$groupId.vcf")
+
+        val builder = StringBuilder()
+        contacts.forEach { (username, phone) ->
+            builder.append("BEGIN:VCARD\r\n")
+            builder.append("VERSION:3.0\r\n")
+            builder.append("FN:$username VGC\r\n")
+            builder.append("TEL:$phone\r\n")
+            builder.append("END:VCARD\r\n")
+        }
+
+        vcfFile.writeText(builder.toString())
+        return vcfFile
+    }
+
+    private fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()
+
+    // Spends one key (via the spend_key_unlock_group RPC, atomic on the
+    // server - see SupabaseClient.spendKeyToUnlockGroup) to unlock this
+    // specific contact group. On success, flips this row to "Unlocked" in
+    // place rather than re-fetching the whole list.
     private fun unlockWithKey(
-        fileId: String,
-        fileIconView: ImageView,
+        groupId: String,
+        groupIconView: ImageView,
         statusDot: android.view.View,
-        fileCountView: TextView,
+        groupCountView: TextView,
         downloadBtn: FrameLayout,
-        downloadBtnIcon: ImageView,
-        fileUrl: String
+        downloadBtnIcon: ImageView
     ) {
         val userId = sessionManager.getUserId()
         if (userId.isNullOrBlank()) {
@@ -142,18 +213,18 @@ class DownloadsActivity : AppCompatActivity() {
         downloadBtn.isEnabled = false
 
         thread {
-            SupabaseClient.spendKeyToUnlock(userId, fileId) { success, message, _ ->
+            SupabaseClient.spendKeyToUnlockGroup(userId, groupId) { success, message, _ ->
                 runOnUiThread {
                     downloadBtn.isEnabled = true
 
                     if (success) {
-                        unlockedFileIds = unlockedFileIds + fileId
+                        unlockedGroupIds = unlockedGroupIds + groupId
 
-                        val contactCount = allFiles.firstOrNull { it.optString("id") == fileId }
-                            ?.optInt("contact_count", 0) ?: 0
-                        fileCountView.text = "Verified, $contactCount contacts"
+                        val memberCount = allGroups.firstOrNull { it.optString("id") == groupId }
+                            ?.optInt("member_count", 0) ?: 0
+                        groupCountView.text = "Verified, $memberCount contacts"
 
-                        fileIconView.setImageResource(R.drawable.ic_unlock)
+                        groupIconView.setImageResource(R.drawable.ic_unlock)
                         statusDot.setBackgroundResource(R.drawable.status_dot_unlocked)
 
                         downloadBtn.setBackgroundResource(R.drawable.file_row_action_background)
@@ -161,31 +232,23 @@ class DownloadsActivity : AppCompatActivity() {
                         downloadBtnIcon.setColorFilter(ContextCompat.getColor(this, R.color.white))
 
                         downloadBtn.setOnClickListener {
-                            if (fileUrl.isNotBlank()) {
-                                try {
-                                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(fileUrl)))
-                                } catch (e: Exception) {
-                                    Toast.makeText(this, "Couldn't open file link", Toast.LENGTH_SHORT).show()
-                                }
-                            } else {
-                                Toast.makeText(this, "No file link available", Toast.LENGTH_SHORT).show()
-                            }
+                            generateVcfAndImport(downloadBtn, downloadBtnIcon, groupId)
                         }
 
                         Toast.makeText(this, "Unlocked! 1 key used.", Toast.LENGTH_SHORT).show()
                     } else {
                         when (message) {
                             "NO_KEYS" -> {
-                                Toast.makeText(this, "You're out of keys. Repost today or buy more to unlock this file.", Toast.LENGTH_LONG).show()
+                                Toast.makeText(this, "You're out of keys. Repost today or buy more to unlock this list.", Toast.LENGTH_LONG).show()
                                 val intent = Intent(this, RepostActivity::class.java)
                                 startActivity(intent)
                             }
                             "ALREADY_UNLOCKED" -> {
                                 Toast.makeText(this, "Already unlocked - refreshing.", Toast.LENGTH_SHORT).show()
-                                fetchFilesFromSupabase()
+                                fetchGroupsFromSupabase()
                             }
                             else -> {
-                                Toast.makeText(this, "Couldn't unlock this file. Try again.", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, "Couldn't unlock this list. Try again.", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }

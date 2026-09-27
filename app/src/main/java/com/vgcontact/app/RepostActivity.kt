@@ -14,9 +14,9 @@ import androidx.core.content.ContextCompat
 import kotlin.concurrent.thread
 
 /**
- * Key-earning screen. Keys (not per-file reposts) are the only currency
- * used to unlock files now - see DownloadsActivity, which spends a key
- * via SupabaseClient.spendKeyToUnlock().
+ * Key-earning screen. Keys are the only currency used to unlock contact
+ * groups now - see DownloadsActivity, which spends a key via
+ * SupabaseClient.spendKeyToUnlockGroup().
  *
  * New users start with 3 free keys (users.key_balance default, set at
  * signup). More keys are earned by:
