@@ -18,11 +18,13 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-        <!-- Launcher: brief dark splash while we check session state -->
+        <!-- Launcher: routes to Home/Register based on session state.
+             No distinct splash visual of its own - inherits the app's
+             normal theme so there is nothing to see beyond the OS's own
+             default app-launch frame. -->
         <activity
             android:name=".SplashActivity"
             android:exported="true"
-            android:theme="@style/Theme.VGContact.Splash"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

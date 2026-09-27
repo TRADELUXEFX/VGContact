@@ -55,6 +55,27 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical" />
 
+                <!-- Shown immediately on open (and on retry) while the
+                     Supabase fetch is in flight, before results or the
+                     empty state are ready to display. -->
+                <LinearLayout
+                    android:id="@+id/loading_state_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@color/white"
+                    android:paddingTop="48dp"
+                    android:paddingBottom="48dp"
+                    android:visibility="visible">
+
+                    <ProgressBar
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:indeterminateTint="@color/vg_green" />
+
+                </LinearLayout>
+
                 <!-- Shown instead of an unexplained blank screen whenever
                      the fetch fails or returns no published groups. Tap
                      to retry. -->

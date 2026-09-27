@@ -14,8 +14,10 @@
     </style>
 
     <style name="Theme.VGContact.Splash" parent="Theme.VGContact">
-        <item name="android:statusBarColor">@color/vg_dark</item>
-        <item name="android:windowBackground">@drawable/splash_background</item>
+        <!-- User does not want a distinct second splash screen at all -
+             SplashActivity should be invisible, just the OS's own default
+             pre-draw continuing straight through to whatever loads next,
+             with no separate background/icon/color of its own. -->
     </style>
 
     <!-- Text Appearance Styles for other Poppins weights -->

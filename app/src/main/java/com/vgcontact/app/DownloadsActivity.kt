@@ -41,12 +41,14 @@ class DownloadsActivity : AppCompatActivity() {
     private fun fetchGroupsFromSupabase() {
         val userId = sessionManager.getUserId()
 
+        showLoadingState(true)
         showEmptyState(false)
 
         thread {
             SupabaseClient.fetchGroups { groupsSuccess, groupsArr ->
                 if (!groupsSuccess || groupsArr == null) {
                     runOnUiThread {
+                        showLoadingState(false)
                         Toast.makeText(this, "Couldn't load contact lists. Check your connection.", Toast.LENGTH_SHORT).show()
                         showEmptyState(true, "Couldn't load contact lists")
                     }
@@ -74,6 +76,15 @@ class DownloadsActivity : AppCompatActivity() {
         }
     }
 
+    // Toggles the white card + spinner shown while the fetch is in
+    // flight, before either results or the empty state are ready to
+    // display - covers the window right after opening this screen (or
+    // tapping retry) where the container would otherwise look blank.
+    private fun showLoadingState(show: Boolean) {
+        val loadingStateContainer = findViewById<LinearLayout>(R.id.loading_state_container)
+        loadingStateContainer.visibility = if (show) android.view.View.VISIBLE else android.view.View.GONE
+    }
+
     // Toggles the illustration/"tap to retry" state. Called whenever the
     // fetch fails outright, and also from loadGroups() when the fetch
     // succeeded but returned zero groups - both cases used to just leave
@@ -87,6 +98,8 @@ class DownloadsActivity : AppCompatActivity() {
     }
 
     private fun loadGroups() {
+        showLoadingState(false)
+
         val fileListContainer = findViewById<LinearLayout>(R.id.file_list_container)
         fileListContainer.removeAllViews()
 

@@ -4,14 +4,10 @@
     device already has a session (SessionManager.isLoggedIn()) and
     decides whether to route to HomeActivity or RegisterActivity.
 
-    Deliberately empty/transparent: the actual splash image (dark
-    background + centered round icon) is painted by the theme's
-    windowBackground (see Theme.VGContact.Splash / splash_background.xml)
-    BEFORE this activity's onCreate/setContentView ever run. If this
-    layout drew its own background+icon on top, it would show as a
-    visible second splash frame replacing the first. Leaving this root
-    transparent means the theme's image is the only thing the user ever
-    sees - one continuous splash, not two.
+    Deliberately empty/transparent: SplashActivity has no distinct splash
+    visual of its own (see Theme.VGContact.Splash) - it inherits the
+    app's normal theme, so this activity just performs the session check
+    and moves on, with nothing separate ever drawn on screen.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
