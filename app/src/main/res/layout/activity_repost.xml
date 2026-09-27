@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="@drawable/header_gradient"
-            android:paddingTop="48dp"
+            android:paddingTop="72dp"
             android:paddingBottom="28dp"
             android:paddingStart="24dp"
             android:paddingEnd="24dp"
@@ -56,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="18dp"
                 android:orientation="horizontal"
-                android:background="@drawable/tab_track_background"
+                android:background="@drawable/header_tab_track_background"
                 android:padding="4dp">
 
                 <TextView
@@ -148,6 +148,7 @@
 
                 <!-- Today's Task: daily repost flow, matching the streak-card design -->
                 <LinearLayout
+                    android:id="@+id/todays_task_card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
@@ -155,15 +156,35 @@
                     android:padding="20dp"
                     android:layout_marginBottom="16dp">
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="TODAY'S TASK"
-                        android:textSize="11sp"
-                        android:textStyle="bold"
-                        android:letterSpacing="0.05"
-                        android:textColor="@color/text_muted"
-                        android:layout_marginBottom="10dp" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="10dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="TODAY'S TASK"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.05"
+                            android:textColor="@color/text_muted" />
+
+                        <ImageView
+                            android:id="@+id/todays_task_close"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_close_small"
+                            app:tint="@color/text_muted"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="?android:attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Dismiss today's task tip" />
+
+                    </LinearLayout>
 
                     <TextView
                         android:layout_width="match_parent"
@@ -207,6 +228,22 @@
                         app:rippleColor="@color/vg_green" />
 
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/todays_task_restore"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/repost_guide_toggle_background"
+                    android:padding="12dp"
+                    android:text="Show today's task again"
+                    android:textAlignment="center"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/vg_green_dark"
+                    android:visibility="gone"
+                    android:clickable="true"
+                    android:focusable="true" />
 
                 <!-- Milestones -->
                 <LinearLayout
