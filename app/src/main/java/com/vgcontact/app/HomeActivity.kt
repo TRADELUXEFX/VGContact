@@ -63,6 +63,9 @@ class HomeActivity : AppCompatActivity() {
         usernameText.text = sessionManager.getUsername() ?: "VGContact User"
         val phone = sessionManager.getPhone() ?: ""
         phoneText.text = "Referral code: $phone"
+        // headerUsernameText/headerPhoneText/headerCopyBtn/headerBellIcon ids
+        // now live directly in activity_home.xml's own header block instead
+        // of a separate included layout_profile_header.xml.
 
         copyBtn.setOnClickListener {
             val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
