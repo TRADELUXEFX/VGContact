@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+
+    <solid android:color="@color/white" />
+
+</shape>
+
+<!-- ShapeableImageView circular crop style for profileIcon. Defined
+     here (not in styles.xml) so both the shape and its 50% corner
+     radius live next to the background shape they replace. -->
