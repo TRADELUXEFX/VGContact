@@ -1,0 +1,97 @@
+name: Deploy
+
+# How to use this from your phone:
+#   1. Go to your repo on github.com (mobile browser works fine).
+#   2. Navigate into the "incoming" folder.
+#   3. Tap "Add file" -> "Upload files".
+#   4. Upload ANY zip file, any name (deploy.zip, update1.zip, whatever).
+#   5. Commit directly to main.
+#   6. This workflow runs: if there's a zip in incoming/, it extracts it,
+#      commits the result, and deletes the zip. Either way (zip or plain
+#      code push) it then builds the APK from whatever is currently in
+#      the repo and publishes a release.
+#
+# This replaces the old two-workflow setup (build.yml + deploy-from-zip.yml)
+# with a single workflow so there's only ever one build per push, whether
+# that push is a zip upload or a normal commit.
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract any zip(s) found in incoming/ into repo root
+        id: extract
+        run: |
+          set -e
+          shopt -s nullglob
+          zips=(incoming/*.zip)
+          if [ ${#zips[@]} -eq 0 ]; then
+            echo "No zip files found in incoming/. Nothing to unpack."
+            echo "found=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "found=true" >> "$GITHUB_OUTPUT"
+          for z in "${zips[@]}"; do
+            echo "Extracting $z ..."
+            unzip -o "$z" -d .
+            rm -f "$z"
+          done
+
+      - name: Commit unpacked files
+        if: steps.extract.outputs.found == 'true'
+        run: |
+          git config user.name "deploy-bot"
+          git config user.email "deploy-bot@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nothing to commit."
+          else
+            git commit -m "Deploy: unpack zip(s) from incoming/"
+            git push
+          fi
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.2'
+
+      - name: Build APK
+        run: gradle assembleDebug
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Upload APK to Releases
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: app/build/outputs/apk/debug/app-debug.apk
+          tag_name: v1.0.${{ github.run_number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
