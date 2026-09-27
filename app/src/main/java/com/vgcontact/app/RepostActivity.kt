@@ -49,6 +49,9 @@ class RepostActivity : AppCompatActivity() {
     private lateinit var statusIcon: ImageView
     private lateinit var statusTitle: TextView
 
+    private lateinit var streakTab: TextView
+    private lateinit var leaderboardTab: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_repost)
@@ -75,6 +78,13 @@ class RepostActivity : AppCompatActivity() {
         statusIcon = findViewById(R.id.repost_status_icon)
         statusTitle = findViewById(R.id.repost_status_title)
 
+        streakTab = findViewById(R.id.repost_tab_streak)
+        leaderboardTab = findViewById(R.id.repost_tab_leaderboard)
+        streakTab.setOnClickListener { selectStreakTab() }
+        leaderboardTab.setOnClickListener {
+            Toast.makeText(this, "Leaderboard coming soon", Toast.LENGTH_SHORT).show()
+        }
+
         guideCloseBtn.setOnClickListener { setGuideHidden(true) }
         guideRestoreText.setOnClickListener { setGuideHidden(false) }
         renderGuide()
@@ -87,6 +97,13 @@ class RepostActivity : AppCompatActivity() {
 
         setupBottomNav()
         ChatSupportHelper.attach(this)
+    }
+
+    private fun selectStreakTab() {
+        streakTab.background = ContextCompat.getDrawable(this, R.drawable.tab_selected_background)
+        streakTab.setTextColor(ContextCompat.getColor(this, R.color.vg_green_dark))
+        leaderboardTab.background = null
+        leaderboardTab.setTextColor(ContextCompat.getColor(this, R.color.white))
     }
 
     /** X on the tip dismisses it; tapping the dashed chip brings it back. */
@@ -135,12 +152,12 @@ class RepostActivity : AppCompatActivity() {
                     when (status) {
                         null -> {
                             repostTodayBtn.isEnabled = true
-                            repostTodayBtn.text = "Repost Today"
+                            repostTodayBtn.text = "REPOSTED TODAY"
                             statusCard.visibility = android.view.View.GONE
                         }
                         "pending" -> {
                             repostTodayBtn.isEnabled = false
-                            repostTodayBtn.text = "Repost Sent"
+                            repostTodayBtn.text = "REPOST SENT"
                             showStatusCard(
                                 title = "Verification pending",
                                 message = "We check WhatsApp status views each night. Your key will appear here once confirmed.",
@@ -150,7 +167,7 @@ class RepostActivity : AppCompatActivity() {
                         }
                         "verified" -> {
                             repostTodayBtn.isEnabled = false
-                            repostTodayBtn.text = "Repost Sent"
+                            repostTodayBtn.text = "REPOST SENT"
                             showStatusCard(
                                 title = "Repost verified",
                                 message = "Today's repost was verified and your key has been added.",
@@ -160,7 +177,7 @@ class RepostActivity : AppCompatActivity() {
                         }
                         "rejected" -> {
                             repostTodayBtn.isEnabled = false
-                            repostTodayBtn.text = "Repost Sent"
+                            repostTodayBtn.text = "REPOST SENT"
                             showStatusCard(
                                 title = "Couldn't verify",
                                 message = "We couldn't verify today's repost. Try again tomorrow.",
@@ -209,7 +226,7 @@ class RepostActivity : AppCompatActivity() {
             SupabaseClient.submitDailyRepost(userId) { success, message ->
                 runOnUiThread {
                     if (success) {
-                        repostTodayBtn.text = "Repost Sent"
+                        repostTodayBtn.text = "REPOST SENT"
                         showStatusCard(
                             title = "Verification pending",
                             message = "We check WhatsApp status views each night. Your key will appear here once confirmed.",

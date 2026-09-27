@@ -45,14 +45,15 @@
                     android:layout_width="56dp"
                     android:layout_height="56dp">
 
-                    <ImageView
+                    <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/headerProfileIcon"
                         android:layout_width="56dp"
                         android:layout_height="56dp"
-                        android:padding="4dp"
-                        android:src="@mipmap/ic_launcher"
+                        android:padding="10dp"
+                        android:src="@mipmap/ic_launcher_round"
                         android:background="@drawable/avatar_circle_background"
-                        android:scaleType="fitCenter"
+                        android:scaleType="centerInside"
+                        app:shapeAppearanceOverlay="@style/CircleImageView"
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?android:attr/selectableItemBackgroundBorderless" />

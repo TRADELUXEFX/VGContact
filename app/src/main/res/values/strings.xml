@@ -74,7 +74,7 @@
     <!-- Navigation -->
     <string name="nav_home">Home</string>
     <string name="nav_repost">Repost</string>
-    <string name="nav_downloads">Downloads</string>
+    <string name="nav_downloads">Get Viewers</string>
     <string name="nav_community">Community</string>
     <string name="nav_profile">Profile</string>
 
