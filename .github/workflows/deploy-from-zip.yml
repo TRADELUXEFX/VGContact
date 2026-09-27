@@ -2,14 +2,19 @@ name: Deploy from uploaded zip
 
 # How to use this from your phone:
 #   1. Go to your repo on github.com (mobile browser works fine).
-#   2. Tap "Add file" -> "Upload files".
-#   3. Upload a zip named exactly "deploy.zip" into the folder "incoming/"
-#      (create the folder by typing "incoming/deploy.zip" as the file name
-#      in the upload box if it doesn't exist yet).
-#   4. Commit directly to main.
-#   5. This workflow runs automatically, extracts deploy.zip into the repo
-#      root (overwriting matching paths), deletes deploy.zip, and commits
-#      the result. Your normal build workflow then runs on that commit.
+#   2. Navigate into the "incoming" folder.
+#   3. Tap "Add file" -> "Upload files".
+#   4. Upload ANY zip file, any name (deploy.zip, update1.zip, whatever).
+#   5. Commit directly to main.
+#   6. This workflow runs automatically: it finds every .zip file sitting
+#      in incoming/, extracts each one into the repo root (overwriting
+#      matching paths), deletes all the zip(s) it just processed, and
+#      commits the result. Your normal build workflow then runs on that
+#      commit.
+#
+# You never need to worry about the exact filename, and you never need
+# to manually delete the zip afterwards - this workflow does both for
+# you automatically, every time.
 #
 # The zip should be structured so its internal paths match where files
 # belong in the repo, e.g. zip containing:
@@ -20,7 +25,7 @@ name: Deploy from uploaded zip
 on:
   push:
     paths:
-      - "incoming/deploy.zip"
+      - "incoming/*.zip"
 
 permissions:
   contents: write
@@ -34,11 +39,20 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Extract deploy.zip into repo root
+      - name: Extract every zip found in incoming/ into repo root
         run: |
           set -e
-          unzip -o incoming/deploy.zip -d .
-          rm -f incoming/deploy.zip
+          shopt -s nullglob
+          zips=(incoming/*.zip)
+          if [ ${#zips[@]} -eq 0 ]; then
+            echo "No zip files found in incoming/. Nothing to do."
+            exit 0
+          fi
+          for z in "${zips[@]}"; do
+            echo "Extracting $z ..."
+            unzip -o "$z" -d .
+            rm -f "$z"
+          done
 
       - name: Commit unpacked files
         run: |
@@ -48,6 +62,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Nothing to commit."
           else
-            git commit -m "Deploy: unpack incoming/deploy.zip"
+            git commit -m "Deploy: unpack zip(s) from incoming/"
             git push
           fi
