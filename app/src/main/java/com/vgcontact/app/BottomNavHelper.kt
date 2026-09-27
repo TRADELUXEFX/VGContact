@@ -14,14 +14,13 @@ import androidx.core.content.ContextCompat
  */
 object BottomNavHelper {
 
-    enum class Tab { HOME, REPOST, DOWNLOADS, COMMUNITY, PROFILE }
+    enum class Tab { HOME, REPOST, DOWNLOADS, PROFILE }
 
     fun setup(activity: Activity, selected: Tab) {
         val tabs = listOf(
             Tab.HOME to Triple(R.id.navHomeTab, R.id.navHomeIcon, R.id.navHomeLabel),
             Tab.REPOST to Triple(R.id.navRepostTab, R.id.navRepostIcon, R.id.navRepostLabel),
             Tab.DOWNLOADS to Triple(R.id.navDownloadsTab, R.id.navDownloadsIcon, R.id.navDownloadsLabel),
-            Tab.COMMUNITY to Triple(R.id.navCommunityTab, R.id.navCommunityIcon, R.id.navCommunityLabel),
             Tab.PROFILE to Triple(R.id.navProfileTab, R.id.navProfileIcon, R.id.navProfileLabel)
         )
 
@@ -64,7 +63,6 @@ object BottomNavHelper {
             Tab.HOME -> HomeActivity::class.java
             Tab.REPOST -> RepostActivity::class.java
             Tab.DOWNLOADS -> DownloadsActivity::class.java
-            Tab.COMMUNITY -> CommunityActivity::class.java
             Tab.PROFILE -> ProfileActivity::class.java
         }
         activity.startActivity(Intent(activity, target))
