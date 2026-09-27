@@ -42,8 +42,6 @@ class CommunityActivity : AppCompatActivity() {
             startActivity(Intent(this, ChatSupportActivity::class.java))
         }
 
-        // Simple title header (this screen doesn't show the full profile header)
-        findViewById<TextView>(R.id.headerTitleText).text = "Community"
         setupBottomNav()
         ChatSupportHelper.attach(this)
     }
