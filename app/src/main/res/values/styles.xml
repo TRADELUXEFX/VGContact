@@ -15,7 +15,7 @@
 
     <style name="Theme.VGContact.Splash" parent="Theme.VGContact">
         <item name="android:statusBarColor">@color/vg_dark</item>
-        <item name="android:windowBackground">@color/vg_dark</item>
+        <item name="android:windowBackground">@drawable/splash_background</item>
     </style>
 
     <!-- Text Appearance Styles for other Poppins weights -->

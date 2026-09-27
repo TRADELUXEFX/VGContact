@@ -54,6 +54,48 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical" />
+
+                <!-- Shown instead of an unexplained blank screen whenever
+                     the fetch fails or returns no published groups. Tap
+                     to retry. -->
+                <LinearLayout
+                    android:id="@+id/empty_state_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingTop="48dp"
+                    android:visibility="gone"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="140dp"
+                        android:layout_height="128dp"
+                        android:src="@drawable/illus_empty_contacts"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:id="@+id/empty_state_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="No contact lists available right now"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary"
+                        android:textAlignment="center" />
+
+                    <TextView
+                        android:id="@+id/empty_state_retry"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Tap to retry"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/vg_green" />
+
+                </LinearLayout>
             </LinearLayout>
         </ScrollView>
     </LinearLayout>

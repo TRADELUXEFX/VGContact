@@ -2,22 +2,18 @@
 <!--
     Shown for the brief moment while SplashActivity checks whether this
     device already has a session (SessionManager.isLoggedIn()) and
-    decides whether to route to HomeActivity or RegisterActivity. Dark
-    background with a centered green spinner, per the app's existing
-    loading-state pattern (see PermissionsActivity's loadingContainer)
-    rather than introducing a new visual style.
+    decides whether to route to HomeActivity or RegisterActivity.
+
+    Deliberately empty/transparent: the actual splash image (dark
+    background + centered round icon) is painted by the theme's
+    windowBackground (see Theme.VGContact.Splash / splash_background.xml)
+    BEFORE this activity's onCreate/setContentView ever run. If this
+    layout drew its own background+icon on top, it would show as a
+    visible second splash frame replacing the first. Leaving this root
+    transparent means the theme's image is the only thing the user ever
+    sees - one continuous splash, not two.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:background="@color/vg_dark">
-
-    <ImageView
-        android:layout_width="96dp"
-        android:layout_height="96dp"
-        android:src="@mipmap/ic_launcher"
-        android:contentDescription="@null" />
-
-</LinearLayout>
+    android:background="@android:color/transparent" />

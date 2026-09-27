@@ -41,11 +41,14 @@ class DownloadsActivity : AppCompatActivity() {
     private fun fetchGroupsFromSupabase() {
         val userId = sessionManager.getUserId()
 
+        showEmptyState(false)
+
         thread {
             SupabaseClient.fetchGroups { groupsSuccess, groupsArr ->
                 if (!groupsSuccess || groupsArr == null) {
                     runOnUiThread {
                         Toast.makeText(this, "Couldn't load contact lists. Check your connection.", Toast.LENGTH_SHORT).show()
+                        showEmptyState(true, "Couldn't load contact lists")
                     }
                     return@fetchGroups
                 }
@@ -71,9 +74,27 @@ class DownloadsActivity : AppCompatActivity() {
         }
     }
 
+    // Toggles the illustration/"tap to retry" state. Called whenever the
+    // fetch fails outright, and also from loadGroups() when the fetch
+    // succeeded but returned zero groups - both cases used to just leave
+    // file_list_container empty with no visible explanation.
+    private fun showEmptyState(show: Boolean, message: String = "No contact lists available right now") {
+        val emptyStateContainer = findViewById<LinearLayout>(R.id.empty_state_container)
+        val emptyStateText = findViewById<TextView>(R.id.empty_state_text)
+        emptyStateText.text = message
+        emptyStateContainer.visibility = if (show) android.view.View.VISIBLE else android.view.View.GONE
+        emptyStateContainer.setOnClickListener { fetchGroupsFromSupabase() }
+    }
+
     private fun loadGroups() {
         val fileListContainer = findViewById<LinearLayout>(R.id.file_list_container)
         fileListContainer.removeAllViews()
+
+        if (allGroups.isEmpty()) {
+            showEmptyState(true, "No contact lists available right now")
+            return
+        }
+        showEmptyState(false)
 
         allGroups.forEach { group ->
             val groupId = group.optString("id")
