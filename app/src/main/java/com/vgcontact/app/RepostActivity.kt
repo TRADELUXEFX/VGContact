@@ -33,6 +33,10 @@ import kotlin.concurrent.thread
  */
 class RepostActivity : AppCompatActivity() {
 
+    companion object {
+        private const val PREF_TODAYS_TASK_DISMISSED = "todays_task_dismissed"
+    }
+
     private lateinit var sessionManager: SessionManager
     private lateinit var prefs: SharedPreferences
 
@@ -47,6 +51,10 @@ class RepostActivity : AppCompatActivity() {
 
     private lateinit var streakTab: TextView
     private lateinit var leaderboardTab: TextView
+
+    private lateinit var todaysTaskCard: LinearLayout
+    private lateinit var todaysTaskClose: ImageView
+    private lateinit var todaysTaskRestore: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,6 +85,13 @@ class RepostActivity : AppCompatActivity() {
             Toast.makeText(this, "Leaderboard coming soon", Toast.LENGTH_SHORT).show()
         }
 
+        todaysTaskCard = findViewById(R.id.todays_task_card)
+        todaysTaskClose = findViewById(R.id.todays_task_close)
+        todaysTaskRestore = findViewById(R.id.todays_task_restore)
+        todaysTaskClose.setOnClickListener { dismissTodaysTask() }
+        todaysTaskRestore.setOnClickListener { restoreTodaysTask() }
+        applyTodaysTaskVisibility()
+
         repostTodayBtn.setOnClickListener { onRepostTodayClicked() }
         buyKeysBtn.setOnClickListener { openBuyKeysChat() }
 
@@ -85,6 +100,22 @@ class RepostActivity : AppCompatActivity() {
 
         setupBottomNav()
         ChatSupportHelper.attach(this)
+    }
+
+    private fun dismissTodaysTask() {
+        prefs.edit().putBoolean(PREF_TODAYS_TASK_DISMISSED, true).apply()
+        applyTodaysTaskVisibility()
+    }
+
+    private fun restoreTodaysTask() {
+        prefs.edit().putBoolean(PREF_TODAYS_TASK_DISMISSED, false).apply()
+        applyTodaysTaskVisibility()
+    }
+
+    private fun applyTodaysTaskVisibility() {
+        val dismissed = prefs.getBoolean(PREF_TODAYS_TASK_DISMISSED, false)
+        todaysTaskCard.visibility = if (dismissed) android.view.View.GONE else android.view.View.VISIBLE
+        todaysTaskRestore.visibility = if (dismissed) android.view.View.VISIBLE else android.view.View.GONE
     }
 
     private fun selectStreakTab() {

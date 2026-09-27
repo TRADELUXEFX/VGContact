@@ -71,7 +71,7 @@
             android:id="@+id/navDownloadsIcon"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:src="@drawable/ic_download"
+            android:src="@drawable/ic_people"
             app:tint="@color/text_muted" />
 
         <TextView
@@ -103,7 +103,7 @@
             android:id="@+id/navRepostIcon"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:src="@drawable/ic_sync"
+            android:src="@drawable/ic_repost"
             app:tint="@color/text_muted" />
 
         <TextView

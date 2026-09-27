@@ -349,9 +349,6 @@
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 app:strokeColor="@color/vg_green_dark"
                 android:textColor="@color/vg_green_dark"
-                app:icon="@drawable/ic_contacts"
-                app:iconTint="@color/vg_green_dark"
-                app:iconGravity="textStart"
                 app:cornerRadius="16dp" />
 
         </LinearLayout>
