@@ -33,8 +33,6 @@ class DownloadsActivity : AppCompatActivity() {
         // File list container
         fetchFilesFromSupabase()
 
-        // Simple title header (this screen doesn't show the full profile header)
-        findViewById<TextView>(R.id.headerTitleText).text = "Downloads"
         setupBottomNav()
         ChatSupportHelper.attach(this)
     }
