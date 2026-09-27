@@ -75,6 +75,11 @@ class HomeActivity : AppCompatActivity() {
         val phoneText = findViewById<TextView>(R.id.headerPhoneText)
         val copyBtn = findViewById<Button>(R.id.headerCopyBtn)
         val bellIcon = findViewById<ImageView>(R.id.headerBellIcon)
+        val profileIcon = findViewById<ImageView>(R.id.headerProfileIcon)
+
+        profileIcon.setOnClickListener {
+            startActivity(Intent(this, ProfileActivity::class.java))
+        }
 
         usernameText.text = sessionManager.getUsername() ?: "VGContact User"
         val phone = sessionManager.getPhone() ?: ""
