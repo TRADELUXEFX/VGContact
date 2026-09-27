@@ -53,25 +53,55 @@ jobs:
 
       - name: Commit unpacked files
         if: steps.extract.outputs.found == 'true'
+        id: commit_unpacked
         run: |
           git config user.name "deploy-bot"
           git config user.email "deploy-bot@users.noreply.github.com"
           git add -A
           if git diff --cached --quiet; then
             echo "Nothing to commit."
+            exit 0
+          fi
+          git commit -m "Deploy: unpack zip(s) from incoming/"
+          if git push; then
+            echo "Push succeeded."
           else
-            git commit -m "Deploy: unpack zip(s) from incoming/"
-            git push
+            echo "::warning::Push of unpacked files was rejected (see log above)."
+            echo "push_failed=true" >> "$GITHUB_OUTPUT"
           fi
 
+      # If the push above failed (e.g. GitHub rejected a change under
+      # .github/workflows/ because this App lacks the `workflows`
+      # permission), the zip deletion from the extract step never made it
+      # to main - the zip is still sitting in incoming/ on the remote.
+      # This step removes just the zip(s) on their own, leaving every
+      # other unpacked file exactly as it was in the failed commit (still
+      # only local to this failed run, untouched on main) so the next
+      # upload isn't blocked by a leftover zip.
+      - name: Ensure the zip is removed even if the full push failed
+        if: steps.extract.outputs.found == 'true' && steps.commit_unpacked.outputs.push_failed == 'true'
+        run: |
+          set -e
+          git fetch origin main
+          git checkout origin/main -- .
+          shopt -s nullglob
+          zips=(incoming/*.zip)
+          if [ ${#zips[@]} -eq 0 ]; then
+            echo "No zip left on main - nothing to clean up."
+            exit 0
+          fi
+          git rm -f "${zips[@]}"
+          git commit -m "Deploy: remove zip(s) from incoming/ after failed deploy"
+          git push origin HEAD:main
+
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.2'
 
