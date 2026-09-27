@@ -1,10 +1,14 @@
 package com.vgcontact.app
 
 import android.content.Intent
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import java.text.SimpleDateFormat
 import java.util.*
@@ -32,15 +36,22 @@ class ProfileActivity : AppCompatActivity() {
         val createdText = findViewById<TextView>(R.id.profile_created)
         val androidIdText = findViewById<TextView>(R.id.profile_android_id)
 
-        emailText.text = "Username: ${sessionManager.getUsername()} · ${sessionManager.getPhone()}"
-        downloadsText.text = "Total Downloaded: ${sessionManager.getTotalDownloads()}"
-        repostsText.text = "Total Reposts: ${sessionManager.getTotalReposts()}"
+        emailText.text = "${sessionManager.getUsername()} · ${sessionManager.getPhone()}"
+        downloadsText.text = sessionManager.getTotalDownloads().toString()
+        repostsText.text = sessionManager.getTotalReposts().toString()
 
         val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-        createdText.text = "Account Created: ${dateFormat.format(Date())}"
+        createdText.text = dateFormat.format(Date())
 
         val androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
-        androidIdText.text = "Android ID: $androidId"
+        androidIdText.text = androidId
+
+        // Copy username
+        findViewById<LinearLayout>(R.id.profileUsernameCopyIcon).setOnClickListener {
+            val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+            clipboard.setPrimaryClip(ClipData.newPlainText("username", sessionManager.getUsername()))
+            Toast.makeText(this, "Username copied", Toast.LENGTH_SHORT).show()
+        }
 
         // Logout button
         val logoutBtn = findViewById<Button>(R.id.logout_btn)
@@ -50,8 +61,6 @@ class ProfileActivity : AppCompatActivity() {
             finish()
         }
 
-        // Simple title header (this screen doesn't show the full profile header)
-        findViewById<TextView>(R.id.headerTitleText).text = "Profile"
         setupBottomNav()
         ChatSupportHelper.attach(this)
     }
