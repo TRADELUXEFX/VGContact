@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.widget.ImageView
+import android.widget.LinearLayout
 
 class HomeActivity : AppCompatActivity() {
 
@@ -33,6 +34,21 @@ class HomeActivity : AppCompatActivity() {
         val repostsCount = findViewById<TextView>(R.id.reposts_count)
         downloadsCount.text = sessionManager.getTotalDownloads().toString()
         repostsCount.text = sessionManager.getTotalReposts().toString()
+
+        // Key balance row + "Get More Keys" button both open the Keys
+        // screen (RepostActivity), same destination as the bottom-nav
+        // Repost tab.
+        val keyBalanceRow = findViewById<LinearLayout>(R.id.home_key_balance_row)
+        val keyBalanceText = findViewById<TextView>(R.id.home_key_balance_text)
+        val getMoreKeysBtn = findViewById<Button>(R.id.repost_btn)
+
+        keyBalanceRow.setOnClickListener {
+            startActivity(Intent(this, RepostActivity::class.java))
+        }
+        getMoreKeysBtn.setOnClickListener {
+            startActivity(Intent(this, RepostActivity::class.java))
+        }
+        refreshKeyBalance(keyBalanceText)
 
         // Community button
         val joinBtn = findViewById<Button>(R.id.join_community_btn)
@@ -77,6 +93,30 @@ class HomeActivity : AppCompatActivity() {
         bellIcon.setOnClickListener {
             startActivity(Intent(this, NotificationsActivity::class.java))
         }
+    }
+
+    private fun refreshKeyBalance(keyBalanceText: TextView) {
+        val userId = sessionManager.getUserId()
+        if (userId.isNullOrBlank()) return
+
+        Thread {
+            SupabaseClient.fetchKeyBalance(userId) { success, balance ->
+                runOnUiThread {
+                    if (success) {
+                        keyBalanceText.text = balance.toString()
+                    }
+                }
+            }
+        }.start()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Covers coming back from the Keys screen (a repost just got
+        // verified, or a key was just spent unlocking a file) so the
+        // dashboard balance doesn't go stale.
+        val keyBalanceText = findViewById<TextView>(R.id.home_key_balance_text)
+        refreshKeyBalance(keyBalanceText)
     }
 
     private fun setupBottomNav() {
