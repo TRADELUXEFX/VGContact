@@ -94,8 +94,6 @@ class RepostActivity : AppCompatActivity() {
             }
         }
 
-        // Simple title header (this screen doesn't show the full profile header)
-        findViewById<TextView>(R.id.headerTitleText).text = "Repost"
         setupBottomNav()
         ChatSupportHelper.attach(this)
     }
