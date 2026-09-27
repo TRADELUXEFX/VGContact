@@ -23,6 +23,11 @@ on:
 
 permissions:
   contents: write
+  # Needed so the deploy-bot commit can push changes under
+  # .github/workflows/ too. Without this, GitHub silently rejects
+  # that specific push, and the fallback step below reverts to the
+  # old code and builds/releases that instead - with no visible error.
+  workflows: write
 
 jobs:
   deploy:
@@ -93,6 +98,16 @@ jobs:
           git rm -f "${zips[@]}"
           git commit -m "Deploy: remove zip(s) from incoming/ after failed deploy"
           git push origin HEAD:main
+
+      # If the push of your new code was rejected, everything after this
+      # point would otherwise silently build and release the OLD code
+      # still on main, with no visible error. Stop here instead so a
+      # failed deploy shows up as a failed run, not a fake success.
+      - name: Stop here if the new code never made it to main
+        if: steps.commit_unpacked.outputs.push_failed == 'true'
+        run: |
+          echo "::error::Your uploaded zip could not be pushed to main, so the build was stopped instead of releasing the old, unchanged code. Check the 'Commit unpacked files' step log above."
+          exit 1
 
       - name: Set up JDK
         uses: actions/setup-java@v5
