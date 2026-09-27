@@ -23,11 +23,6 @@ on:
 
 permissions:
   contents: write
-  # Needed so the deploy-bot commit can push changes under
-  # .github/workflows/ too. Without this, GitHub silently rejects
-  # that specific push, and the fallback step below reverts to the
-  # old code and builds/releases that instead - with no visible error.
-  workflows: write
 
 jobs:
   deploy:
@@ -101,13 +96,12 @@ jobs:
           fi
 
       # If the push above failed (e.g. GitHub rejected a change under
-      # .github/workflows/ because this App lacks the `workflows`
-      # permission), the zip deletion from the extract step never made it
-      # to main - the zip is still sitting in incoming/ on the remote.
-      # This step removes just the zip(s) on their own, leaving every
-      # other unpacked file exactly as it was in the failed commit (still
-      # only local to this failed run, untouched on main) so the next
-      # upload isn't blocked by a leftover zip.
+      # .github/workflows/), the zip deletion from the extract step never
+      # made it to main - the zip is still sitting in incoming/ on the
+      # remote. This step removes just the zip(s) on their own, leaving
+      # every other unpacked file exactly as it was in the failed commit
+      # (still only local to this failed run, untouched on main) so the
+      # next upload isn't blocked by a leftover zip.
       - name: Ensure the zip is removed even if the full push failed
         if: steps.extract.outputs.found == 'true' && steps.commit_unpacked.outputs.push_failed == 'true'
         run: |
