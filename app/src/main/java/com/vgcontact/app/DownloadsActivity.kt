@@ -99,13 +99,10 @@ class DownloadsActivity : AppCompatActivity() {
             fileStatusView.setTextColor(statusColor)
             statusPill.setBackgroundResource(if (isLocked) R.drawable.pill_locked_background else R.drawable.pill_unlocked_background)
 
-            downloadBtn.text = if (isLocked) "Repost to Unlock" else "Download"
+            downloadBtn.text = if (isLocked) "Unlock with Key" else "Download"
             downloadBtn.setOnClickListener {
                 if (isLocked) {
-                    val intent = Intent(this, RepostActivity::class.java)
-                    intent.putExtra("file_id", fileId)
-                    intent.putExtra("file_name", fileName)
-                    startActivity(intent)
+                    unlockWithKey(fileId, downloadBtn, statusPill, statusIconView, fileStatusView, fileUrl)
                 } else if (fileUrl.isNotBlank()) {
                     try {
                         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(fileUrl)))
@@ -121,6 +118,76 @@ class DownloadsActivity : AppCompatActivity() {
         }
     }
 
+
+    // Spends one key (via the spend_key_unlock RPC, atomic on the server -
+    // see SupabaseClient.spendKeyToUnlock) to unlock this specific file.
+    // On success, flips this row to "Unlocked" in place rather than
+    // re-fetching the whole list.
+    private fun unlockWithKey(
+        fileId: String,
+        downloadBtn: Button,
+        statusPill: LinearLayout,
+        statusIconView: ImageView,
+        fileStatusView: TextView,
+        fileUrl: String
+    ) {
+        val userId = sessionManager.getUserId()
+        if (userId.isNullOrBlank()) {
+            Toast.makeText(this, "Couldn't verify your account. Please restart the app.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        downloadBtn.isEnabled = false
+
+        thread {
+            SupabaseClient.spendKeyToUnlock(userId, fileId) { success, message, _ ->
+                runOnUiThread {
+                    downloadBtn.isEnabled = true
+
+                    if (success) {
+                        unlockedFileIds = unlockedFileIds + fileId
+
+                        fileStatusView.text = "Unlocked"
+                        val unlockedColor = ContextCompat.getColor(this, R.color.success_text)
+                        statusIconView.setImageResource(R.drawable.ic_unlock)
+                        statusIconView.setColorFilter(unlockedColor)
+                        fileStatusView.setTextColor(unlockedColor)
+                        statusPill.setBackgroundResource(R.drawable.pill_unlocked_background)
+
+                        downloadBtn.text = "Download"
+                        downloadBtn.setOnClickListener {
+                            if (fileUrl.isNotBlank()) {
+                                try {
+                                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(fileUrl)))
+                                } catch (e: Exception) {
+                                    Toast.makeText(this, "Couldn't open file link", Toast.LENGTH_SHORT).show()
+                                }
+                            } else {
+                                Toast.makeText(this, "No file link available", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
+                        Toast.makeText(this, "Unlocked! 1 key used.", Toast.LENGTH_SHORT).show()
+                    } else {
+                        when (message) {
+                            "NO_KEYS" -> {
+                                Toast.makeText(this, "You're out of keys. Repost today or buy more to unlock this file.", Toast.LENGTH_LONG).show()
+                                val intent = Intent(this, RepostActivity::class.java)
+                                startActivity(intent)
+                            }
+                            "ALREADY_UNLOCKED" -> {
+                                Toast.makeText(this, "Already unlocked - refreshing.", Toast.LENGTH_SHORT).show()
+                                fetchFilesFromSupabase()
+                            }
+                            else -> {
+                                Toast.makeText(this, "Couldn't unlock this file. Try again.", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     private fun setupBottomNav() {
         BottomNavHelper.setup(this, BottomNavHelper.Tab.DOWNLOADS)
