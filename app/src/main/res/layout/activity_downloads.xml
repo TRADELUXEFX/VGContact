@@ -64,7 +64,6 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:background="@color/white"
                     android:paddingTop="48dp"
                     android:paddingBottom="48dp"
                     android:visibility="visible">

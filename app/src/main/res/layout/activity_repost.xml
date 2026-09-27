@@ -83,11 +83,13 @@
         </LinearLayout>
 
         <ScrollView
+            android:id="@+id/repost_content_scroll"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:clipToPadding="false"
-            android:paddingBottom="88dp">
+            android:paddingBottom="88dp"
+            android:visibility="gone">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -511,6 +513,26 @@
 
             </LinearLayout>
         </ScrollView>
+
+        <!-- Shown until both the key balance and today's repost status
+             have finished loading, so the screen never briefly shows
+             stale defaults (0 keys, enabled button, no status card)
+             before the real data arrives. -->
+        <LinearLayout
+            android:id="@+id/repost_loading_state"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="visible">
+
+            <ProgressBar
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:indeterminateTint="@color/vg_green" />
+
+        </LinearLayout>
     </LinearLayout>
 
     <include layout="@layout/bottom_nav_bar" />

@@ -51,4 +51,12 @@
     <!-- Warning -->
     <color name="warning_red">#D9534F</color>
 
+    <!-- Register screen (dark background) -->
+    <color name="register_bg">#0D0D0D</color>
+    <color name="register_card_bg">#1A1A1A</color>
+    <color name="register_field_bg">#141414</color>
+    <color name="register_text_primary">#F5F5F5</color>
+    <color name="register_text_muted">#9AA39D</color>
+    <color name="register_divider">#2A2A2A</color>
+
 </resources>

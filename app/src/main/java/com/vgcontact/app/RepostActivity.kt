@@ -40,6 +40,9 @@ class RepostActivity : AppCompatActivity() {
     private lateinit var sessionManager: SessionManager
     private lateinit var prefs: SharedPreferences
 
+    private lateinit var contentScroll: android.widget.ScrollView
+    private lateinit var loadingState: LinearLayout
+
     private lateinit var keyBalanceText: TextView
     private lateinit var repostStatusText: TextView
     private lateinit var repostTodayBtn: Button
@@ -56,6 +59,14 @@ class RepostActivity : AppCompatActivity() {
     private lateinit var todaysTaskClose: ImageView
     private lateinit var todaysTaskRestore: TextView
 
+    // Both fetches must finish before the real content is revealed on
+    // first load - whichever finishes second is the one that reveals
+    // it. Later refreshes (e.g. onResume the next day) update the
+    // already-visible content in place rather than hiding it again.
+    private var keyBalanceLoaded = false
+    private var todayStatusLoaded = false
+    private var initialContentRevealed = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_repost)
@@ -68,6 +79,9 @@ class RepostActivity : AppCompatActivity() {
             finish()
             return
         }
+
+        contentScroll = findViewById(R.id.repost_content_scroll)
+        loadingState = findViewById(R.id.repost_loading_state)
 
         keyBalanceText = findViewById(R.id.key_balance_text)
         repostStatusText = findViewById(R.id.repost_status)
@@ -143,8 +157,19 @@ class RepostActivity : AppCompatActivity() {
                     if (success) {
                         keyBalanceText.text = balance.toString()
                     }
+                    keyBalanceLoaded = true
+                    revealContentIfReady()
                 }
             }
+        }
+    }
+
+    private fun revealContentIfReady() {
+        if (initialContentRevealed) return
+        if (keyBalanceLoaded && todayStatusLoaded) {
+            initialContentRevealed = true
+            loadingState.visibility = android.view.View.GONE
+            contentScroll.visibility = android.view.View.VISIBLE
         }
     }
 
@@ -155,7 +180,11 @@ class RepostActivity : AppCompatActivity() {
         thread {
             SupabaseClient.fetchTodayRepostStatus(userId) { success, status ->
                 runOnUiThread {
-                    if (!success) return@runOnUiThread
+                    if (!success) {
+                        todayStatusLoaded = true
+                        revealContentIfReady()
+                        return@runOnUiThread
+                    }
                     when (status) {
                         null -> {
                             repostTodayBtn.isEnabled = true
@@ -193,6 +222,8 @@ class RepostActivity : AppCompatActivity() {
                             )
                         }
                     }
+                    todayStatusLoaded = true
+                    revealContentIfReady()
                 }
             }
         }
