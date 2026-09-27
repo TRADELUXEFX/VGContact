@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">VG CONTACTS</string>
+    <string name="app_name">VGContact</string>
 
     <!-- Login -->
     <string name="login_title">VGContact</string>

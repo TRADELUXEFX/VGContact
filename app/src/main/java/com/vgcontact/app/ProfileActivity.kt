@@ -34,6 +34,7 @@ class ProfileActivity : AppCompatActivity() {
         val phoneText = findViewById<TextView>(R.id.profile_phone)
         val createdText = findViewById<TextView>(R.id.profile_created)
         val androidIdText = findViewById<TextView>(R.id.profile_android_id)
+        val appVersionText = findViewById<TextView>(R.id.profile_app_version)
 
         emailText.text = sessionManager.getUsername()
         phoneText.text = sessionManager.getPhone()
@@ -43,6 +44,7 @@ class ProfileActivity : AppCompatActivity() {
 
         val androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
         androidIdText.text = androidId
+        appVersionText.text = BuildInfo.displayVersion()
 
         // Copy username
         findViewById<LinearLayout>(R.id.profileUsernameCopyIcon).setOnClickListener {
