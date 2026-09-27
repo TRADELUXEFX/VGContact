@@ -207,24 +207,61 @@ object SupabaseClient {
         }
     }
 
-    // Creates a repost row with a generated unlock_code, returns the code on success.
-    fun createRepost(userId: String, fileId: String, callback: (Boolean, String?) -> Unit) {
+    // Current key balance. New users start with 3 (set server-side by the
+    // users.key_balance default); this just reads whatever the DB has now,
+    // since it may have changed since login (nightly verification, admin
+    // top-up, etc).
+    fun fetchKeyBalance(userId: String, callback: (Boolean, Int) -> Unit) {
         if (!isConfigured()) {
-            callback(false, null)
+            callback(false, 0)
             return
         }
 
         try {
-            val code = (1..6)
-                .map { "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".random() }
-                .joinToString("")
+            val url = "$supabaseUrl/rest/v1/users?id=eq.$userId&select=key_balance"
+            val request = Request.Builder()
+                .url(url)
+                .addHeader("apikey", anonKey)
+                .addHeader("Authorization", "Bearer $anonKey")
+                .get()
+                .build()
 
-            val url = "$supabaseUrl/rest/v1/reposts"
+            client.newCall(request).execute().use { response ->
+                if (response.isSuccessful) {
+                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
+                    if (arr.length() > 0) {
+                        callback(true, arr.getJSONObject(0).optInt("key_balance", 0))
+                    } else {
+                        callback(false, 0)
+                    }
+                } else {
+                    callback(false, 0)
+                }
+            }
+        } catch (e: Exception) {
+            callback(false, 0)
+        }
+    }
+
+    // Records today's repost attempt as 'pending'. This does NOT grant a
+    // key - keys are only added once the repost is manually cross-checked
+    // against WhatsApp status viewers that night and marked 'verified' in
+    // the daily_reposts table (see vgcontact_keys_schema.sql). One attempt
+    // per calendar day is enforced both here (via the RPC's own check) and
+    // by a unique index on (user_id, repost_date), so a double-tap can't
+    // queue two pending rows.
+    //
+    // message is one of: "OK", "ALREADY_REPOSTED_TODAY", or a raw error.
+    fun submitDailyRepost(userId: String, callback: (Boolean, String) -> Unit) {
+        if (!isConfigured()) {
+            callback(false, "NOT_CONFIGURED")
+            return
+        }
+
+        try {
+            val url = "$supabaseUrl/rest/v1/rpc/submit_daily_repost"
             val body = JSONObject().apply {
-                put("user_id", userId)
-                put("file_id", fileId)
-                put("status", "completed")
-                put("unlock_code", code)
+                put("p_user_id", userId)
             }
 
             val request = Request.Builder()
@@ -232,13 +269,103 @@ object SupabaseClient {
                 .addHeader("apikey", anonKey)
                 .addHeader("Authorization", "Bearer $anonKey")
                 .addHeader("Content-Type", "application/json")
-                .addHeader("Prefer", "return=representation")
                 .post(body.toString().toRequestBody("application/json".toMediaType()))
                 .build()
 
             client.newCall(request).execute().use { response ->
                 if (response.isSuccessful) {
-                    callback(true, code)
+                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
+                    if (arr.length() > 0) {
+                        val row = arr.getJSONObject(0)
+                        callback(row.optBoolean("success", false), row.optString("message", "OK"))
+                    } else {
+                        callback(false, "EMPTY_RESPONSE")
+                    }
+                } else {
+                    callback(false, "REQUEST_FAILED")
+                }
+            }
+        } catch (e: Exception) {
+            callback(false, "EXCEPTION")
+        }
+    }
+
+    // Spends one key to unlock a file, via the spend_key_unlock RPC so the
+    // balance check and the deduction happen atomically on the server -
+    // two rapid taps can't both succeed off a stale balance read.
+    //
+    // message is one of: "OK", "NO_KEYS", "ALREADY_UNLOCKED",
+    // "USER_NOT_FOUND", or a raw error.
+    fun spendKeyToUnlock(userId: String, fileId: String, callback: (Boolean, String, Int) -> Unit) {
+        if (!isConfigured()) {
+            callback(false, "NOT_CONFIGURED", 0)
+            return
+        }
+
+        try {
+            val url = "$supabaseUrl/rest/v1/rpc/spend_key_unlock"
+            val body = JSONObject().apply {
+                put("p_user_id", userId)
+                put("p_file_id", fileId)
+            }
+
+            val request = Request.Builder()
+                .url(url)
+                .addHeader("apikey", anonKey)
+                .addHeader("Authorization", "Bearer $anonKey")
+                .addHeader("Content-Type", "application/json")
+                .post(body.toString().toRequestBody("application/json".toMediaType()))
+                .build()
+
+            client.newCall(request).execute().use { response ->
+                if (response.isSuccessful) {
+                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
+                    if (arr.length() > 0) {
+                        val row = arr.getJSONObject(0)
+                        callback(
+                            row.optBoolean("success", false),
+                            row.optString("message", "OK"),
+                            row.optInt("remaining_keys", 0)
+                        )
+                    } else {
+                        callback(false, "EMPTY_RESPONSE", 0)
+                    }
+                } else {
+                    callback(false, "REQUEST_FAILED", 0)
+                }
+            }
+        } catch (e: Exception) {
+            callback(false, "EXCEPTION", 0)
+        }
+    }
+
+    // Whether today's daily repost has already been submitted (regardless
+    // of verified/pending/rejected) - used to grey out the Repost Today
+    // button after the first tap of the day instead of relying only on
+    // the server rejecting a second attempt.
+    fun fetchTodayRepostStatus(userId: String, callback: (Boolean, String?) -> Unit) {
+        if (!isConfigured()) {
+            callback(false, null)
+            return
+        }
+
+        try {
+            val url = "$supabaseUrl/rest/v1/daily_reposts?user_id=eq.$userId&repost_date=eq.${todayIsoDate()}&select=status"
+            val request = Request.Builder()
+                .url(url)
+                .addHeader("apikey", anonKey)
+                .addHeader("Authorization", "Bearer $anonKey")
+                .get()
+                .build()
+
+            client.newCall(request).execute().use { response ->
+                if (response.isSuccessful) {
+                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
+                    if (arr.length() > 0) {
+                        callback(true, arr.getJSONObject(0).optString("status"))
+                    } else {
+                        callback(true, null)
+                    }
                 } else {
                     callback(false, null)
                 }
@@ -248,35 +375,10 @@ object SupabaseClient {
         }
     }
 
-    // Records that a user has unlocked a file (after a valid repost/code).
-    fun unlockFile(userId: String, fileId: String, callback: (Boolean) -> Unit) {
-        if (!isConfigured()) {
-            callback(false)
-            return
-        }
-
-        try {
-            val url = "$supabaseUrl/rest/v1/unlocks"
-            val body = JSONObject().apply {
-                put("user_id", userId)
-                put("file_id", fileId)
-            }
-
-            val request = Request.Builder()
-                .url(url)
-                .addHeader("apikey", anonKey)
-                .addHeader("Authorization", "Bearer $anonKey")
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Prefer", "return=minimal")
-                .post(body.toString().toRequestBody("application/json".toMediaType()))
-                .build()
-
-            client.newCall(request).execute().use { response ->
-                callback(response.isSuccessful)
-            }
-        } catch (e: Exception) {
-            callback(false)
-        }
+    private fun todayIsoDate(): String {
+        val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+        sdf.timeZone = java.util.TimeZone.getTimeZone("UTC")
+        return sdf.format(java.util.Date())
     }
 
 }
