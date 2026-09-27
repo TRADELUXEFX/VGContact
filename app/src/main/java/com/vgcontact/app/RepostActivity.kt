@@ -1,12 +1,16 @@
 package com.vgcontact.app
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import kotlin.concurrent.thread
 
 /**
@@ -30,17 +34,27 @@ import kotlin.concurrent.thread
 class RepostActivity : AppCompatActivity() {
 
     private lateinit var sessionManager: SessionManager
+    private lateinit var prefs: SharedPreferences
 
     private lateinit var keyBalanceText: TextView
     private lateinit var repostStatusText: TextView
     private lateinit var repostTodayBtn: Button
     private lateinit var buyKeysBtn: Button
 
+    private lateinit var guideCard: LinearLayout
+    private lateinit var guideCloseBtn: ImageView
+    private lateinit var guideRestoreText: TextView
+
+    private lateinit var statusCard: LinearLayout
+    private lateinit var statusIcon: ImageView
+    private lateinit var statusTitle: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_repost)
 
         sessionManager = SessionManager(this)
+        prefs = getSharedPreferences("vgcontact_repost_ui", MODE_PRIVATE)
 
         if (!sessionManager.isLoggedIn()) {
             startActivity(Intent(this, RegisterActivity::class.java))
@@ -53,6 +67,18 @@ class RepostActivity : AppCompatActivity() {
         repostTodayBtn = findViewById(R.id.repost_btn)
         buyKeysBtn = findViewById(R.id.buy_keys_btn)
 
+        guideCard = findViewById(R.id.repost_guide_card)
+        guideCloseBtn = findViewById(R.id.repost_guide_close)
+        guideRestoreText = findViewById(R.id.repost_guide_restore)
+
+        statusCard = findViewById(R.id.repost_status_card)
+        statusIcon = findViewById(R.id.repost_status_icon)
+        statusTitle = findViewById(R.id.repost_status_title)
+
+        guideCloseBtn.setOnClickListener { setGuideHidden(true) }
+        guideRestoreText.setOnClickListener { setGuideHidden(false) }
+        renderGuide()
+
         repostTodayBtn.setOnClickListener { onRepostTodayClicked() }
         buyKeysBtn.setOnClickListener { openBuyKeysChat() }
 
@@ -61,6 +87,18 @@ class RepostActivity : AppCompatActivity() {
 
         setupBottomNav()
         ChatSupportHelper.attach(this)
+    }
+
+    /** X on the tip dismisses it; tapping the dashed chip brings it back. */
+    private fun setGuideHidden(hidden: Boolean) {
+        prefs.edit().putBoolean("guide_hidden", hidden).apply()
+        renderGuide()
+    }
+
+    private fun renderGuide() {
+        val hidden = prefs.getBoolean("guide_hidden", false)
+        guideCard.visibility = if (hidden) android.view.View.GONE else android.view.View.VISIBLE
+        guideRestoreText.visibility = if (hidden) android.view.View.VISIBLE else android.view.View.GONE
     }
 
     override fun onResume() {
@@ -98,27 +136,50 @@ class RepostActivity : AppCompatActivity() {
                         null -> {
                             repostTodayBtn.isEnabled = true
                             repostTodayBtn.text = "Repost Today"
-                            repostStatusText.text = "Repost once a day to earn a key. Verified reposts add a key to your balance the next day."
+                            statusCard.visibility = android.view.View.GONE
                         }
                         "pending" -> {
                             repostTodayBtn.isEnabled = false
                             repostTodayBtn.text = "Repost Sent"
-                            repostStatusText.text = "⏳ Verifying today's repost — we check WhatsApp status views each night. Your key will appear here once confirmed."
+                            showStatusCard(
+                                title = "Verification pending",
+                                message = "We check WhatsApp status views each night. Your key will appear here once confirmed.",
+                                icon = R.drawable.ic_pending,
+                                tint = R.color.warning_amber
+                            )
                         }
                         "verified" -> {
                             repostTodayBtn.isEnabled = false
                             repostTodayBtn.text = "Repost Sent"
-                            repostStatusText.text = "✅ Today's repost was verified and your key has been added."
+                            showStatusCard(
+                                title = "Repost verified",
+                                message = "Today's repost was verified and your key has been added.",
+                                icon = R.drawable.ic_check,
+                                tint = R.color.vg_green
+                            )
                         }
                         "rejected" -> {
                             repostTodayBtn.isEnabled = false
                             repostTodayBtn.text = "Repost Sent"
-                            repostStatusText.text = "We couldn't verify today's repost. Try again tomorrow."
+                            showStatusCard(
+                                title = "Couldn't verify",
+                                message = "We couldn't verify today's repost. Try again tomorrow.",
+                                icon = R.drawable.ic_close_small,
+                                tint = R.color.vg_red
+                            )
                         }
                     }
                 }
             }
         }
+    }
+
+    private fun showStatusCard(title: String, message: String, icon: Int, tint: Int) {
+        statusCard.visibility = android.view.View.VISIBLE
+        statusTitle.text = title
+        repostStatusText.text = message
+        statusIcon.setImageResource(icon)
+        statusIcon.setColorFilter(ContextCompat.getColor(this, tint))
     }
 
     private fun onRepostTodayClicked() {
@@ -137,19 +198,29 @@ class RepostActivity : AppCompatActivity() {
         }
 
         repostTodayBtn.isEnabled = false
-        repostStatusText.text = "⏳ Verifying today's repost — this can take a few hours"
+        showStatusCard(
+            title = "Verification pending",
+            message = "Verifying today's repost — this can take a few hours.",
+            icon = R.drawable.ic_pending,
+            tint = R.color.warning_amber
+        )
 
         thread {
             SupabaseClient.submitDailyRepost(userId) { success, message ->
                 runOnUiThread {
                     if (success) {
                         repostTodayBtn.text = "Repost Sent"
-                        repostStatusText.text = "⏳ Verifying today's repost — we check WhatsApp status views each night. Your key will appear here once confirmed."
+                        showStatusCard(
+                            title = "Verification pending",
+                            message = "We check WhatsApp status views each night. Your key will appear here once confirmed.",
+                            icon = R.drawable.ic_pending,
+                            tint = R.color.warning_amber
+                        )
                     } else if (message == "ALREADY_REPOSTED_TODAY") {
                         refreshTodayStatus()
                     } else {
                         repostTodayBtn.isEnabled = true
-                        repostStatusText.text = "Couldn't log your repost. Try again."
+                        statusCard.visibility = android.view.View.GONE
                         Toast.makeText(this, "Couldn't log your repost. Try again.", Toast.LENGTH_SHORT).show()
                     }
                 }
