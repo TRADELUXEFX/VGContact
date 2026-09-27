@@ -5,9 +5,9 @@
     decides whether to route to HomeActivity or RegisterActivity.
 
     Deliberately empty/transparent: SplashActivity has no distinct splash
-    visual of its own (see Theme.VGContact.Splash) - it inherits the
-    app's normal theme, so this activity just performs the session check
-    and moves on, with nothing separate ever drawn on screen.
+    visual of its own - it uses the app's normal Theme.VGContact with no
+    splash-specific override, so this activity just performs the session
+    check and moves on, with nothing separate ever drawn on screen.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"

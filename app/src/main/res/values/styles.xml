@@ -13,12 +13,10 @@
         <item name="fontFamily">@font/poppins</item>
     </style>
 
-    <style name="Theme.VGContact.Splash" parent="Theme.VGContact">
-        <!-- User does not want a distinct second splash screen at all -
-             SplashActivity should be invisible, just the OS's own default
-             pre-draw continuing straight through to whatever loads next,
-             with no separate background/icon/color of its own. -->
-    </style>
+    <!-- No custom splash theme: SplashActivity uses the app's normal
+         Theme.VGContact, which is Android's own default launch behavior
+         (system pre-draw using the launcher icon, then straight into
+         this activity - nothing custom drawn on top). -->
 
     <!-- Text Appearance Styles for other Poppins weights -->
     <style name="TextAppearance.Poppins.Medium" parent="android:TextAppearance">
