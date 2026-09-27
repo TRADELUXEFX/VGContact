@@ -31,14 +31,18 @@ class ProfileActivity : AppCompatActivity() {
 
         // Profile Info
         val emailText = findViewById<TextView>(R.id.profile_email)
+        val phoneText = findViewById<TextView>(R.id.profile_phone)
+        val keysText = findViewById<TextView>(R.id.profile_keys)
         val downloadsText = findViewById<TextView>(R.id.profile_downloads)
         val repostsText = findViewById<TextView>(R.id.profile_reposts)
         val createdText = findViewById<TextView>(R.id.profile_created)
         val androidIdText = findViewById<TextView>(R.id.profile_android_id)
 
-        emailText.text = "${sessionManager.getUsername()} · ${sessionManager.getPhone()}"
+        emailText.text = sessionManager.getUsername()
+        phoneText.text = sessionManager.getPhone()
         downloadsText.text = sessionManager.getTotalDownloads().toString()
         repostsText.text = sessionManager.getTotalReposts().toString()
+        refreshKeyBalance(keysText)
 
         val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
         createdText.text = dateFormat.format(Date())
@@ -63,6 +67,26 @@ class ProfileActivity : AppCompatActivity() {
 
         setupBottomNav()
         ChatSupportHelper.attach(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshKeyBalance(findViewById(R.id.profile_keys))
+    }
+
+    private fun refreshKeyBalance(keysText: TextView) {
+        val userId = sessionManager.getUserId()
+        if (userId.isNullOrBlank()) return
+
+        Thread {
+            SupabaseClient.fetchKeyBalance(userId) { success, balance ->
+                runOnUiThread {
+                    if (success) {
+                        keysText.text = balance.toString()
+                    }
+                }
+            }
+        }.start()
     }
 
     private fun setupBottomNav() {
