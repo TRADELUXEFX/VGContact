@@ -35,4 +35,20 @@
     <!-- Input fields -->
     <color name="field_bg">#F6FBF1</color>
 
+    <!-- Badges & dots -->
+    <color name="badge_dot_green">#1FAA59</color>
+    <color name="badge_bg">#E1F5EB</color>
+    <color name="badge_border">#DCEEE1</color>
+
+    <!-- Red status (banned / pending) -->
+    <color name="vg_red_dark">#B3413D</color>
+
+    <!-- Neutral tracks & dividers -->
+    <color name="gray_light">#E4E8E6</color>
+    <color name="tab_track_fill">#E4E8E6</color>
+    <color name="locked_chip_border">#CFD6D3</color>
+
+    <!-- Warning -->
+    <color name="warning_red">#D9534F</color>
+
 </resources>
