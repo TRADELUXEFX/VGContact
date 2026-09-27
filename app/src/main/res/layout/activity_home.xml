@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     Root is a FrameLayout so the bottom nav bar can float over the
-    content as a rounded pill (see bottom_nav_bar.xml) instead of
-    sitting in-flow as a full-width bar. Structure matches VGKontact's
-    activity_profile.xml: gradient header, then a card of label-above-
-    value rows separated by thin dividers.
+    scrollable content as a rounded pill (see bottom_nav_bar.xml).
+    Structure matches VGKontact's activity_main_menu.xml: gradient
+    header with circular avatar + badge + referral row, then a body
+    with a stats card and action buttons below.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -12,35 +12,9 @@
     android:layout_height="match_parent"
     android:background="@color/background">
 
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@drawable/header_gradient"
-        android:paddingTop="48dp"
-        android:paddingBottom="36dp"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
-        android:gravity="center">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Profile"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:textColor="@color/white" />
-    </LinearLayout>
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
         android:fillViewport="true"
         android:clipToPadding="false"
         android:paddingBottom="88dp">
@@ -48,234 +22,290 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp">
+        android:orientation="vertical">
 
+        <!-- ================= HEADER ================= -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@drawable/card_background"
-            android:padding="20dp">
-
-            <!-- Account -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="ACCOUNT"
-                android:textSize="11sp"
-                android:textAllCaps="true"
-                android:letterSpacing="0.05"
-                android:textColor="@color/text_muted" />
+            android:background="@drawable/header_gradient"
+            android:paddingTop="48dp"
+            android:paddingBottom="18dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingBottom="16dp">
+                android:gravity="center_vertical">
 
-                <TextView
-                    android:id="@+id/profile_email"
+                <FrameLayout
+                    android:layout_width="56dp"
+                    android:layout_height="56dp">
+
+                    <ImageView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_profile_person"
+                        app:tint="@color/vg_green"
+                        android:background="@drawable/avatar_circle_background"
+                        android:scaleType="fitCenter" />
+
+                </FrameLayout>
+
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="17sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/vg_dark" />
-
-                <LinearLayout
-                    android:id="@+id/profileUsernameCopyIcon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="@drawable/badge_verified_background"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="6dp"
-                    android:contentDescription="Copy username"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground">
-
-                    <ImageView
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
-                        android:src="@drawable/ic_copy"
-                        app:tint="@color/vg_green" />
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/headerUsernameText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:text="Copy"
-                        android:textSize="12sp"
+                        android:textSize="16sp"
                         android:textStyle="bold"
-                        android:textColor="@color/vg_green" />
+                        android:letterSpacing="0.01"
+                        android:textColor="@color/white"
+                        android:maxLines="1"
+                        android:ellipsize="end" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="@drawable/group_badge_background"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="10dp"
+                        android:paddingTop="3dp"
+                        android:paddingBottom="3dp">
+
+                        <View
+                            android:layout_width="6dp"
+                            android:layout_height="6dp"
+                            android:layout_marginEnd="6dp"
+                            android:background="@drawable/badge_dot" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="VERIFIED"
+                            android:textSize="9sp"
+                            android:textStyle="bold"
+                            android:textAllCaps="true"
+                            android:letterSpacing="0.04"
+                            android:textColor="@color/white" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
+                <FrameLayout
+                    android:layout_width="56dp"
+                    android:layout_height="56dp">
+
+                    <ImageView
+                        android:id="@+id/headerBellIcon"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_notification_bell"
+                        android:background="@drawable/notification_circle_background"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="Notifications"
+                        app:tint="@color/white" />
+
+                </FrameLayout>
+
             </LinearLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/stats_card_border"
-                android:layout_marginBottom="16dp" />
-
-            <!-- Total Downloaded -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="TOTAL DOWNLOADED"
-                android:textSize="11sp"
-                android:textAllCaps="true"
-                android:letterSpacing="0.05"
-                android:textColor="@color/text_muted" />
-
-            <TextView
-                android:id="@+id/profile_downloads"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="17sp"
-                android:textStyle="bold"
-                android:textColor="@color/vg_dark"
-                android:paddingBottom="16dp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/stats_card_border"
-                android:layout_marginBottom="16dp" />
-
-            <!-- Total Reposts -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="TOTAL REPOSTS"
-                android:textSize="11sp"
-                android:textAllCaps="true"
-                android:letterSpacing="0.05"
-                android:textColor="@color/text_muted" />
-
+            <!-- Referral code row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingBottom="16dp">
+                android:background="@drawable/header_tab_track_background"
+                android:paddingStart="12dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp">
 
                 <TextView
-                    android:id="@+id/profile_reposts"
+                    android:id="@+id/headerPhoneText"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="17sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/vg_dark" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:textSize="11sp"
+                    android:textColor="@color/white"
                     android:gravity="center_vertical"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+
+                <Button
+                    android:id="@+id/headerCopyBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="24dp"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp"
-                    android:background="@drawable/badge_verified_background">
-
-                    <ImageView
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
-                        android:src="@drawable/ic_sync"
-                        app:tint="@color/vg_green" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:text="Synced"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/vg_green" />
-
-                </LinearLayout>
+                    android:text="Copy"
+                    android:textAllCaps="false"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/vg_green_dark"
+                    android:backgroundTint="@color/white"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    app:cornerRadius="12dp" />
 
             </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/stats_card_border"
-                android:layout_marginBottom="16dp" />
-
-            <!-- Account Created -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="ACCOUNT CREATED"
-                android:textSize="11sp"
-                android:textAllCaps="true"
-                android:letterSpacing="0.05"
-                android:textColor="@color/text_muted" />
-
-            <TextView
-                android:id="@+id/profile_created"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="17sp"
-                android:textStyle="bold"
-                android:textColor="@color/vg_dark"
-                android:paddingBottom="16dp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/stats_card_border"
-                android:layout_marginBottom="16dp" />
-
-            <!-- Device ID -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="DEVICE ID"
-                android:textSize="11sp"
-                android:textAllCaps="true"
-                android:letterSpacing="0.05"
-                android:textColor="@color/text_muted" />
-
-            <TextView
-                android:id="@+id/profile_android_id"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="13sp"
-                android:textColor="@color/text_secondary" />
 
         </LinearLayout>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/logout_btn"
+        <!-- ================= BODY ================= -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="16dp"
-            android:text="Log Out"
-            android:textAllCaps="false"
-            android:backgroundTint="@color/vg_red"
-            android:textColor="@color/white"
-            app:icon="@drawable/ic_logout"
-            app:iconTint="@color/white"
-            app:iconGravity="textStart"
-            app:cornerRadius="16dp" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="20dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="8dp">
+
+            <!-- Stats card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/card_background"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+                        <TextView
+                            android:id="@+id/downloads_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/vg_green_dark" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Downloads"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_muted"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@color/stats_card_border" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+                        <TextView
+                            android:id="@+id/reposts_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/vg_green_dark" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Reposts"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_muted"
+                            android:layout_marginTop="2dp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/repost_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="18dp"
+                    android:text="Repost Content"
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.02"
+                    android:backgroundTint="@color/vg_green"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    app:icon="@drawable/ic_sync"
+                    app:iconTint="@color/white"
+                    app:iconGravity="textStart"
+                    app:cornerRadius="16dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/content_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="20dp" />
+
+        </LinearLayout>
+
+        <!-- ================= ACTIONS ================= -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="26dp">
+
+            <Button
+                android:id="@+id/join_community_btn"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Join Our Community"
+                android:textAllCaps="true"
+                android:letterSpacing="0.02"
+                android:textStyle="bold"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                app:strokeColor="@color/vg_green_dark"
+                android:textColor="@color/vg_green_dark"
+                app:icon="@drawable/ic_contacts"
+                app:iconTint="@color/vg_green_dark"
+                app:iconGravity="textStart"
+                app:cornerRadius="16dp" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
-    </ScrollView>
-
-</LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
     <include layout="@layout/bottom_nav_bar" />
 
