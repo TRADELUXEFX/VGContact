@@ -534,6 +534,41 @@ object SupabaseClient {
         }
     }
 
+    // Upserts this device's current FCM token onto the user's row, so the
+    // send-push Edge Function knows where to deliver notifications for
+    // them. Called on login/register and whenever FCM hands us a refreshed
+    // token (see VgFirebaseMessagingService.onNewToken). Best-effort: a
+    // failure here just means push delivery is stale until the next
+    // successful call - never worth interrupting the user over.
+    fun saveFcmToken(userId: String, token: String, callback: (Boolean) -> Unit) {
+        if (!isConfigured()) {
+            callback(false)
+            return
+        }
+
+        try {
+            val url = "$supabaseUrl/rest/v1/users?id=eq.$userId"
+            val body = JSONObject().apply {
+                put("fcm_token", token)
+            }
+
+            val request = Request.Builder()
+                .url(url)
+                .addHeader("apikey", anonKey)
+                .addHeader("Authorization", "Bearer $anonKey")
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Prefer", "return=minimal")
+                .patch(body.toString().toRequestBody("application/json".toMediaType()))
+                .build()
+
+            client.newCall(request).execute().use { response ->
+                callback(response.isSuccessful)
+            }
+        } catch (e: Exception) {
+            callback(false)
+        }
+    }
+
     // Marks every notification currently visible to this user as read
     // (called when they open the Notifications screen), via the
     // mark_notifications_read RPC.

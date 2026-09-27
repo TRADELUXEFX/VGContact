@@ -90,6 +90,15 @@
             android:exported="false"
             android:screenOrientation="portrait" />
 
+        <!-- Receives pushes sent by the send-push Supabase Edge Function. -->
+        <service
+            android:name=".VgFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
         <!-- Serves generated .vcf files (see DownloadsActivity) out to the
              device's contacts app via a content:// URI, since Android 7+
              blocks passing raw file:// paths between apps. -->
