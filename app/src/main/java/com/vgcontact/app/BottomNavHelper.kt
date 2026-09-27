@@ -27,6 +27,7 @@ object BottomNavHelper {
 
         val activeColor = ContextCompat.getColor(activity, R.color.vg_green)
         val inactiveColor = ContextCompat.getColor(activity, R.color.text_muted)
+        val activeTabBackground = ContextCompat.getDrawable(activity, R.drawable.nav_active_tab_background)
 
         for ((tab, ids) in tabs) {
             val (rowId, iconId, labelId) = ids
@@ -37,6 +38,18 @@ object BottomNavHelper {
             val isSelected = tab == selected
             icon?.setColorFilter(if (isSelected) activeColor else inactiveColor)
             label?.setTextColor(if (isSelected) activeColor else inactiveColor)
+
+            // Match VGKontact: active tab gets the soft green capsule,
+            // inactive tabs keep the plain borderless ripple.
+            if (isSelected) {
+                row.background = activeTabBackground
+            } else {
+                val outValue = android.util.TypedValue()
+                activity.theme.resolveAttribute(
+                    android.R.attr.selectableItemBackgroundBorderless, outValue, true
+                )
+                row.setBackgroundResource(outValue.resourceId)
+            }
 
             row.setOnClickListener {
                 if (tab != selected) {
