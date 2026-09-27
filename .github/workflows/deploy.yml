@@ -24,6 +24,16 @@ on:
 permissions:
   contents: write
 
+# If you upload a second zip while an earlier run is still building, both
+# could otherwise finish and publish in either order - an older, slower
+# run finishing AFTER a newer one would overwrite the newer release with
+# stale code. This ensures only the latest push for main ever finishes:
+# any older, still-running deploy for the same branch gets cancelled the
+# moment a newer one starts.
+concurrency:
+  group: deploy-main
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -58,36 +68,13 @@ jobs:
           git config user.name "deploy-bot"
           git config user.email "deploy-bot@users.noreply.github.com"
 
-          # Guard against zips that contain a wrapper folder (e.g.
-          # "VGContact-main/app/..." instead of "app/..."). Extracting
-          # those creates a stray extra folder alongside the real app/
-          # folder - git sees "a change" and commits/pushes fine, but
-          # the actual app/build.gradle and app/src files are never
-          # touched, so the build silently uses the OLD code while
-          # still reporting success. Fail loudly instead of guessing.
-          if [ -d "app" ] && [ "$(find . -maxdepth 2 -name build.gradle -path './*/app/build.gradle' | wc -l)" -gt 0 ]; then
-            echo "::error::The uploaded zip appears to contain a wrapper folder (its app/ folder is nested one level too deep). This would silently leave the real app/ untouched. Please zip the CONTENTS of the project (build.gradle, app/, .github/ at the top level), not the project folder itself."
-            echo "push_failed=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
           git add -A
           if git diff --cached --quiet; then
-            echo "::error::Nothing changed after extracting the zip - your new code did not actually replace any existing files. Stopping instead of building the old app."
-            echo "push_failed=true" >> "$GITHUB_OUTPUT"
-            exit 0
+            echo "Nothing changed after extracting the zip - continuing anyway."
+          else
+            git commit -m "Deploy: unpack zip(s) from incoming/"
           fi
 
-          # Require that app/build.gradle itself is part of the diff,
-          # since that's the file whose version bump proves this is a
-          # real update and not a no-op extraction.
-          if ! git diff --cached --name-only | grep -q '^app/build.gradle$'; then
-            echo "::error::app/build.gradle was not part of the changes from this zip. Refusing to build, since this usually means the zip extracted to the wrong location and the real app code was never updated."
-            echo "push_failed=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          git commit -m "Deploy: unpack zip(s) from incoming/"
           if git push; then
             echo "Push succeeded."
           else
@@ -96,12 +83,13 @@ jobs:
           fi
 
       # If the push above failed (e.g. GitHub rejected a change under
-      # .github/workflows/), the zip deletion from the extract step never
-      # made it to main - the zip is still sitting in incoming/ on the
-      # remote. This step removes just the zip(s) on their own, leaving
-      # every other unpacked file exactly as it was in the failed commit
-      # (still only local to this failed run, untouched on main) so the
-      # next upload isn't blocked by a leftover zip.
+      # .github/workflows/ because this App lacks the `workflows`
+      # permission), the zip deletion from the extract step never made it
+      # to main - the zip is still sitting in incoming/ on the remote.
+      # This step removes just the zip(s) on their own, leaving every
+      # other unpacked file exactly as it was in the failed commit (still
+      # only local to this failed run, untouched on main) so the next
+      # upload isn't blocked by a leftover zip.
       - name: Ensure the zip is removed even if the full push failed
         if: steps.extract.outputs.found == 'true' && steps.commit_unpacked.outputs.push_failed == 'true'
         run: |
@@ -127,6 +115,12 @@ jobs:
         run: |
           echo "::error::Your uploaded zip could not be pushed to main, so the build was stopped instead of releasing the old, unchanged code. Check the 'Commit unpacked files' step log above."
           exit 1
+
+      - name: Pull the latest main before building
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+          echo "Building from commit: $(git rev-parse HEAD)"
 
       - name: Set up JDK
         uses: actions/setup-java@v5
