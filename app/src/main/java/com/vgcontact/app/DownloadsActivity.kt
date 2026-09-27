@@ -3,7 +3,7 @@ package com.vgcontact.app
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -82,27 +82,28 @@ class DownloadsActivity : AppCompatActivity() {
             val isLocked = !unlockedFileIds.contains(fileId)
 
             val fileView = layoutInflater.inflate(R.layout.item_file, fileListContainer, false)
+            val fileIconView = fileView.findViewById<ImageView>(R.id.file_icon)
             val fileNameView = fileView.findViewById<TextView>(R.id.file_name)
             val fileCountView = fileView.findViewById<TextView>(R.id.file_count)
-            val statusPill = fileView.findViewById<LinearLayout>(R.id.file_status_pill)
-            val statusIconView = fileView.findViewById<ImageView>(R.id.file_status_icon)
-            val fileStatusView = fileView.findViewById<TextView>(R.id.file_status)
-            val downloadBtn = fileView.findViewById<Button>(R.id.download_btn)
+            val statusDot = fileView.findViewById<android.view.View>(R.id.file_status_dot)
+            val downloadBtn = fileView.findViewById<FrameLayout>(R.id.download_btn)
+            val downloadBtnIcon = fileView.findViewById<ImageView>(R.id.download_btn_icon)
 
             fileNameView.text = fileName
-            fileCountView.text = "$contactCount Contacts"
-            fileStatusView.text = if (isLocked) "Locked" else "Unlocked"
+            fileCountView.text = if (isLocked) "Locked, $contactCount contacts" else "Verified, $contactCount contacts"
 
-            statusIconView.setImageResource(if (isLocked) R.drawable.ic_lock else R.drawable.ic_unlock)
-            val statusColor = ContextCompat.getColor(this, if (isLocked) R.color.locked_text else R.color.success_text)
-            statusIconView.setColorFilter(statusColor)
-            fileStatusView.setTextColor(statusColor)
-            statusPill.setBackgroundResource(if (isLocked) R.drawable.pill_locked_background else R.drawable.pill_unlocked_background)
+            fileIconView.setImageResource(if (isLocked) R.drawable.ic_lock else R.drawable.ic_unlock)
+            statusDot.setBackgroundResource(if (isLocked) R.drawable.status_dot_locked else R.drawable.status_dot_unlocked)
 
-            downloadBtn.text = if (isLocked) "Unlock with Key" else "Download"
+            downloadBtn.setBackgroundResource(if (isLocked) R.drawable.file_row_action_locked_background else R.drawable.file_row_action_background)
+            downloadBtnIcon.setImageResource(if (isLocked) R.drawable.ic_lock else R.drawable.ic_download)
+            downloadBtnIcon.setColorFilter(
+                ContextCompat.getColor(this, if (isLocked) R.color.locked_text else R.color.white)
+            )
+
             downloadBtn.setOnClickListener {
                 if (isLocked) {
-                    unlockWithKey(fileId, downloadBtn, statusPill, statusIconView, fileStatusView, fileUrl)
+                    unlockWithKey(fileId, fileIconView, statusDot, fileCountView, downloadBtn, downloadBtnIcon, fileUrl)
                 } else if (fileUrl.isNotBlank()) {
                     try {
                         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(fileUrl)))
@@ -125,10 +126,11 @@ class DownloadsActivity : AppCompatActivity() {
     // re-fetching the whole list.
     private fun unlockWithKey(
         fileId: String,
-        downloadBtn: Button,
-        statusPill: LinearLayout,
-        statusIconView: ImageView,
-        fileStatusView: TextView,
+        fileIconView: ImageView,
+        statusDot: android.view.View,
+        fileCountView: TextView,
+        downloadBtn: FrameLayout,
+        downloadBtnIcon: ImageView,
         fileUrl: String
     ) {
         val userId = sessionManager.getUserId()
@@ -147,14 +149,17 @@ class DownloadsActivity : AppCompatActivity() {
                     if (success) {
                         unlockedFileIds = unlockedFileIds + fileId
 
-                        fileStatusView.text = "Unlocked"
-                        val unlockedColor = ContextCompat.getColor(this, R.color.success_text)
-                        statusIconView.setImageResource(R.drawable.ic_unlock)
-                        statusIconView.setColorFilter(unlockedColor)
-                        fileStatusView.setTextColor(unlockedColor)
-                        statusPill.setBackgroundResource(R.drawable.pill_unlocked_background)
+                        val contactCount = allFiles.firstOrNull { it.optString("id") == fileId }
+                            ?.optInt("contact_count", 0) ?: 0
+                        fileCountView.text = "Verified, $contactCount contacts"
 
-                        downloadBtn.text = "Download"
+                        fileIconView.setImageResource(R.drawable.ic_unlock)
+                        statusDot.setBackgroundResource(R.drawable.status_dot_unlocked)
+
+                        downloadBtn.setBackgroundResource(R.drawable.file_row_action_background)
+                        downloadBtnIcon.setImageResource(R.drawable.ic_download)
+                        downloadBtnIcon.setColorFilter(ContextCompat.getColor(this, R.color.white))
+
                         downloadBtn.setOnClickListener {
                             if (fileUrl.isNotBlank()) {
                                 try {
