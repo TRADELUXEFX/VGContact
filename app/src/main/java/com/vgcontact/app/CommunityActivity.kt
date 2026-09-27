@@ -48,7 +48,7 @@ class CommunityActivity : AppCompatActivity() {
 
 
     private fun setupBottomNav() {
-        BottomNavHelper.setup(this, BottomNavHelper.Tab.COMMUNITY)
+        BottomNavHelper.setup(this, BottomNavHelper.Tab.HOME)
     }
 
 }
