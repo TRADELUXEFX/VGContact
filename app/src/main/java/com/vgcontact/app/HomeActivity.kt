@@ -98,6 +98,26 @@ class HomeActivity : AppCompatActivity() {
         bellIcon.setOnClickListener {
             startActivity(Intent(this, NotificationsActivity::class.java))
         }
+
+        refreshUnreadBadge(findViewById(R.id.headerBellUnreadDot))
+    }
+
+    // Shows the small red dot on the bell if any notification (own or
+    // broadcast) is currently unread. Re-checked each time Home loads,
+    // since NotificationsActivity marks everything read on open.
+    private fun refreshUnreadBadge(dot: android.view.View) {
+        val userId = sessionManager.getUserId()
+        if (userId.isNullOrBlank()) return
+
+        Thread {
+            SupabaseClient.fetchNotifications(userId) { success, notifications ->
+                runOnUiThread {
+                    if (success) {
+                        dot.visibility = if (notifications.any { !it.isRead }) android.view.View.VISIBLE else android.view.View.GONE
+                    }
+                }
+            }
+        }.start()
     }
 
     private fun refreshKeyBalance(keyBalanceText: TextView) {

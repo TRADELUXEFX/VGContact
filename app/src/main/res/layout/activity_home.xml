@@ -126,6 +126,16 @@
                         android:contentDescription="Notifications"
                         app:tint="@color/white" />
 
+                    <View
+                        android:id="@+id/headerBellUnreadDot"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:layout_gravity="top|end"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/notification_unread_dot"
+                        android:visibility="gone" />
+
                 </FrameLayout>
 
             </LinearLayout>

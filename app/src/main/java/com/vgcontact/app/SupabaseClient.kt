@@ -475,4 +475,94 @@ object SupabaseClient {
         return sdf.format(java.util.Date())
     }
 
+    // A notification the user can see: their own targeted rows (a group
+    // they're in became full) plus every broadcast row (any group filled).
+    data class AppNotification(
+        val id: String,
+        val title: String,
+        val body: String,
+        val createdAt: String,
+        val isRead: Boolean
+    )
+
+    // Up to the 50 most recent notifications visible to this user, via the
+    // fetch_notifications RPC (SECURITY DEFINER - direct table reads are
+    // blocked by RLS, see notifications_schema.sql).
+    fun fetchNotifications(userId: String, callback: (Boolean, List<AppNotification>) -> Unit) {
+        if (!isConfigured()) {
+            callback(false, emptyList())
+            return
+        }
+
+        try {
+            val url = "$supabaseUrl/rest/v1/rpc/fetch_notifications"
+            val body = JSONObject().apply {
+                put("p_user_id", userId)
+            }
+
+            val request = Request.Builder()
+                .url(url)
+                .addHeader("apikey", anonKey)
+                .addHeader("Authorization", "Bearer $anonKey")
+                .addHeader("Content-Type", "application/json")
+                .post(body.toString().toRequestBody("application/json".toMediaType()))
+                .build()
+
+            client.newCall(request).execute().use { response ->
+                if (response.isSuccessful) {
+                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
+                    val notifications = mutableListOf<AppNotification>()
+                    for (i in 0 until arr.length()) {
+                        val row = arr.getJSONObject(i)
+                        notifications.add(
+                            AppNotification(
+                                id = row.optString("id"),
+                                title = row.optString("title"),
+                                body = row.optString("body"),
+                                createdAt = row.optString("created_at"),
+                                isRead = row.optBoolean("is_read", false)
+                            )
+                        )
+                    }
+                    callback(true, notifications)
+                } else {
+                    callback(false, emptyList())
+                }
+            }
+        } catch (e: Exception) {
+            callback(false, emptyList())
+        }
+    }
+
+    // Marks every notification currently visible to this user as read
+    // (called when they open the Notifications screen), via the
+    // mark_notifications_read RPC.
+    fun markNotificationsRead(userId: String, callback: (Boolean) -> Unit) {
+        if (!isConfigured()) {
+            callback(false)
+            return
+        }
+
+        try {
+            val url = "$supabaseUrl/rest/v1/rpc/mark_notifications_read"
+            val body = JSONObject().apply {
+                put("p_user_id", userId)
+            }
+
+            val request = Request.Builder()
+                .url(url)
+                .addHeader("apikey", anonKey)
+                .addHeader("Authorization", "Bearer $anonKey")
+                .addHeader("Content-Type", "application/json")
+                .post(body.toString().toRequestBody("application/json".toMediaType()))
+                .build()
+
+            client.newCall(request).execute().use { response ->
+                callback(response.isSuccessful)
+            }
+        } catch (e: Exception) {
+            callback(false)
+        }
+    }
+
 }
