@@ -41,10 +41,6 @@ class RepostActivity : AppCompatActivity() {
     private lateinit var repostTodayBtn: Button
     private lateinit var buyKeysBtn: Button
 
-    private lateinit var guideCard: LinearLayout
-    private lateinit var guideCloseBtn: ImageView
-    private lateinit var guideRestoreText: TextView
-
     private lateinit var statusCard: LinearLayout
     private lateinit var statusIcon: ImageView
     private lateinit var statusTitle: TextView
@@ -70,10 +66,6 @@ class RepostActivity : AppCompatActivity() {
         repostTodayBtn = findViewById(R.id.repost_btn)
         buyKeysBtn = findViewById(R.id.buy_keys_btn)
 
-        guideCard = findViewById(R.id.repost_guide_card)
-        guideCloseBtn = findViewById(R.id.repost_guide_close)
-        guideRestoreText = findViewById(R.id.repost_guide_restore)
-
         statusCard = findViewById(R.id.repost_status_card)
         statusIcon = findViewById(R.id.repost_status_icon)
         statusTitle = findViewById(R.id.repost_status_title)
@@ -84,10 +76,6 @@ class RepostActivity : AppCompatActivity() {
         leaderboardTab.setOnClickListener {
             Toast.makeText(this, "Leaderboard coming soon", Toast.LENGTH_SHORT).show()
         }
-
-        guideCloseBtn.setOnClickListener { setGuideHidden(true) }
-        guideRestoreText.setOnClickListener { setGuideHidden(false) }
-        renderGuide()
 
         repostTodayBtn.setOnClickListener { onRepostTodayClicked() }
         buyKeysBtn.setOnClickListener { openBuyKeysChat() }
@@ -104,18 +92,6 @@ class RepostActivity : AppCompatActivity() {
         streakTab.setTextColor(ContextCompat.getColor(this, R.color.vg_green_dark))
         leaderboardTab.background = null
         leaderboardTab.setTextColor(ContextCompat.getColor(this, R.color.white))
-    }
-
-    /** X on the tip dismisses it; tapping the dashed chip brings it back. */
-    private fun setGuideHidden(hidden: Boolean) {
-        prefs.edit().putBoolean("guide_hidden", hidden).apply()
-        renderGuide()
-    }
-
-    private fun renderGuide() {
-        val hidden = prefs.getBoolean("guide_hidden", false)
-        guideCard.visibility = if (hidden) android.view.View.GONE else android.view.View.VISIBLE
-        guideRestoreText.visibility = if (hidden) android.view.View.VISIBLE else android.view.View.GONE
     }
 
     override fun onResume() {
