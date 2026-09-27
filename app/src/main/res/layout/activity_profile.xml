@@ -58,11 +58,11 @@
             android:background="@drawable/card_background"
             android:padding="20dp">
 
-            <!-- Account -->
+            <!-- Username -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="ACCOUNT"
+                android:text="USERNAME"
                 android:textSize="11sp"
                 android:textAllCaps="true"
                 android:letterSpacing="0.05"
@@ -119,6 +119,56 @@
                 </LinearLayout>
 
             </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/stats_card_border"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Phone Number -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="PHONE NUMBER"
+                android:textSize="11sp"
+                android:textAllCaps="true"
+                android:letterSpacing="0.05"
+                android:textColor="@color/text_muted" />
+
+            <TextView
+                android:id="@+id/profile_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="@color/vg_dark"
+                android:paddingBottom="16dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/stats_card_border"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Keys -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="KEYS"
+                android:textSize="11sp"
+                android:textAllCaps="true"
+                android:letterSpacing="0.05"
+                android:textColor="@color/text_muted" />
+
+            <TextView
+                android:id="@+id/profile_keys"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="@color/vg_dark"
+                android:paddingBottom="16dp" />
 
             <View
                 android:layout_width="match_parent"
