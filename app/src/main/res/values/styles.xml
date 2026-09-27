@@ -13,10 +13,11 @@
         <item name="fontFamily">@font/poppins</item>
     </style>
 
-    <!-- No custom splash theme: SplashActivity uses the app's normal
-         Theme.VGContact, which is Android's own default launch behavior
-         (system pre-draw using the launcher icon, then straight into
-         this activity - nothing custom drawn on top). -->
+    <!-- No separate splash theme: the app has a single launcher
+         activity (RegisterActivity) using this one theme, matching
+         VGKontact's OnboardingActivity. Android's own default launch
+         behavior (icon over this plain windowBackground, then straight
+         into the activity) is the entire "splash screen". -->
 
     <!-- Text Appearance Styles for other Poppins weights -->
     <style name="TextAppearance.Poppins.Medium" parent="android:TextAppearance">

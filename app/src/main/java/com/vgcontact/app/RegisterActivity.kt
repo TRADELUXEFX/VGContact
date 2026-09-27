@@ -13,12 +13,13 @@ import androidx.appcompat.app.AppCompatActivity
 import kotlin.concurrent.thread
 
 /**
- * REGISTRATION ONLY. This is the launcher screen — reached the first
- * time someone opens the app on this device. It signs a brand-new user
- * up. It never logs an existing user in.
+ * REGISTRATION ONLY, and the app's launcher activity. Reached the first
+ * time someone opens the app on this device (or every time, on a
+ * device that isn't registered yet). It signs a brand-new user up. It
+ * never logs an existing user in.
  *
  * If this device is already registered (SessionManager.isLoggedIn()),
- * skip straight to HomeActivity — same as before.
+ * skip straight to HomeActivity.
  *
  * If someone already has an account but reinstalled the app (so this
  * device has no local session), they use the "Already have an account?
@@ -26,6 +27,13 @@ import kotlin.concurrent.thread
  * separate, login-only screen. Registration and login are two
  * different jobs now, matching the VGKontact OnboardingActivity /
  * LoginActivity split.
+ *
+ * No separate splash activity/screen sits in front of this one -
+ * matching VGKontact's OnboardingActivity, the launcher activity does
+ * its own session check immediately in onCreate(). Whatever "splash"
+ * moment the user sees is just Android's own default pre-launch frame
+ * (the launcher icon on the theme's plain window background), which
+ * requires no custom code at all.
  */
 class RegisterActivity : AppCompatActivity() {
 
@@ -41,6 +49,19 @@ class RegisterActivity : AppCompatActivity() {
 
         // Already registered on this device -> go straight to home.
         if (sessionManager.isLoggedIn()) {
+            // Keeps users.fcm_token in sync with whatever token is
+            // currently valid, on every cold start - onNewToken() only
+            // fires on rotation, so this is what catches a token that
+            // changed since the last time the app was opened. Formerly
+            // lived in the now-removed SplashActivity.
+            val userId = sessionManager.getUserId()
+            if (!userId.isNullOrBlank()) {
+                com.google.firebase.messaging.FirebaseMessaging.getInstance().token
+                    .addOnSuccessListener { token ->
+                        SupabaseClient.saveFcmToken(userId, token) { _ -> }
+                    }
+            }
+
             startActivity(Intent(this, HomeActivity::class.java))
             finish()
             return

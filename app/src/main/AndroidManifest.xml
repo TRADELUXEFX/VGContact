@@ -18,12 +18,14 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-        <!-- Launcher: routes to Home/Register based on session state.
-             No distinct splash visual of its own - inherits the app's
-             normal theme so there is nothing to see beyond the OS's own
-             default app-launch frame. -->
+        <!-- Onboarding / Registration Screen. App's launcher activity -
+             matches VGKontact's OnboardingActivity: no separate splash
+             activity in front of it, it just performs its own session
+             check immediately in onCreate(). Whatever "splash" moment
+             the user sees is Android's own default pre-launch frame,
+             which needs no custom theme or drawable to produce. -->
         <activity
-            android:name=".SplashActivity"
+            android:name=".RegisterActivity"
             android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -31,12 +33,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- Onboarding / Registration Screen -->
-        <activity
-            android:name=".RegisterActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
 
         <!-- Login: only reached via the "Already have an account?" link -->
         <activity
