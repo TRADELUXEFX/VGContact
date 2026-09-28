@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- EXACTLY 4 PERMISSIONS PER MVP SPEC -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.VGContact">
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
+
+        <!-- Onboarding / Registration Screen. App's launcher activity.
+             Uses the dark splash theme ONLY for the moment Android shows
+             the launch window; RegisterActivity.onCreate() switches to
+             the normal Theme.VGContact before drawing anything, so the
+             register screen keeps its own white background. -->
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.VGContact.Splash">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Login: only reached via the "Already have an account?" link -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- Permissions: shown once after register/login, before Home -->
+        <activity
+            android:name=".PermissionsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- Home Screen -->
+        <activity
+            android:name=".HomeActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- Repost Screen -->
+        <activity
+            android:name=".RepostActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- Downloads Screen -->
+        <activity
+            android:name=".DownloadsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- Buy Keys Screen: reached from "Get more" on Home -->
+        <activity
+            android:name=".BuyKeysActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- Community Screen -->
+        <activity
+            android:name=".CommunityActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- Profile Screen -->
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- Notifications: reached from the header bell icon -->
+        <activity
+            android:name=".NotificationsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- Chat Support: reached from the global floating chat button -->
+        <activity
+            android:name=".ChatSupportActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- Receives pushes sent by the send-push Supabase Edge Function. -->
+        <service
+            android:name=".VgFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <!-- Serves generated .vcf files (see DownloadsActivity) out to the
+             device's contacts app via a content:// URI, since Android 7+
+             blocks passing raw file:// paths between apps. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+    </application>
+
+</manifest>

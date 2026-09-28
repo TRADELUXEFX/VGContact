@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Shown for the brief moment while SplashActivity checks whether this
+    device already has a session (SessionManager.isLoggedIn()) and
+    decides whether to route to HomeActivity or RegisterActivity.
+
+    Deliberately empty/transparent: SplashActivity has no distinct splash
+    visual of its own - it uses the app's normal Theme.VGContact with no
+    splash-specific override, so this activity just performs the session
+    check and moves on, with nothing separate ever drawn on screen.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent" />
