@@ -121,7 +121,15 @@ class RegisterActivity : AppCompatActivity() {
                         setLoading(false)
 
                         if (success && user != null) {
-                            sessionManager.saveUsername(user.optString("username", username))
+                            val finalUsername = user.optString("username", username)
+                            if (finalUsername != username) {
+                                Toast.makeText(
+                                    this,
+                                    "That name was taken. Your username is $finalUsername",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                            sessionManager.saveUsername(finalUsername)
                             sessionManager.savePhone(user.optString("phone", phone))
                             sessionManager.saveUserId(user.optString("id", ""))
                             sessionManager.saveRegistrationFrom(user)
