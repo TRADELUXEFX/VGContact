@@ -369,7 +369,7 @@
                         android:id="@+id/get_more_keys_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="44dp"
-                        android:text="Get more"
+                        android:text="Buy Keys"
                         android:textAllCaps="false"
                         android:textStyle="bold"
                         android:textColor="@color/white"
@@ -389,45 +389,25 @@
                 android:textSize="12sp"
                 android:textColor="@color/text_muted" />
 
-            <!-- READY FOR YOU: always 3 rows. Real groups fill in as they
-                 exist, placeholders cover the rest (see HomeActivity). -->
-            <LinearLayout
+            <!-- Single entry point into the unlock flow. No file preview,
+                 no contact counts here - just the action. The real list,
+                 lock state per file, and the spend-a-key confirmation all
+                 live in DownloadsActivity (see confirmUnlock/unlockWithKey
+                 in DownloadsActivity.kt), which this opens directly. -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/unlock_contact_list_btn"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="56dp"
                 android:layout_marginTop="22dp"
-                android:layout_marginBottom="10dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="READY FOR YOU"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:letterSpacing="0.08"
-                    android:textColor="@color/text_muted" />
-
-                <TextView
-                    android:id="@+id/see_all_groups"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="4dp"
-                    android:text="See all"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/vg_green_dark"
-                    android:clickable="true"
-                    android:focusable="true" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/ready_groups_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" />
+                android:text="Unlock Contact List"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/vg_green"
+                app:icon="@drawable/ic_unlock"
+                app:iconTint="@color/white"
+                app:iconGravity="textStart"
+                app:cornerRadius="16dp" />
 
         </LinearLayout>
 
