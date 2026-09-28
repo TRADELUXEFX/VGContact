@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    One leaderboard row (rank 4 and below): rank number, initials avatar,
+    username, verified-repost count. The "me" row swaps the background in
+    code (lb_row_me_background) so the user can spot themselves.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/lb_row_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:background="@drawable/card_background"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:paddingStart="14dp"
+    android:paddingEnd="14dp"
+    android:layout_marginBottom="8dp">
+
+    <TextView
+        android:id="@+id/lb_row_rank"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/baloo_2_bold"
+        android:includeFontPadding="false"
+        android:textSize="14sp"
+        android:textColor="@color/text_muted" />
+
+    <TextView
+        android:id="@+id/lb_row_avatar"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:gravity="center"
+        android:background="@drawable/avatar_circle_tint_background"
+        android:fontFamily="@font/baloo_2_bold"
+        android:includeFontPadding="false"
+        android:textSize="12sp"
+        android:textColor="@color/vg_green_dark" />
+
+    <TextView
+        android:id="@+id/lb_row_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="8dp"
+        android:fontFamily="@font/baloo_2_bold"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textSize="15sp"
+        android:textColor="@color/vg_dark" />
+
+    <TextView
+        android:id="@+id/lb_row_score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/baloo_2_bold"
+        android:includeFontPadding="false"
+        android:textSize="13sp"
+        android:textColor="@color/vg_green_dark" />
+
+</LinearLayout>

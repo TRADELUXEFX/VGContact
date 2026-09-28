@@ -600,4 +600,74 @@ object SupabaseClient {
         }
     }
 
+    // One row of the leaderboard. rank is shared on ties (1, 2, 2, 4).
+    data class LeaderboardEntry(
+        val rank: Int,
+        val userId: String,
+        val username: String,
+        val score: Int,
+        val isMe: Boolean
+    )
+
+    // Top players plus this user's own row (even if they are outside the
+    // top), via the get_leaderboard RPC (SECURITY DEFINER - it returns only
+    // username + numbers, never phone/android_id).
+    //
+    // metric: "streak" | "reposts" | "referrals"
+    // period: "week" | "month" | "all"
+    fun fetchLeaderboard(
+        userId: String,
+        metric: String,
+        period: String,
+        limit: Int,
+        callback: (Boolean, List<LeaderboardEntry>) -> Unit
+    ) {
+        if (!isConfigured()) {
+            callback(false, emptyList())
+            return
+        }
+
+        try {
+            val url = "$supabaseUrl/rest/v1/rpc/get_leaderboard"
+            val body = JSONObject().apply {
+                put("p_user_id", userId)
+                put("p_metric", metric)
+                put("p_period", period)
+                put("p_limit", limit)
+            }
+
+            val request = Request.Builder()
+                .url(url)
+                .addHeader("apikey", anonKey)
+                .addHeader("Authorization", "Bearer $anonKey")
+                .addHeader("Content-Type", "application/json")
+                .post(body.toString().toRequestBody("application/json".toMediaType()))
+                .build()
+
+            client.newCall(request).execute().use { response ->
+                if (response.isSuccessful) {
+                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
+                    val entries = mutableListOf<LeaderboardEntry>()
+                    for (i in 0 until arr.length()) {
+                        val row = arr.getJSONObject(i)
+                        entries.add(
+                            LeaderboardEntry(
+                                rank = row.optInt("rank", 0),
+                                userId = row.optString("user_id"),
+                                username = row.optString("username"),
+                                score = row.optInt("score", 0),
+                                isMe = row.optBoolean("is_me", false)
+                            )
+                        )
+                    }
+                    callback(true, entries)
+                } else {
+                    callback(false, emptyList())
+                }
+            }
+        } catch (e: Exception) {
+            callback(false, emptyList())
+        }
+    }
+
 }
