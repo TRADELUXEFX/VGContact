@@ -117,6 +117,7 @@ class RepostActivity : AppCompatActivity() {
         refreshTodayStatus()
 
         setupBottomNav()
+        FloatingContactHelper.attach(this)
     }
 
     private fun dismissTodaysTask() {

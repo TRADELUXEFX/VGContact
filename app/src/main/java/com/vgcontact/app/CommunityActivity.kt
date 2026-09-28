@@ -43,6 +43,7 @@ class CommunityActivity : AppCompatActivity() {
         }
 
         setupBottomNav()
+        FloatingContactHelper.attach(this)
     }
 
 

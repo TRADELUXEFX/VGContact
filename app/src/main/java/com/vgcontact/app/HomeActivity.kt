@@ -76,6 +76,7 @@ class HomeActivity : AppCompatActivity() {
         // Shared profile header (username, phone/referral row, bell)
         setupProfileHeader()
         setupBottomNav()
+        FloatingContactHelper.attach(this)
     }
 
 

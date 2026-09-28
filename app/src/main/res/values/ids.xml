@@ -1,5 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Reserved ID for the globally-injected floating chat support button (see FloatingContactHelper) -->
-    <item name="global_chat_btn" type="id" />
 </resources>

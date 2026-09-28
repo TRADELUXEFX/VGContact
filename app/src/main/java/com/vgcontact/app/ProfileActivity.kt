@@ -62,6 +62,7 @@ class ProfileActivity : AppCompatActivity() {
         }
 
         setupBottomNav()
+        FloatingContactHelper.attach(this)
     }
 
     private fun setupBottomNav() {

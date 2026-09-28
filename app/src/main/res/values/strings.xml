@@ -9,6 +9,9 @@
     <string name="login_referral">Referral Username (optional)</string>
     <string name="login_button">Get Started</string>
 
+    <!-- Floating contact button -->
+    <string name="menu_contact_us">Contact Us</string>
+
     <!-- Home -->
     <string name="home_title">VGContact</string>
     <string name="home_total_downloads">Total Downloads</string>

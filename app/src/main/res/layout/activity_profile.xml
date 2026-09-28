@@ -225,7 +225,7 @@
                 <ImageView
                     android:layout_width="22dp"
                     android:layout_height="22dp"
-                    android:src="@drawable/ic_receipt"
+                    android:src="@drawable/ic_terms"
                     app:tint="@color/vg_green_dark"
                     android:contentDescription="@null" />
 

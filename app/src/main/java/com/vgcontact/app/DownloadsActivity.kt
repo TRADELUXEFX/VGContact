@@ -35,6 +35,7 @@ class DownloadsActivity : AppCompatActivity() {
         fetchGroupsFromSupabase()
 
         setupBottomNav()
+        FloatingContactHelper.attach(this)
     }
 
     private fun fetchGroupsFromSupabase() {

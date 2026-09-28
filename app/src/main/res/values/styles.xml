@@ -11,17 +11,6 @@
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:fontFamily">@font/poppins</item>
         <item name="fontFamily">@font/poppins</item>
-        <item name="android:windowAnimationStyle">@style/VGWindowAnimation</item>
-    </style>
-
-    <!-- Screen changes fade in over the old screen (which is held in
-         place) instead of sliding, so the floating Contact Us button,
-         which sits at the same spot on every screen, looks fixed. -->
-    <style name="VGWindowAnimation" parent="@android:style/Animation.Activity">
-        <item name="android:activityOpenEnterAnimation">@anim/vg_fade_in</item>
-        <item name="android:activityOpenExitAnimation">@anim/vg_hold</item>
-        <item name="android:activityCloseEnterAnimation">@anim/vg_hold</item>
-        <item name="android:activityCloseExitAnimation">@anim/vg_fade_out</item>
     </style>
 
     <!-- Splash theme. Applied ONLY to the launcher activity in the
