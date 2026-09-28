@@ -45,7 +45,7 @@ class BuyKeysActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_buy_keys)
-        window.statusBarColor = ContextCompat.getColor(this, R.color.vg_green_dark)
+        window.statusBarColor = ContextCompat.getColor(this, R.color.vg_green)
 
         sessionManager = SessionManager(this)
 
@@ -55,7 +55,7 @@ class BuyKeysActivity : AppCompatActivity() {
             return
         }
 
-        BackHeader.bind(this)
+        BackHeader.bind(this, "Get more keys")
 
         buyBtn = findViewById(R.id.buy_keys_whatsapp_btn)
         packViews[1] = findViewById(R.id.buy_pack_1)
@@ -132,7 +132,7 @@ class BuyKeysActivity : AppCompatActivity() {
             SupabaseClient.fetchKeyBalance(userId) { success, balance ->
                 runOnUiThread {
                     if (success) {
-                        balanceText.text = "$balance ${if (balance == 1) "key" else "keys"} left"
+                        balanceText.text = balance.toString()
                     }
                     // Reveal on success and on failure, so a network error
                     // never traps the user behind the spinner. On later

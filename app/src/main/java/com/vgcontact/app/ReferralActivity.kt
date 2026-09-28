@@ -22,6 +22,12 @@ class ReferralActivity : AppCompatActivity() {
 
     private lateinit var sessionManager: SessionManager
 
+    // The body stays hidden (spinner under the green header) until both
+    // fetches finish. Later refreshes (onResume) update in place.
+    private var keysLoaded = false
+    private var milestonesLoaded = false
+    private var contentRevealed = false
+
     companion object {
         // Each user's link is this base + their phone number.
         const val LINK_BASE = "https://vgcontact.netlify.app?ref="
@@ -30,8 +36,6 @@ class ReferralActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_referral)
-        window.statusBarColor = ContextCompat.getColor(this, R.color.vg_green_dark)
-
         sessionManager = SessionManager(this)
 
         if (!sessionManager.isLoggedIn()) {
@@ -40,52 +44,125 @@ class ReferralActivity : AppCompatActivity() {
             return
         }
 
-        val code = sessionManager.getPhone().orEmpty()
-        val link = if (code.isNotBlank()) LINK_BASE + code else ""
+        val phone = sessionManager.getPhone().orEmpty()
+        val username = sessionManager.getUsername().orEmpty()
+        val link = if (phone.isNotBlank()) LINK_BASE + phone else ""
 
-        BackHeader.bind(this, "Refer & Earn")
+        BackHeader.bind(this, "Refer and earn")
+        window.statusBarColor = ContextCompat.getColor(this, R.color.vg_green)
 
-        findViewById<TextView>(R.id.referral_code_text).text =
-            if (code.isNotBlank()) code else "Unavailable"
-        findViewById<TextView>(R.id.referral_link_text).text =
-            if (link.isNotBlank()) link else "Unavailable"
+        val codeText = findViewById<TextView>(R.id.referral_code_text)
+        val tabNumber = findViewById<TextView>(R.id.referral_tab_number)
+        val tabUsername = findViewById<TextView>(R.id.referral_tab_username)
+
+        // The code shown (and copied / shared) follows the Number / Username switch.
+        var showingNumber = true
+        fun currentValue(): String = if (showingNumber) phone else username
+
+        fun render() {
+            val value = currentValue()
+            codeText.text = when {
+                value.isBlank() -> "Unavailable"
+                showingNumber -> formatPhone(value)
+                else -> value
+            }
+            tabNumber.background =
+                if (showingNumber) ContextCompat.getDrawable(this, R.drawable.referral_switch_selected) else null
+            tabUsername.background =
+                if (!showingNumber) ContextCompat.getDrawable(this, R.drawable.referral_switch_selected) else null
+            tabNumber.setTextColor(
+                ContextCompat.getColor(this, if (showingNumber) R.color.white else R.color.text_secondary)
+            )
+            tabUsername.setTextColor(
+                ContextCompat.getColor(this, if (!showingNumber) R.color.white else R.color.text_secondary)
+            )
+        }
+
+        tabNumber.setOnClickListener { showingNumber = true; render() }
+        tabUsername.setOnClickListener { showingNumber = false; render() }
+        render()
 
         findViewById<View>(R.id.referral_copy_code_btn).setOnClickListener {
-            copy("referral_code", code)
+            copy("referral_code", currentValue())
         }
-        findViewById<View>(R.id.referral_copy_link_btn).setOnClickListener {
-            copy("referral_link", link)
+        findViewById<View>(R.id.referral_share_btn).setOnClickListener {
+            share(currentValue(), link)
         }
-        findViewById<View>(R.id.referral_share_btn).setOnClickListener { share(code, link) }
+    }
+
+    // 09110321143 -> 0911 032 1143 (display only; copy/share use the raw value).
+    private fun formatPhone(raw: String): String {
+        val digits = raw.filter { it.isDigit() }
+        return if (digits.length == 11) {
+            "${digits.substring(0, 4)} ${digits.substring(4, 7)} ${digits.substring(7)}"
+        } else raw
     }
 
     override fun onResume() {
         super.onResume()
+        loadKeyBalance()
         loadMilestones()
+    }
+
+    // Header "Total keys" card: the user's current key balance.
+    private fun loadKeyBalance() {
+        val userId = sessionManager.getUserId().orEmpty()
+        if (userId.isBlank()) {
+            keysLoaded = true
+            revealIfReady()
+            return
+        }
+        Thread {
+            SupabaseClient.fetchKeyBalance(userId) { ok, balance ->
+                runOnUiThread {
+                    if (isFinishing) return@runOnUiThread
+                    if (ok) {
+                        findViewById<TextView>(R.id.referral_keys_text).text = balance.toString()
+                    }
+                    keysLoaded = true
+                    revealIfReady()
+                }
+            }
+        }.start()
     }
 
     // Asks the server to pay any milestone keys now due (every 10 referrals
     // = 1 key; never pays the same key twice) and returns the live count.
     private fun loadMilestones() {
         val userId = sessionManager.getUserId().orEmpty()
-        if (userId.isBlank()) return
+        if (userId.isBlank()) {
+            milestonesLoaded = true
+            revealIfReady()
+            return
+        }
         Thread {
             SupabaseClient.claimReferralKeys(userId) { ok, referrals, keysAdded ->
                 runOnUiThread {
-                    if (ok && !isFinishing) {
+                    if (isFinishing) return@runOnUiThread
+                    if (ok) {
                         showMilestones(referrals)
                         if (keysAdded > 0) {
+                            loadKeyBalance()
                             val word = if (keysAdded == 1) "key" else "keys"
                             Toast.makeText(this, "You earned $keysAdded $word!", Toast.LENGTH_LONG).show()
                         }
                     }
+                    // Reveal only after the milestones are filled in (or failed).
+                    milestonesLoaded = true
+                    revealIfReady()
                 }
             }
         }.start()
     }
 
+    private fun revealIfReady() {
+        if (contentRevealed || !keysLoaded || !milestonesLoaded) return
+        contentRevealed = true
+        findViewById<View>(R.id.referral_loading_state).visibility = View.GONE
+        findViewById<View>(R.id.referral_content_scroll).visibility = View.VISIBLE
+    }
+
     private fun showMilestones(count: Int) {
-        findViewById<TextView>(R.id.referral_count_num).text = count.toString()
         findViewById<TextView>(R.id.referral_to_go).text = "${10 - (count % 10)} to go"
         findViewById<ProgressBar>(R.id.referral_progress).progress = count % 10
         styleChip(R.id.referral_chip_10, count >= 10)
