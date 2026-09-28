@@ -40,11 +40,12 @@
         android:orientation="vertical">
 
         <TextView
+            android:fontFamily="@font/baloo_2_bold"
+            android:includeFontPadding="false"
             android:id="@+id/file_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="13.5sp"
-            android:textStyle="bold"
+            android:textSize="15.5sp"
             android:textColor="@color/vg_dark"
             android:maxLines="1"
             android:ellipsize="end" />

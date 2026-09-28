@@ -27,11 +27,12 @@
             android:gravity="center">
 
             <TextView
+                android:fontFamily="@font/baloo_2_extrabold"
+                android:includeFontPadding="false"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Get Viewers"
-                android:textSize="22sp"
-                android:textStyle="bold"
+                android:textSize="24sp"
                 android:textColor="@color/white"
                 android:textAlignment="center" />
 

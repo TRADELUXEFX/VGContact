@@ -62,7 +62,6 @@ class ProfileActivity : AppCompatActivity() {
         }
 
         setupBottomNav()
-        ChatSupportHelper.attach(this)
     }
 
     private fun setupBottomNav() {

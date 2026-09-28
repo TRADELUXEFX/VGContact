@@ -36,13 +36,14 @@
             android:layout_marginStart="10dp">
 
             <TextView
+                android:fontFamily="@font/baloo_2_bold"
+                android:includeFontPadding="false"
                 android:id="@+id/headerUsernameText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="VGContact User"
                 android:textColor="@color/white"
-                android:textSize="15sp"
-                android:textStyle="bold"
+                android:textSize="17sp"
                 android:maxLines="1"
                 android:ellipsize="end" />
 

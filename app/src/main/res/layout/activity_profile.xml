@@ -29,11 +29,12 @@
         android:gravity="center">
 
         <TextView
+            android:fontFamily="@font/baloo_2_extrabold"
+            android:includeFontPadding="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Profile"
-            android:textSize="22sp"
-            android:textStyle="bold"
+            android:textSize="24sp"
             android:textColor="@color/white" />
     </LinearLayout>
 
@@ -292,6 +293,9 @@
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
+            android:fontFamily="@font/baloo_2_bold"
+            android:includeFontPadding="false"
+            android:textSize="16sp"
             android:id="@+id/logout_btn"
             android:layout_width="match_parent"
             android:layout_height="56dp"

@@ -27,11 +27,12 @@
             android:gravity="center">
 
             <TextView
+                android:fontFamily="@font/baloo_2_extrabold"
+                android:includeFontPadding="false"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Community"
-                android:textSize="22sp"
-                android:textStyle="bold"
+                android:textSize="24sp"
                 android:textColor="@color/white"
                 android:textAlignment="center" />
 
@@ -90,6 +91,9 @@
                 </LinearLayout>
 
                 <com.google.android.material.button.MaterialButton
+                    android:fontFamily="@font/baloo_2_bold"
+                    android:includeFontPadding="false"
+                    android:textSize="16sp"
                     android:id="@+id/join_whatsapp_btn"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
@@ -104,6 +108,9 @@
                     android:layout_marginBottom="12dp" />
 
                 <com.google.android.material.button.MaterialButton
+                    android:fontFamily="@font/baloo_2_bold"
+                    android:includeFontPadding="false"
+                    android:textSize="16sp"
                     android:id="@+id/chat_support_btn"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"

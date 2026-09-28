@@ -43,7 +43,6 @@ class CommunityActivity : AppCompatActivity() {
         }
 
         setupBottomNav()
-        ChatSupportHelper.attach(this)
     }
 
 

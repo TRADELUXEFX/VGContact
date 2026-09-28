@@ -11,6 +11,17 @@
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:fontFamily">@font/poppins</item>
         <item name="fontFamily">@font/poppins</item>
+        <item name="android:windowAnimationStyle">@style/VGWindowAnimation</item>
+    </style>
+
+    <!-- Screen changes fade in over the old screen (which is held in
+         place) instead of sliding, so the floating Contact Us button,
+         which sits at the same spot on every screen, looks fixed. -->
+    <style name="VGWindowAnimation" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/vg_fade_in</item>
+        <item name="android:activityOpenExitAnimation">@anim/vg_hold</item>
+        <item name="android:activityCloseEnterAnimation">@anim/vg_hold</item>
+        <item name="android:activityCloseExitAnimation">@anim/vg_fade_out</item>
     </style>
 
     <!-- Splash theme. Applied ONLY to the launcher activity in the
@@ -42,12 +53,32 @@
         <item name="fontFamily">@font/poppins_bold</item>
     </style>
 
+    <!-- Two-font system.
+         Poppins (theme default): body copy, small caps labels, inputs,
+         nav labels, data values - anything read rather than felt.
+         Baloo 2: the voice of the app - screen titles, section headings,
+         big numbers (keys, streak, prices), usernames, list-item titles,
+         tabs and buttons. Use these instead of textStyle="bold" so the
+         font's real weight is used rather than a faux-bold. -->
+    <style name="TextAppearance.Baloo.ExtraBold" parent="android:TextAppearance">
+        <item name="android:fontFamily">@font/baloo_2_extrabold</item>
+        <item name="fontFamily">@font/baloo_2_extrabold</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="TextAppearance.Baloo.Bold" parent="android:TextAppearance">
+        <item name="android:fontFamily">@font/baloo_2_bold</item>
+        <item name="fontFamily">@font/baloo_2_bold</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
     <!-- Button Styles -->
     <style name="ButtonPrimary" parent="Widget.MaterialComponents.Button">
         <item name="backgroundTint">@color/vg_green</item>
         <item name="android:textColor">@color/white</item>
         <item name="cornerRadius">16dp</item>
-        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/baloo_2_bold</item>
+        <item name="fontFamily">@font/baloo_2_bold</item>
         <item name="android:textAllCaps">true</item>
     </style>
 

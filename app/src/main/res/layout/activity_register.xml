@@ -35,11 +35,12 @@
                 android:textColor="@color/white" />
 
             <TextView
+                android:fontFamily="@font/baloo_2_extrabold"
+                android:includeFontPadding="false"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/login_title"
-                android:textSize="26sp"
-                android:textStyle="bold"
+                android:textSize="28sp"
                 android:layout_marginTop="2dp"
                 android:gravity="center"
                 android:textColor="@color/white" />
@@ -231,12 +232,13 @@
                 android:layout_height="56dp">
 
                 <com.google.android.material.button.MaterialButton
+                    android:fontFamily="@font/baloo_2_bold"
+                    android:includeFontPadding="false"
                     android:id="@+id/register_btn"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:text="@string/login_button"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
+                    android:textSize="18sp"
                     android:textAllCaps="false"
                     android:backgroundTint="@color/vg_green"
                     android:textColor="@color/white"

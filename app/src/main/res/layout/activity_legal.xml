@@ -33,12 +33,13 @@
             android:focusable="true" />
 
         <TextView
+            android:fontFamily="@font/baloo_2_extrabold"
+            android:includeFontPadding="false"
             android:id="@+id/legal_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="18sp"
-            android:textStyle="bold"
+            android:textSize="20sp"
             android:textColor="@color/white" />
 
     </FrameLayout>

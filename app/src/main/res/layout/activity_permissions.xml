@@ -38,12 +38,13 @@
                 tools:text="STEP 1 OF 2" />
 
             <TextView
+                android:fontFamily="@font/baloo_2_extrabold"
+                android:includeFontPadding="false"
                 android:id="@+id/stepTitleText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:textSize="24sp"
-                android:textStyle="bold"
+                android:textSize="26sp"
                 android:textColor="@color/white"
                 android:gravity="center"
                 tools:text="Stay Notified" />
@@ -101,11 +102,12 @@
             android:padding="24dp">
 
             <Button
+                android:fontFamily="@font/baloo_2_bold"
+                android:includeFontPadding="false"
                 android:id="@+id/stepActionButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:textSize="16sp"
-                android:textStyle="bold"
+                android:textSize="18sp"
                 android:backgroundTint="@color/vg_green"
                 android:textColor="@color/white"
                 app:cornerRadius="28dp"

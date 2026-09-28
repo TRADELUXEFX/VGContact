@@ -76,7 +76,6 @@ class HomeActivity : AppCompatActivity() {
         // Shared profile header (username, phone/referral row, bell)
         setupProfileHeader()
         setupBottomNav()
-        ChatSupportHelper.attach(this)
     }
 
 

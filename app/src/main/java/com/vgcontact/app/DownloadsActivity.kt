@@ -35,7 +35,6 @@ class DownloadsActivity : AppCompatActivity() {
         fetchGroupsFromSupabase()
 
         setupBottomNav()
-        ChatSupportHelper.attach(this)
     }
 
     private fun fetchGroupsFromSupabase() {

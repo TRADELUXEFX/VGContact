@@ -79,13 +79,14 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:text="Get More Status\nViewers With VGContact"
+                    android:fontFamily="@font/baloo_2_extrabold"
+                    android:includeFontPadding="false"
                     android:textSize="32sp"
-                    android:textStyle="bold"
                     android:textColor="@color/white"
                     android:maxLines="2"
                     app:autoSizeTextType="uniform"
                     app:autoSizeMinTextSize="24sp"
-                    app:autoSizeMaxTextSize="32sp"
+                    app:autoSizeMaxTextSize="34sp"
                     app:autoSizeStepGranularity="1sp" />
 
                 <TextView
@@ -129,8 +130,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="1 key"
-                            android:textSize="17sp"
-                            android:textStyle="bold"
+                            android:fontFamily="@font/baloo_2_bold"
+                            android:includeFontPadding="false"
+                            android:textSize="20sp"
                             android:textColor="@color/vg_dark" />
 
                         <TextView
@@ -148,8 +150,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="₦1,000"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
+                        android:fontFamily="@font/baloo_2_extrabold"
+                        android:includeFontPadding="false"
+                        android:textSize="22sp"
                         android:textColor="@color/vg_green_dark" />
 
                 </LinearLayout>
@@ -182,8 +185,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="5 keys"
-                            android:textSize="17sp"
-                            android:textStyle="bold"
+                            android:fontFamily="@font/baloo_2_bold"
+                            android:includeFontPadding="false"
+                            android:textSize="20sp"
                             android:textColor="@color/vg_dark" />
 
                         <TextView
@@ -201,8 +205,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="₦5,000"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
+                        android:fontFamily="@font/baloo_2_extrabold"
+                        android:includeFontPadding="false"
+                        android:textSize="22sp"
                         android:textColor="@color/vg_green_dark" />
 
                 </LinearLayout>
@@ -245,8 +250,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="10 keys"
-                            android:textSize="17sp"
-                            android:textStyle="bold"
+                            android:fontFamily="@font/baloo_2_bold"
+                            android:includeFontPadding="false"
+                            android:textSize="20sp"
                             android:textColor="@color/vg_dark" />
 
                         <TextView
@@ -264,8 +270,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="₦8,000"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
+                        android:fontFamily="@font/baloo_2_extrabold"
+                        android:includeFontPadding="false"
+                        android:textSize="22sp"
                         android:textColor="@color/vg_green_dark" />
 
                 </LinearLayout>
@@ -291,8 +298,8 @@
                 android:layout_height="58dp"
                 android:text="Get 5 keys"
                 android:textAllCaps="false"
-                android:textSize="16sp"
-                android:textStyle="bold"
+                android:fontFamily="@font/baloo_2_bold"
+                android:textSize="19sp"
                 android:textColor="@color/white"
                 android:backgroundTint="@color/vg_dark"
                 app:cornerRadius="29dp" />

@@ -117,7 +117,6 @@ class RepostActivity : AppCompatActivity() {
         refreshTodayStatus()
 
         setupBottomNav()
-        ChatSupportHelper.attach(this)
     }
 
     private fun dismissTodaysTask() {

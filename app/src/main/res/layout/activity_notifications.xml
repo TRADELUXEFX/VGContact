@@ -24,11 +24,12 @@
         android:gravity="center">
 
         <TextView
+            android:fontFamily="@font/baloo_2_extrabold"
+            android:includeFontPadding="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Notifications"
-            android:textSize="22sp"
-            android:textStyle="bold"
+            android:textSize="24sp"
             android:textColor="@color/white"
             android:textAlignment="center" />
 
@@ -112,13 +113,14 @@
             android:contentDescription="@null" />
 
         <TextView
+            android:fontFamily="@font/baloo_2_extrabold"
+            android:includeFontPadding="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="Couldn't load notifications"
             android:textColor="@color/vg_dark"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textSize="18sp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -130,6 +132,9 @@
             android:textAlignment="center" />
 
         <com.google.android.material.button.MaterialButton
+            android:fontFamily="@font/baloo_2_bold"
+            android:includeFontPadding="false"
+            android:textSize="16sp"
             android:id="@+id/notifications_retry_btn"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
