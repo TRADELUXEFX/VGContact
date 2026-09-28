@@ -205,7 +205,7 @@ class RepostActivity : AppCompatActivity() {
                             showRepostSent()
                             showStatusCard(
                                 title = "Verification pending",
-                                message = "We check WhatsApp status views each night. Your key will appear here once confirmed.",
+                                message = "We check your repost and add your key within 24 hours.",
                                 icon = R.drawable.ic_pending,
                                 tint = R.color.warning_amber
                             )
@@ -264,7 +264,7 @@ class RepostActivity : AppCompatActivity() {
         repostTodayBtn.isEnabled = false
         showStatusCard(
             title = "Verification pending",
-            message = "Verifying today's repost — this can take a few hours.",
+            message = "We'll add your key within 24 hours.",
             icon = R.drawable.ic_pending,
             tint = R.color.warning_amber
         )
@@ -276,7 +276,7 @@ class RepostActivity : AppCompatActivity() {
                         showRepostSent()
                         showStatusCard(
                             title = "Verification pending",
-                            message = "We check WhatsApp status views each night. Your key will appear here once confirmed.",
+                            message = "We check your repost and add your key within 24 hours.",
                             icon = R.drawable.ic_pending,
                             tint = R.color.warning_amber
                         )

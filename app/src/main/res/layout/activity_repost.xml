@@ -318,7 +318,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:layout_marginStart="12dp"
-                                android:text="Get one key added once approved"
+                                android:text="Get 1 key added within 24 hours"
                                 android:textColor="@color/text_secondary"
                                 android:textSize="14sp" />
 

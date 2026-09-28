@@ -197,6 +197,57 @@
             android:paddingEnd="20dp"
             android:paddingBottom="8dp">
 
+            <!-- First-time intro, shown once (dismissed with "Got it") -->
+            <LinearLayout
+                android:id="@+id/home_intro_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/card_background"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="How VGContact works"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/vg_dark" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:lineSpacingExtra="6dp"
+                    android:text="1   Get a key. Repost for free, or buy one for ₦1,000.\n2   Unlock a contact file. 1 key unlocks 1 file.\n3   Download it and save the contacts."
+                    android:textSize="14sp"
+                    android:textColor="@color/text_secondary" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Keys are added within 24 hours."
+                    android:textSize="12sp"
+                    android:textColor="@color/text_muted" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/home_intro_got_it"
+                    android:layout_width="wrap_content"
+                    android:layout_height="44dp"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="8dp"
+                    android:text="Got it"
+                    android:textAllCaps="false"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:backgroundTint="@color/vg_green"
+                    app:cornerRadius="22dp" />
+
+            </LinearLayout>
+
             <!-- TODAY: repost banner, first container on Home, above the keys card -->
             <TextView
                 android:layout_width="wrap_content"
@@ -328,6 +379,15 @@
                 </LinearLayout>
 
             </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="4dp"
+                android:text="1 key unlocks 1 contact file"
+                android:textSize="12sp"
+                android:textColor="@color/text_muted" />
 
             <!-- READY FOR YOU: always 3 rows. Real groups fill in as they
                  exist, placeholders cover the rest (see HomeActivity). -->

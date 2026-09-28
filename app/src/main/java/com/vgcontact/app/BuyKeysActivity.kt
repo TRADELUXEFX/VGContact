@@ -10,12 +10,17 @@ import androidx.appcompat.app.AppCompatActivity
 /**
  * Buy-keys page, opened from the "Get more" button on Home. Only for
  * buying keys - earning them by reposting stays on RepostActivity.
- * No in-app payment yet, so buying opens the same WhatsApp chat the
- * Repost screen's buy button uses.
+ * No in-app payment yet, so buying opens a WhatsApp chat with support
+ * (SUPPORT_WHATSAPP) with a prefilled message.
  */
 class BuyKeysActivity : AppCompatActivity() {
 
     private lateinit var sessionManager: SessionManager
+
+    companion object {
+        // 09110321143 in international format (Nigeria +234, no leading 0).
+        const val SUPPORT_WHATSAPP = "2349110321143"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +39,10 @@ class BuyKeysActivity : AppCompatActivity() {
         findViewById<android.view.View>(R.id.buy_keys_whatsapp_btn).setOnClickListener {
             try {
                 val intent = Intent(Intent.ACTION_VIEW)
-                intent.data = Uri.parse("https://wa.me/?text=Hi%2C%20I%27d%20like%20to%20buy%20more%20VGContact%20keys")
+                val username = sessionManager.getUsername()
+                val message = "Hi, I'd like to buy more VGContact keys." +
+                    if (username.isNullOrBlank()) "" else " My username is $username."
+                intent.data = Uri.parse("https://wa.me/$SUPPORT_WHATSAPP?text=${Uri.encode(message)}")
                 startActivity(intent)
             } catch (e: Exception) {
                 Toast.makeText(this, "WhatsApp not installed", Toast.LENGTH_SHORT).show()

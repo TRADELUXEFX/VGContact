@@ -119,18 +119,41 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Need more keys?"
-                        android:textSize="17sp"
+                        android:text="₦1,000 per key"
+                        android:textSize="22sp"
                         android:textStyle="bold"
+                        android:textColor="@color/vg_green_dark" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="1 key unlocks 1 contact file."
+                        android:textSize="14sp"
                         android:textColor="@color/vg_dark" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Each key unlocks one contact group. Message us on WhatsApp and we'll add the keys to your account."
+                        android:layout_marginTop="10dp"
+                        android:text="1   Message us on WhatsApp"
                         android:textSize="14sp"
-                        android:lineSpacingExtra="3dp"
+                        android:textColor="@color/text_secondary" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="2   Pay for your keys"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="3   We add them to your account within 24 hours"
+                        android:textSize="14sp"
                         android:textColor="@color/text_secondary" />
 
                     <com.google.android.material.button.MaterialButton

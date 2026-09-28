@@ -137,7 +137,7 @@ class DownloadsActivity : AppCompatActivity() {
 
             downloadBtn.setOnClickListener {
                 if (isLocked) {
-                    unlockWithKey(groupId, groupIconView, statusDot, groupCountView, downloadBtn, downloadBtnIcon)
+                    confirmUnlock(groupId, groupIconView, statusDot, groupCountView, downloadBtn, downloadBtnIcon)
                 } else {
                     generateVcfAndImport(downloadBtn, downloadBtnIcon, groupId)
                 }
@@ -225,6 +225,56 @@ class DownloadsActivity : AppCompatActivity() {
     }
 
     private fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()
+
+    // Tap on a locked file: check the balance first, then either confirm the
+    // spend ("This uses 1 key. You have 3 -> 2 after.") or, with 0 keys,
+    // point to the two ways to get one (repost free / buy for N1,000).
+    // If the balance can't be read, falls back to the direct unlock, which
+    // still handles NO_KEYS server-side.
+    private fun confirmUnlock(
+        groupId: String,
+        groupIconView: ImageView,
+        statusDot: android.view.View,
+        groupCountView: TextView,
+        downloadBtn: FrameLayout,
+        downloadBtnIcon: ImageView
+    ) {
+        val userId = sessionManager.getUserId()
+        if (userId.isNullOrBlank()) {
+            Toast.makeText(this, "Couldn't verify your account. Please restart the app.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        downloadBtn.isEnabled = false
+        thread {
+            SupabaseClient.fetchKeyBalance(userId) { ok, balance ->
+                runOnUiThread {
+                    downloadBtn.isEnabled = true
+                    when {
+                        !ok -> unlockWithKey(groupId, groupIconView, statusDot, groupCountView, downloadBtn, downloadBtnIcon)
+                        balance <= 0 -> androidx.appcompat.app.AlertDialog.Builder(this)
+                            .setTitle("You're out of keys")
+                            .setMessage("Repost today for a free key, or buy one for \u20A61,000. Keys are added within 24 hours.")
+                            .setPositiveButton("Repost free") { _, _ ->
+                                startActivity(Intent(this, RepostActivity::class.java))
+                            }
+                            .setNegativeButton("Buy a key") { _, _ ->
+                                startActivity(Intent(this, BuyKeysActivity::class.java))
+                            }
+                            .show()
+                        else -> androidx.appcompat.app.AlertDialog.Builder(this)
+                            .setTitle("Unlock this file?")
+                            .setMessage("This uses 1 key. You have $balance \u2192 ${balance - 1} after.")
+                            .setPositiveButton("Unlock") { _, _ ->
+                                unlockWithKey(groupId, groupIconView, statusDot, groupCountView, downloadBtn, downloadBtnIcon)
+                            }
+                            .setNegativeButton("Cancel", null)
+                            .show()
+                    }
+                }
+            }
+        }
+    }
 
     // Spends one key (via the spend_key_unlock_group RPC, atomic on the
     // server - see SupabaseClient.spendKeyToUnlockGroup) to unlock this

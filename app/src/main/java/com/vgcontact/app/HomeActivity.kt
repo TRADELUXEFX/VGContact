@@ -49,6 +49,17 @@ class HomeActivity : AppCompatActivity() {
         }
         renderReadyGroups(emptyList(), emptySet())
 
+        // First-time intro card: shown once, then never again.
+        val tips = getSharedPreferences("vg_tips", MODE_PRIVATE)
+        val introCard = findViewById<android.view.View>(R.id.home_intro_card)
+        if (!tips.getBoolean("home_intro_seen", false)) {
+            introCard.visibility = android.view.View.VISIBLE
+        }
+        findViewById<Button>(R.id.home_intro_got_it).setOnClickListener {
+            tips.edit().putBoolean("home_intro_seen", true).apply()
+            introCard.visibility = android.view.View.GONE
+        }
+
         // Community button
         val joinBtn = findViewById<Button>(R.id.join_community_btn)
         joinBtn.setOnClickListener {
