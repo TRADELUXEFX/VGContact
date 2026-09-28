@@ -351,32 +351,23 @@
                 </LinearLayout>
 
                 <!-- 1. Repost button: stands on its own, not inside any card. -->
-                <FrameLayout
+                <com.google.android.material.button.MaterialButton
+                    android:fontFamily="@font/baloo_2_bold"
+                    android:includeFontPadding="false"
+                    android:textSize="16sp"
+                    android:id="@+id/repost_btn"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="14dp"
-                    android:paddingBottom="4dp"
-                    android:background="@drawable/btn_primary_shadow">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:fontFamily="@font/baloo_2_extrabold"
-                        android:includeFontPadding="false"
-                        android:textSize="18sp"
-                        android:id="@+id/repost_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="60dp"
-                        android:text="REPOST TODAY"
-                        android:textAllCaps="true"
-                        android:letterSpacing="0.04"
-                        android:backgroundTint="@color/repost_btn_bg"
-                        android:textColor="@color/repost_btn_text"
-                        app:rippleColor="#33FFFFFF"
-                        app:strokeColor="@color/vg_green_dark"
-                        app:strokeWidth="2dp"
-                        app:cornerRadius="18dp"
-                        app:elevation="0dp" />
-
-                </FrameLayout>
+                    android:layout_height="56dp"
+                    android:layout_marginBottom="12dp"
+                    android:text="REPOST TODAY"
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.02"
+                    android:backgroundTint="@color/repost_btn_bg"
+                    android:textColor="@color/repost_btn_text"
+                    app:strokeColor="@color/vg_green"
+                    app:strokeWidth="2dp"
+                    app:cornerRadius="16dp"
+                    app:elevation="0dp" />
 
                 <!-- Buy keys: one slim outlined button, no big card -->
                 <com.google.android.material.button.MaterialButton
@@ -384,22 +375,17 @@
                     android:includeFontPadding="false"
                     android:textSize="16sp"
                     android:id="@+id/buy_keys_btn"
-                    style="@style/Widget.MaterialComponents.Button"
                     android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:text="Need New Views? Buy Views"
+                    android:layout_height="52dp"
+                    android:text="Buy Status Viewers"
                     android:textAllCaps="false"
-                    android:backgroundTint="@color/vg_green_tint"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    app:strokeColor="@color/vg_green_dark"
                     android:textColor="@color/vg_green_dark"
-                    app:rippleColor="#331FAA59"
-                    app:strokeColor="@color/vg_green"
-                    app:strokeWidth="1.5dp"
                     app:icon="@drawable/ic_unlock"
                     app:iconTint="@color/vg_green_dark"
                     app:iconGravity="textStart"
-                    app:iconPadding="10dp"
-                    app:cornerRadius="18dp"
-                    app:elevation="0dp" />
+                    app:cornerRadius="16dp" />
 
                 <!-- Milestones: same chips as before, tighter card -->
                 <LinearLayout

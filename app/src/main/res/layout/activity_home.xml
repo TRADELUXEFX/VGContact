@@ -431,6 +431,22 @@
             android:paddingTop="8dp"
             android:paddingBottom="26dp">
 
+            <!-- Refer & Earn: opens the phone's share menu with the user's
+                 referral code (same code shown in the header). -->
+            <com.google.android.material.button.MaterialButton
+                android:fontFamily="@font/baloo_2_bold"
+                android:includeFontPadding="false"
+                android:textSize="16sp"
+                android:id="@+id/refer_earn_btn"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginBottom="12dp"
+                android:text="Refer &amp; Earn"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/vg_green"
+                app:cornerRadius="16dp" />
+
             <Button
                 android:fontFamily="@font/baloo_2_bold"
                 android:includeFontPadding="false"
