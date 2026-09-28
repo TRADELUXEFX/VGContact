@@ -3,9 +3,7 @@ package com.vgcontact.app
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
-import android.widget.ScrollView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class NotificationsActivity : AppCompatActivity() {
@@ -20,42 +18,63 @@ class NotificationsActivity : AppCompatActivity() {
 
         val userId = sessionManager.getUserId()
         if (userId.isNullOrBlank()) {
+            showState(loading = false, error = true)
             return
         }
+
+        findViewById<View>(R.id.notifications_retry_btn).setOnClickListener {
+            loadNotifications(userId)
+        }
+
+        loadNotifications(userId)
+    }
+
+    private fun loadNotifications(userId: String) {
+        showState(loading = true)
 
         Thread {
             SupabaseClient.fetchNotifications(userId) { success, notifications ->
                 runOnUiThread {
                     if (!success) {
-                        Toast.makeText(this, "Couldn't load notifications. Check your connection.", Toast.LENGTH_SHORT).show()
+                        // A failed load must never look like an empty inbox.
+                        showState(error = true)
                         return@runOnUiThread
                     }
                     render(notifications)
                 }
-            }
 
-            // Mark everything the user can currently see as read. Fire
-            // right after the fetch above, on the same background thread -
-            // the already-fetched list still shows this visit's unread
-            // dots, and the bell badge just reflects the new (all-read)
-            // state next time Home loads.
-            SupabaseClient.markNotificationsRead(userId) { _ -> }
+                // Only mark as read once the list actually loaded, so a
+                // failed fetch doesn't silently clear the unread dot for
+                // notifications the user never got to see.
+                if (success) {
+                    SupabaseClient.markNotificationsRead(userId) { _ -> }
+                }
+            }
         }.start()
     }
 
+    // Exactly one of these is visible at a time.
+    private fun showState(
+        loading: Boolean = false,
+        error: Boolean = false,
+        empty: Boolean = false,
+        list: Boolean = false
+    ) {
+        findViewById<View>(R.id.notifications_loading_state).visibility = if (loading) View.VISIBLE else View.GONE
+        findViewById<View>(R.id.notifications_error_state).visibility = if (error) View.VISIBLE else View.GONE
+        findViewById<View>(R.id.notifications_empty_state).visibility = if (empty) View.VISIBLE else View.GONE
+        findViewById<View>(R.id.notifications_scroll).visibility = if (list) View.VISIBLE else View.GONE
+    }
+
     private fun render(notifications: List<SupabaseClient.AppNotification>) {
-        val scroll = findViewById<ScrollView>(R.id.notifications_scroll)
-        val emptyState = findViewById<LinearLayout>(R.id.notifications_empty_state)
         val container = findViewById<LinearLayout>(R.id.notification_list_container)
 
         if (notifications.isEmpty()) {
-            scroll.visibility = View.GONE
-            emptyState.visibility = View.VISIBLE
+            showState(empty = true)
             return
         }
 
-        scroll.visibility = View.VISIBLE
-        emptyState.visibility = View.GONE
+        showState(list = true)
         container.removeAllViews()
 
         notifications.forEach { notification ->
