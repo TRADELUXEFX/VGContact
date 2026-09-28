@@ -307,6 +307,54 @@ object SupabaseClient {
         }
     }
 
+    // Unlocks several groups at once, all or nothing, via the
+    // spend_keys_unlock_groups RPC (1 key per NEW group, already-unlocked
+    // groups are free). message is one of: "OK", "NO_KEYS", "GROUP_NOT_FOUND",
+    // "GROUP_NOT_FULL", "USER_NOT_FOUND", or "REQUEST_FAILED" / "EXCEPTION"
+    // (e.g. the SQL hasn't been added to Supabase yet).
+    fun spendKeysToUnlockGroups(userId: String, groupIds: List<String>, callback: (Boolean, String, Int) -> Unit) {
+        if (!isConfigured()) {
+            callback(false, "NOT_CONFIGURED", 0)
+            return
+        }
+
+        try {
+            val url = "$supabaseUrl/rest/v1/rpc/spend_keys_unlock_groups"
+            val body = JSONObject().apply {
+                put("p_user_id", userId)
+                put("p_group_ids", org.json.JSONArray(groupIds))
+            }
+
+            val request = Request.Builder()
+                .url(url)
+                .addHeader("apikey", anonKey)
+                .addHeader("Authorization", "Bearer $anonKey")
+                .addHeader("Content-Type", "application/json")
+                .post(body.toString().toRequestBody("application/json".toMediaType()))
+                .build()
+
+            client.newCall(request).execute().use { response ->
+                if (response.isSuccessful) {
+                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
+                    if (arr.length() > 0) {
+                        val row = arr.getJSONObject(0)
+                        callback(
+                            row.optBoolean("success", false),
+                            row.optString("message", "OK"),
+                            row.optInt("remaining_keys", 0)
+                        )
+                    } else {
+                        callback(false, "EMPTY_RESPONSE", 0)
+                    }
+                } else {
+                    callback(false, "REQUEST_FAILED", 0)
+                }
+            }
+        } catch (e: Exception) {
+            callback(false, "EXCEPTION", 0)
+        }
+    }
+
     // Whether today's daily repost has already been submitted (regardless
     // of verified/pending/rejected) - used to grey out the Repost Today
     // button. The server decides what "today" is (UTC).

@@ -16,6 +16,16 @@
     android:padding="12dp"
     android:layout_marginBottom="10dp">
 
+    <!-- Select mode only: tick box at the start of the row. -->
+    <ImageView
+        android:id="@+id/file_check"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="10dp"
+        android:src="@drawable/ic_checkbox_off"
+        android:visibility="gone"
+        android:contentDescription="@null" />
+
     <FrameLayout
         android:layout_width="42dp"
         android:layout_height="42dp"
