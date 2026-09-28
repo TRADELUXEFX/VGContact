@@ -163,6 +163,7 @@ class ReferralActivity : AppCompatActivity() {
     }
 
     private fun showMilestones(count: Int) {
+        findViewById<TextView>(R.id.referral_earnings_text).text = count.toString()
         findViewById<TextView>(R.id.referral_to_go).text = "${10 - (count % 10)} to go"
         findViewById<ProgressBar>(R.id.referral_progress).progress = count % 10
         styleChip(R.id.referral_chip_10, count >= 10)

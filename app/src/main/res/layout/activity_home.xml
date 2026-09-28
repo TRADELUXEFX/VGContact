@@ -144,47 +144,67 @@
 
             </LinearLayout>
 
-            <!-- Referral code row -->
+            <!-- Referral link container: the long link is cut off with "..."
+                 before it reaches the Copy button, which stays visible. -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:background="@drawable/header_tab_track_background"
-                android:paddingStart="12dp"
+                android:background="@drawable/header_referral_container_background"
+                android:paddingStart="14dp"
                 android:paddingEnd="8dp"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp">
 
-                <TextView
-                    android:id="@+id/headerPhoneText"
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="11sp"
-                    android:textColor="@color/white"
-                    android:gravity="center_vertical"
-                    android:maxLines="1"
-                    android:ellipsize="end" />
+                    android:layout_marginEnd="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Your referral link"
+                        android:textSize="11sp"
+                        android:textColor="#CCFFFFFF" />
+
+                    <TextView
+                        android:id="@+id/headerPhoneText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:textSize="13sp"
+                        android:textColor="@color/white"
+                        android:singleLine="true"
+                        android:maxLines="1"
+                        android:ellipsize="end" />
+
+                </LinearLayout>
 
                 <Button
                     android:id="@+id/headerCopyBtn"
                     android:layout_width="wrap_content"
-                    android:layout_height="24dp"
+                    android:layout_height="36dp"
                     android:minWidth="0dp"
                     android:minHeight="0dp"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
                     android:text="Copy"
                     android:textAllCaps="false"
-                    android:textSize="10sp"
+                    android:textSize="12sp"
                     android:textStyle="bold"
                     android:textColor="@color/vg_green_dark"
                     android:backgroundTint="@color/white"
+                    android:drawableStart="@drawable/ic_copy"
+                    android:drawableTint="@color/vg_green_dark"
+                    android:drawablePadding="6dp"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
-                    app:cornerRadius="12dp" />
+                    app:cornerRadius="10dp" />
 
             </LinearLayout>
 
@@ -426,7 +446,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="44dp"
                         android:text="Buy Keys"
-                        android:textAllCaps="false"
+                        android:textAllCaps="true"
                         android:textColor="@color/white"
                         android:backgroundTint="@color/vg_green"
                         app:cornerRadius="22dp" />
@@ -444,6 +464,70 @@
                 android:textSize="12sp"
                 android:textColor="@color/text_muted" />
 
+            <!-- Total referrals card: same style as the keys card. Tap opens
+                 the Referral page. -->
+            <LinearLayout
+                android:id="@+id/home_referrals_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="16dp"
+                android:background="@drawable/card_background"
+                android:clickable="true"
+                android:focusable="true">
+
+                <FrameLayout
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:background="@drawable/file_row_icon_background">
+
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_people"
+                        app:tint="@color/vg_green_dark"
+                        android:contentDescription="@null" />
+
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="14dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:fontFamily="@font/poppins_bold"
+                        android:includeFontPadding="false"
+                        android:id="@+id/home_referrals_count_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="30sp"
+                        android:textColor="@color/vg_green_dark" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Total referrals"
+                        android:textSize="13sp"
+                        android:textColor="@color/text_secondary" />
+
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/text_muted"
+                    android:contentDescription="@null" />
+
+            </LinearLayout>
+
             <!-- Single entry point into the unlock flow. No file preview,
                  no contact counts here - just the action. The real list,
                  lock state per file, and the spend-a-key confirmation all
@@ -458,7 +542,7 @@
                 android:layout_height="56dp"
                 android:layout_marginTop="22dp"
                 android:text="Unlock Contact List"
-                android:textAllCaps="false"
+                android:textAllCaps="true"
                 android:textColor="@color/white"
                 android:backgroundTint="@color/vg_green"
                 app:icon="@drawable/ic_unlock"
@@ -489,9 +573,12 @@
                 android:layout_height="56dp"
                 android:layout_marginBottom="12dp"
                 android:text="Refer &amp; Earn"
-                android:textAllCaps="false"
+                android:textAllCaps="true"
                 android:textColor="@color/white"
                 android:backgroundTint="@color/vg_green"
+                app:icon="@drawable/ic_people"
+                app:iconTint="@color/white"
+                app:iconGravity="textStart"
                 app:cornerRadius="16dp" />
 
             <Button
