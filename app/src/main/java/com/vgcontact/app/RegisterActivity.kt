@@ -28,12 +28,11 @@ import kotlin.concurrent.thread
  * different jobs now, matching the VGKontact OnboardingActivity /
  * LoginActivity split.
  *
- * No separate splash activity/screen sits in front of this one -
- * matching VGKontact's OnboardingActivity, the launcher activity does
- * its own session check immediately in onCreate(). Whatever "splash"
- * moment the user sees is just Android's own default pre-launch frame
- * (the launcher icon on the theme's plain window background), which
- * requires no custom code at all.
+ * No separate splash activity/screen sits in front of this one. The
+ * "splash" is the launch window Android shows while the process starts,
+ * styled by Theme.VGContact.Splash (dark). onCreate() immediately
+ * switches to Theme.VGContact so the splash color stays out of the
+ * register screen.
  */
 class RegisterActivity : AppCompatActivity() {
 
@@ -42,6 +41,11 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var registerBtn: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Leave the dark splash theme (set in the manifest for the launch
+        // window only) and go back to the normal app theme BEFORE any
+        // layout is inflated, so the register screen is unaffected by
+        // the splash color.
+        setTheme(R.style.Theme_VGContact)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 

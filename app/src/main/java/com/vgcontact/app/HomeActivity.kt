@@ -16,13 +16,6 @@ class HomeActivity : AppCompatActivity() {
 
     private lateinit var sessionManager: SessionManager
 
-    // Home is only revealed once both network results (key balance and
-    // the bell's unread dot) are in. Later refreshes (onResume) update
-    // the visible screen in place without bringing the spinner back.
-    private var keyBalanceLoaded = false
-    private var unreadBadgeLoaded = false
-    private var initialContentRevealed = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
@@ -77,15 +70,6 @@ class HomeActivity : AppCompatActivity() {
     }
 
 
-    private fun revealContentIfReady() {
-        if (initialContentRevealed) return
-        if (keyBalanceLoaded && unreadBadgeLoaded) {
-            initialContentRevealed = true
-            findViewById<android.view.View>(R.id.home_loading_state).visibility = android.view.View.GONE
-            findViewById<android.view.View>(R.id.home_content_scroll).visibility = android.view.View.VISIBLE
-        }
-    }
-
     private fun setupProfileHeader() {
         val usernameText = findViewById<TextView>(R.id.headerUsernameText)
         val phoneText = findViewById<TextView>(R.id.headerPhoneText)
@@ -123,11 +107,7 @@ class HomeActivity : AppCompatActivity() {
     // since NotificationsActivity marks everything read on open.
     private fun refreshUnreadBadge(dot: android.view.View) {
         val userId = sessionManager.getUserId()
-        if (userId.isNullOrBlank()) {
-            unreadBadgeLoaded = true
-            revealContentIfReady()
-            return
-        }
+        if (userId.isNullOrBlank()) return
 
         Thread {
             SupabaseClient.fetchNotifications(userId) { success, notifications ->
@@ -135,18 +115,23 @@ class HomeActivity : AppCompatActivity() {
                     if (success) {
                         dot.visibility = if (notifications.any { !it.isRead }) android.view.View.VISIBLE else android.view.View.GONE
                     }
-                    unreadBadgeLoaded = true
-                    revealContentIfReady()
                 }
             }
         }.start()
     }
 
+    // The spinner sits inside the white stats card. The card's contents
+    // stay hidden until the balance arrives (first load only); later
+    // refreshes (onResume) update the visible number in place.
+    private fun showCardContent() {
+        findViewById<android.view.View>(R.id.home_card_loading).visibility = android.view.View.GONE
+        findViewById<android.view.View>(R.id.home_card_content).visibility = android.view.View.VISIBLE
+    }
+
     private fun refreshKeyBalance(keyBalanceText: TextView) {
         val userId = sessionManager.getUserId()
         if (userId.isNullOrBlank()) {
-            keyBalanceLoaded = true
-            revealContentIfReady()
+            showCardContent()
             return
         }
 
@@ -156,8 +141,7 @@ class HomeActivity : AppCompatActivity() {
                     if (success) {
                         keyBalanceText.text = balance.toString()
                     }
-                    keyBalanceLoaded = true
-                    revealContentIfReady()
+                    showCardContent()
                 }
             }
         }.start()

@@ -18,8 +18,7 @@
         android:layout_height="match_parent"
         android:fillViewport="true"
         android:clipToPadding="false"
-        android:paddingBottom="88dp"
-        android:visibility="gone">
+        android:paddingBottom="88dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -198,13 +197,30 @@
             android:paddingEnd="20dp"
             android:paddingBottom="8dp">
 
-            <!-- Stats card -->
+            <!-- Stats card. The spinner lives INSIDE this white card: while
+                 the data loads, the card contents are hidden (they keep
+                 their space so the card never resizes) and the spinner is
+                 centered in the card. -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_background">
+
+            <ProgressBar
+                android:id="@+id/home_card_loading"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="center"
+                android:indeterminateTint="@color/vg_green"
+                android:visibility="visible" />
+
             <LinearLayout
+                android:id="@+id/home_card_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="@drawable/card_background"
-                android:padding="16dp">
+                android:padding="16dp"
+                android:visibility="invisible">
 
                 <!-- Key balance row - shows the same key_balance the Keys
                      screen shows, via SupabaseClient.fetchKeyBalance(), so
@@ -331,6 +347,8 @@
 
             </LinearLayout>
 
+            </FrameLayout>
+
             <LinearLayout
                 android:id="@+id/content_container"
                 android:layout_width="match_parent"
@@ -368,23 +386,6 @@
     </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
-
-    <!-- Shown until the key balance and unread-bell state have both
-         loaded, so Home never shows stale defaults first. -->
-    <LinearLayout
-        android:id="@+id/home_loading_state"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:visibility="visible">
-
-        <ProgressBar
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:indeterminateTint="@color/vg_green" />
-
-    </LinearLayout>
 
     <include layout="@layout/bottom_nav_bar" />
 

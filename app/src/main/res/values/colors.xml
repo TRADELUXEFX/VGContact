@@ -10,6 +10,10 @@
     <color name="white">#FFFFFF</color>
     <color name="background">#F5FAF6</color>
 
+    <!-- Splash only. Used by Theme.VGContact.Splash's window background
+         and nowhere else, so the dark splash never touches any screen. -->
+    <color name="splash_background">#111B21</color>
+
     <!-- Text -->
     <color name="text_primary">#555555</color>
     <color name="text_secondary">#7A8580</color>

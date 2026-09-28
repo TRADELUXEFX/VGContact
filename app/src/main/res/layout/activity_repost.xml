@@ -96,6 +96,49 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
+                <!-- Verification status: its own card, shown at the very
+                     top (above Your Keys / Streak) once the user has
+                     reposted today. Icon on the left, text on the right,
+                     the pair centered in the card. -->
+                <LinearLayout
+                    android:id="@+id/repost_status_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:background="@drawable/card_background"
+                    android:padding="18dp"
+                    android:layout_marginBottom="12dp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/repost_status_icon"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_pending"
+                        app:tint="@color/warning_amber"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:id="@+id/repost_status_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:text="Verification pending"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/vg_dark" />
+
+                    <!-- Kept (same id) so existing code that sets it keeps
+                         working, but never shown. -->
+                    <TextView
+                        android:id="@+id/repost_status"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
                 <!-- Two stat cards side by side: keys + streak -->
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -163,130 +206,137 @@
 
                 </LinearLayout>
 
-                <!-- One action card: status + button + instructions together.
-                     The verification status lives INSIDE this card (same ids
-                     as before) so it is always right next to the button. -->
+                <!-- 1. Repost button: stands on its own, not inside any card. -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/repost_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginBottom="12dp"
+                    android:text="REPOST TODAY"
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.02"
+                    android:textStyle="bold"
+                    android:backgroundTint="@color/repost_btn_bg"
+                    android:textColor="@color/repost_btn_text"
+                    app:cornerRadius="16dp"
+                    app:elevation="0dp" />
+
+                <!-- 3. How it works: its own card, three numbered steps.
+                     The X hides the whole card; "Show how it works"
+                     below brings it back. -->
                 <LinearLayout
+                    android:id="@+id/todays_task_card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
+                    android:orientation="horizontal"
+                    android:gravity="top"
                     android:background="@drawable/card_background"
                     android:padding="18dp"
                     android:layout_marginBottom="12dp">
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="10dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="TODAY"
-                            android:textSize="11sp"
-                            android:textStyle="bold"
-                            android:letterSpacing="0.05"
-                            android:textColor="@color/text_muted" />
-
-
-
-                    </LinearLayout>
-
-                    <!-- Verification status (hidden until the user has reposted today) -->
-                    <LinearLayout
-                        android:id="@+id/repost_status_card"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="12dp"
-                        android:visibility="gone">
-
-                        <ImageView
-                            android:id="@+id/repost_status_icon"
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:src="@drawable/ic_pending"
-                            app:tint="@color/warning_amber"
-                            android:contentDescription="@null" />
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="12dp"
-                            android:orientation="vertical">
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="10dp">
 
                             <TextView
-                                android:id="@+id/repost_status_title"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="Verification pending"
-                                android:textSize="15sp"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:background="@drawable/step_number_background"
+                                android:gravity="center"
+                                android:text="1"
+                                android:textSize="12sp"
                                 android:textStyle="bold"
-                                android:textColor="@color/vg_dark" />
+                                android:textColor="@color/vg_green_dark" />
 
                             <TextView
-                                android:id="@+id/repost_status"
-                                android:layout_width="match_parent"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:text="We check reposts each night."
-                                android:textColor="@color/text_muted"
-                                android:textSize="13sp" />
+                                android:layout_weight="1"
+                                android:layout_marginStart="12dp"
+                                android:text="Tap the Repost button"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="14sp" />
 
                         </LinearLayout>
-                    </LinearLayout>
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/repost_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="52dp"
-                        android:text="REPOSTED TODAY"
-                        android:textAllCaps="true"
-                        android:letterSpacing="0.02"
-                        android:textStyle="bold"
-                        android:backgroundTint="@color/vg_green_tint"
-                        android:textColor="@color/vg_green_dark"
-                        app:cornerRadius="14dp"
-                        app:elevation="0dp"
-                        app:rippleColor="@color/vg_green" />
-
-                    <!-- Dismissible how-it-works tip. Only this row hides when the X
-                         is tapped; the status and Repost button above it never do. -->
-                    <LinearLayout
-                        android:id="@+id/todays_task_card"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="top"
-                        android:layout_marginTop="12dp">
-
-                        <TextView
-                            android:layout_width="0dp"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Tap Repost, repost admin's WhatsApp status, then come back. Your key is added once approved."
-                            android:textColor="@color/text_secondary"
-                            android:textSize="13sp"
-                            android:lineSpacingMultiplier="1.3" />
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="10dp">
 
-                        <ImageView
-                            android:id="@+id/todays_task_close"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:layout_marginStart="10dp"
-                            android:src="@drawable/ic_close_small"
-                            app:tint="@color/text_muted"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:background="?android:attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="Dismiss today's task tip" />
+                            <TextView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:background="@drawable/step_number_background"
+                                android:gravity="center"
+                                android:text="2"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/vg_green_dark" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="12dp"
+                                android:text="Repost the admin's WhatsApp status"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="14sp" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="0dp">
+
+                            <TextView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:background="@drawable/step_number_background"
+                                android:gravity="center"
+                                android:text="3"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/vg_green_dark" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="12dp"
+                                android:text="Get one key added once approved"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="14sp" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/todays_task_close"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="10dp"
+                        android:src="@drawable/ic_close_small"
+                        app:tint="@color/text_muted"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?android:attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Dismiss how it works" />
 
                 </LinearLayout>
 
@@ -493,10 +543,9 @@
             </LinearLayout>
         </ScrollView>
 
-        <!-- Shown until both the key balance and today's repost status
-             have finished loading, so the screen never briefly shows
-             stale defaults (0 keys, enabled button, no status card)
-             before the real data arrives. -->
+        <!-- Same loading pattern as Get Viewers: the green header above
+             stays visible and this spinner fills the body area under it
+             until the screen's data has loaded. -->
         <LinearLayout
             android:id="@+id/repost_loading_state"
             android:layout_width="match_parent"

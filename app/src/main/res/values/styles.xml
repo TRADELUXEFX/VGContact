@@ -13,11 +13,18 @@
         <item name="fontFamily">@font/poppins</item>
     </style>
 
-    <!-- No separate splash theme: the app has a single launcher
-         activity (RegisterActivity) using this one theme, matching
-         VGKontact's OnboardingActivity. Android's own default launch
-         behavior (icon over this plain windowBackground, then straight
-         into the activity) is the entire "splash screen". -->
+    <!-- Splash theme. Applied ONLY to the launcher activity in the
+         manifest, and only affects the window shown while the app
+         process starts. RegisterActivity swaps back to Theme.VGContact
+         in onCreate() (before setContentView) so this dark color never
+         reaches the register screen or any other screen. Change the
+         splash color via @color/splash_background and nothing else
+         changes. -->
+    <style name="Theme.VGContact.Splash" parent="Theme.VGContact">
+        <item name="android:windowBackground">@color/splash_background</item>
+        <item name="android:statusBarColor">@color/splash_background</item>
+        <item name="android:navigationBarColor">@color/splash_background</item>
+    </style>
 
     <!-- Text Appearance Styles for other Poppins weights -->
     <style name="TextAppearance.Poppins.Medium" parent="android:TextAppearance">

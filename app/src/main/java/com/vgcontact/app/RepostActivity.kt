@@ -59,10 +59,10 @@ class RepostActivity : AppCompatActivity() {
     private lateinit var todaysTaskClose: ImageView
     private lateinit var todaysTaskRestore: TextView
 
-    // Both fetches must finish before the real content is revealed on
-    // first load - whichever finishes second is the one that reveals
-    // it. Later refreshes (e.g. onResume the next day) update the
-    // already-visible content in place rather than hiding it again.
+    // Both fetches must finish before the body is revealed on first
+    // load (the green header stays visible the whole time, same as Get
+    // Viewers). Later refreshes (e.g. onResume) update the visible
+    // content in place instead of hiding it again.
     private var keyBalanceLoaded = false
     private var todayStatusLoaded = false
     private var initialContentRevealed = false
@@ -149,7 +149,11 @@ class RepostActivity : AppCompatActivity() {
 
     private fun refreshKeyBalance() {
         val userId = sessionManager.getUserId()
-        if (userId.isNullOrBlank()) return
+        if (userId.isNullOrBlank()) {
+            keyBalanceLoaded = true
+            revealContentIfReady()
+            return
+        }
 
         thread {
             SupabaseClient.fetchKeyBalance(userId) { success, balance ->
@@ -175,7 +179,11 @@ class RepostActivity : AppCompatActivity() {
 
     private fun refreshTodayStatus() {
         val userId = sessionManager.getUserId()
-        if (userId.isNullOrBlank()) return
+        if (userId.isNullOrBlank()) {
+            todayStatusLoaded = true
+            revealContentIfReady()
+            return
+        }
 
         thread {
             SupabaseClient.fetchTodayRepostStatus(userId) { success, status ->
@@ -188,7 +196,7 @@ class RepostActivity : AppCompatActivity() {
                     when (status) {
                         null -> {
                             repostTodayBtn.isEnabled = true
-                            repostTodayBtn.text = "REPOSTED TODAY"
+                            repostTodayBtn.text = "REPOST TODAY"
                             statusCard.visibility = android.view.View.GONE
                         }
                         "pending" -> {

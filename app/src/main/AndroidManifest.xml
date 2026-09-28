@@ -18,16 +18,16 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-        <!-- Onboarding / Registration Screen. App's launcher activity -
-             matches VGKontact's OnboardingActivity: no separate splash
-             activity in front of it, it just performs its own session
-             check immediately in onCreate(). Whatever "splash" moment
-             the user sees is Android's own default pre-launch frame,
-             which needs no custom theme or drawable to produce. -->
+        <!-- Onboarding / Registration Screen. App's launcher activity.
+             Uses the dark splash theme ONLY for the moment Android shows
+             the launch window; RegisterActivity.onCreate() switches to
+             the normal Theme.VGContact before drawing anything, so the
+             register screen keeps its own white background. -->
         <activity
             android:name=".RegisterActivity"
             android:exported="true"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.VGContact.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
