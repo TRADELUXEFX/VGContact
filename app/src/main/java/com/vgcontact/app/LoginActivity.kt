@@ -79,6 +79,7 @@ class LoginActivity : AppCompatActivity() {
                                 sessionManager.saveUsername(user.optString("username", ""))
                                 sessionManager.savePhone(user.optString("phone", phone))
                                 sessionManager.saveUserId(user.optString("id", ""))
+                                sessionManager.saveRegistrationFrom(user)
                                 VgFirebaseMessagingService.flushPendingTokenIfAny(this)
                                 startActivity(Intent(this, PermissionsActivity::class.java))
                                 finish()

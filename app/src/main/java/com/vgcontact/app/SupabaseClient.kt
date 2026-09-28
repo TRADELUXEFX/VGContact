@@ -670,4 +670,72 @@ object SupabaseClient {
         }
     }
 
+    // Referral milestones: every 10 referrals = 1 key. The claim_referral_keys
+    // RPC counts this user's qualifying referrals, adds any keys not yet
+    // paid (safe to call repeatedly - it never pays the same key twice) and
+    // returns (referrals, keys_earned, keys_added). Run off the UI thread.
+    fun claimReferralKeys(userId: String, callback: (Boolean, Int, Int) -> Unit) {
+        if (!isConfigured() || userId.isBlank()) {
+            callback(false, 0, 0)
+            return
+        }
+
+        try {
+            val url = "$supabaseUrl/rest/v1/rpc/claim_referral_keys"
+            val body = JSONObject().apply { put("p_user_id", userId) }
+            val request = Request.Builder()
+                .url(url)
+                .addHeader("apikey", anonKey)
+                .addHeader("Authorization", "Bearer $anonKey")
+                .addHeader("Content-Type", "application/json")
+                .post(body.toString().toRequestBody("application/json".toMediaType()))
+                .build()
+
+            client.newCall(request).execute().use { response ->
+                if (response.isSuccessful) {
+                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
+                    if (arr.length() > 0) {
+                        val row = arr.getJSONObject(0)
+                        callback(true, row.optInt("referrals", 0), row.optInt("keys_added", 0))
+                    } else {
+                        callback(false, 0, 0)
+                    }
+                } else {
+                    callback(false, 0, 0)
+                }
+            }
+        } catch (e: Exception) {
+            callback(false, 0, 0)
+        }
+    }
+
+    // Date registered + referred by for accounts that logged in before
+    // those were being saved (see SessionManager.saveRegistrationFrom).
+    fun fetchUserProfile(userId: String, callback: (Boolean, JSONObject?) -> Unit) {
+        if (!isConfigured() || userId.isBlank()) {
+            callback(false, null)
+            return
+        }
+
+        try {
+            val url = "$supabaseUrl/rest/v1/users?id=eq.$userId&select=created_at,referred_by"
+            val request = Request.Builder()
+                .url(url)
+                .addHeader("apikey", anonKey)
+                .addHeader("Authorization", "Bearer $anonKey")
+                .get()
+                .build()
+
+            client.newCall(request).execute().use { response ->
+                if (response.isSuccessful) {
+                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
+                    if (arr.length() > 0) callback(true, arr.getJSONObject(0)) else callback(false, null)
+                } else {
+                    callback(false, null)
+                }
+            }
+        } catch (e: Exception) {
+            callback(false, null)
+        }
+    }
 }

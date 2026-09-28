@@ -49,9 +49,9 @@ class HomeActivity : AppCompatActivity() {
             startActivity(Intent(this, DownloadsActivity::class.java))
         }
 
-        // Refer & Earn: share the app with the user's referral code.
+        // Refer & Earn: opens the referral page (code, link, how it works).
         findViewById<Button>(R.id.refer_earn_btn).setOnClickListener {
-            shareReferral()
+            startActivity(Intent(this, ReferralActivity::class.java))
         }
 
         // Community button
@@ -84,27 +84,6 @@ class HomeActivity : AppCompatActivity() {
         FloatingContactHelper.attach(this)
     }
 
-
-    // Opens the phone's share menu (WhatsApp, SMS, etc.) with a ready
-    // message. The referral code is the same value shown in the Home header.
-    private fun shareReferral() {
-        val code = sessionManager.getPhone().orEmpty()
-        val message = buildString {
-            append("Join me on VGContact! ")
-            if (code.isNotBlank()) {
-                append("When you sign up, enter my referral code: $code")
-            }
-        }
-        try {
-            val intent = Intent(Intent.ACTION_SEND).apply {
-                type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, message)
-            }
-            startActivity(Intent.createChooser(intent, "Refer & Earn"))
-        } catch (e: Exception) {
-            Toast.makeText(this, "Couldn't open share menu", Toast.LENGTH_SHORT).show()
-        }
-    }
 
     private fun setupProfileHeader() {
         val usernameText = findViewById<TextView>(R.id.headerUsernameText)

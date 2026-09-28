@@ -22,7 +22,7 @@ android {
         minSdk 24
         targetSdk 34
         versionCode 21
-        versionName "1.1.10"
+        versionName "1.0.${System.getenv('GITHUB_RUN_NUMBER') ?: '0'}"
 
         buildConfigField "String", "SUPABASE_URL", "\"${supabaseUrl}\""
         buildConfigField "String", "SUPABASE_ANON_KEY", "\"${supabaseAnonKey}\""

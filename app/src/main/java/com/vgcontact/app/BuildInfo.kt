@@ -1,14 +1,10 @@
 package com.vgcontact.app
 
 /**
- * Convenience accessor for showing the app version on a Profile/Settings
- * screen, e.g.:
- *
- *   versionText.text = BuildInfo.displayVersion()
- *
- * Produces something like "1.0.1 (2)".
+ * Version text for the Profile screen, e.g. "VGKontact v1.0.954".
+ * The number is the GitHub run number (see versionName in build.gradle),
+ * so it matches the release tag on the Releases page.
  */
 object BuildInfo {
-    fun displayVersion(): String =
-        "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+    fun displayVersion(): String = "VGKontact v${BuildConfig.VERSION_NAME}"
 }

@@ -33,7 +33,7 @@
             android:includeFontPadding="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Profile"
+            android:text="My Profile"
             android:textSize="24sp"
             android:textColor="@color/white" />
     </LinearLayout>
@@ -64,9 +64,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="USERNAME"
-                android:textSize="11sp"
+                android:textSize="12sp"
                 android:textAllCaps="true"
-                android:letterSpacing="0.05"
+                android:letterSpacing="0.08"
                 android:textColor="@color/text_muted" />
 
             <LinearLayout
@@ -81,7 +81,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="17sp"
+                    android:textSize="20sp"
                     android:textStyle="bold"
                     android:textColor="@color/vg_dark" />
 
@@ -132,16 +132,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="PHONE NUMBER"
-                android:textSize="11sp"
+                android:textSize="12sp"
                 android:textAllCaps="true"
-                android:letterSpacing="0.05"
+                android:letterSpacing="0.08"
                 android:textColor="@color/text_muted" />
 
             <TextView
                 android:id="@+id/profile_phone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="17sp"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 android:textColor="@color/vg_dark"
                 android:paddingBottom="16dp" />
@@ -152,21 +152,46 @@
                 android:background="@color/stats_card_border"
                 android:layout_marginBottom="16dp" />
 
-            <!-- Account Created -->
+            <!-- Referred By -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="ACCOUNT CREATED"
-                android:textSize="11sp"
+                android:text="REFERRED BY"
+                android:textSize="12sp"
                 android:textAllCaps="true"
-                android:letterSpacing="0.05"
+                android:letterSpacing="0.08"
+                android:textColor="@color/text_muted" />
+
+            <TextView
+                android:id="@+id/profile_referred_by"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/vg_dark"
+                android:paddingBottom="16dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/stats_card_border"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Date Registered -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="DATE REGISTERED"
+                android:textSize="12sp"
+                android:textAllCaps="true"
+                android:letterSpacing="0.08"
                 android:textColor="@color/text_muted" />
 
             <TextView
                 android:id="@+id/profile_created"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="17sp"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 android:textColor="@color/vg_dark"
                 android:paddingBottom="16dp" />
@@ -182,16 +207,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="APP VERSION"
-                android:textSize="11sp"
+                android:textSize="12sp"
                 android:textAllCaps="true"
-                android:letterSpacing="0.05"
+                android:letterSpacing="0.08"
                 android:textColor="@color/text_muted" />
 
             <TextView
                 android:id="@+id/profile_app_version"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="17sp"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 android:textColor="@color/vg_dark"
                 android:paddingBottom="16dp" />

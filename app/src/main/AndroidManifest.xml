@@ -71,6 +71,12 @@
             android:exported="false"
             android:screenOrientation="portrait" />
 
+        <!-- Referral Screen: reached from "Refer & Earn" on Home -->
+        <activity
+            android:name=".ReferralActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
         <!-- Community Screen -->
         <activity
             android:name=".CommunityActivity"

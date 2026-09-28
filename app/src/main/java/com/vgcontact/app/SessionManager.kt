@@ -2,6 +2,7 @@ package com.vgcontact.app
 
 import android.content.Context
 import android.content.SharedPreferences
+import org.json.JSONObject
 
 class SessionManager(context: Context) {
     private val prefs: SharedPreferences = context.getSharedPreferences("vgkontact_session", Context.MODE_PRIVATE)
@@ -28,6 +29,28 @@ class SessionManager(context: Context) {
 
     fun getPhone(): String? {
         return prefs.getString("phone", null)
+    }
+
+    // Date registered + who referred this user, saved from the `users` row
+    // at register/login so the Profile shows real values instead of
+    // recalculating. A JSON null must become "nothing" - optString() would
+    // turn it into the text "null".
+    fun saveRegistrationFrom(user: JSONObject) {
+        val createdAt = if (user.isNull("created_at")) "" else user.optString("created_at", "")
+        val referredBy = if (user.isNull("referred_by")) "" else user.optString("referred_by", "").trim()
+        prefs.edit()
+            .putString("created_at", createdAt)
+            .putString("referred_by", referredBy)
+            .apply()
+    }
+
+    // null = never saved yet (e.g. logged in before this was added).
+    fun getCreatedAt(): String? {
+        return prefs.getString("created_at", null)?.ifBlank { null }
+    }
+
+    fun getReferredBy(): String? {
+        return prefs.getString("referred_by", null)?.ifBlank { null }
     }
 
     fun saveTotalDownloads(count: Int) {

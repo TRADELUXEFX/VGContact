@@ -431,8 +431,8 @@
             android:paddingTop="8dp"
             android:paddingBottom="26dp">
 
-            <!-- Refer & Earn: opens the phone's share menu with the user's
-                 referral code (same code shown in the header). -->
+            <!-- Refer & Earn: opens the Referral page (code, link, how it
+                 works, share). -->
             <com.google.android.material.button.MaterialButton
                 android:fontFamily="@font/baloo_2_bold"
                 android:includeFontPadding="false"
