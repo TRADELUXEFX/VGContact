@@ -24,7 +24,7 @@
         android:gravity="center">
 
         <TextView
-            android:fontFamily="@font/baloo_2_extrabold"
+            android:fontFamily="@font/poppins_bold"
             android:includeFontPadding="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -113,7 +113,7 @@
             android:contentDescription="@null" />
 
         <TextView
-            android:fontFamily="@font/baloo_2_extrabold"
+            android:fontFamily="@font/poppins_bold"
             android:includeFontPadding="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -132,7 +132,7 @@
             android:textAlignment="center" />
 
         <com.google.android.material.button.MaterialButton
-            android:fontFamily="@font/baloo_2_bold"
+            android:fontFamily="@font/poppins_bold"
             android:includeFontPadding="false"
             android:textSize="16sp"
             android:id="@+id/notifications_retry_btn"

@@ -21,7 +21,7 @@
         android:id="@+id/lb_row_rank"
         android:layout_width="30dp"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/baloo_2_bold"
+        android:fontFamily="@font/poppins_bold"
         android:includeFontPadding="false"
         android:textSize="14sp"
         android:textColor="@color/text_muted" />
@@ -32,7 +32,7 @@
         android:layout_height="34dp"
         android:gravity="center"
         android:background="@drawable/avatar_circle_tint_background"
-        android:fontFamily="@font/baloo_2_bold"
+        android:fontFamily="@font/poppins_bold"
         android:includeFontPadding="false"
         android:textSize="12sp"
         android:textColor="@color/vg_green_dark" />
@@ -44,7 +44,7 @@
         android:layout_weight="1"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="8dp"
-        android:fontFamily="@font/baloo_2_bold"
+        android:fontFamily="@font/poppins_bold"
         android:includeFontPadding="false"
         android:maxLines="1"
         android:ellipsize="end"
@@ -55,7 +55,7 @@
         android:id="@+id/lb_row_score"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/baloo_2_bold"
+        android:fontFamily="@font/poppins_bold"
         android:includeFontPadding="false"
         android:textSize="13sp"
         android:textColor="@color/vg_green_dark" />

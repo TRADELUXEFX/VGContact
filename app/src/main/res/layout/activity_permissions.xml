@@ -38,7 +38,7 @@
                 tools:text="STEP 1 OF 2" />
 
             <TextView
-                android:fontFamily="@font/baloo_2_extrabold"
+                android:fontFamily="@font/poppins_bold"
                 android:includeFontPadding="false"
                 android:id="@+id/stepTitleText"
                 android:layout_width="wrap_content"
@@ -102,7 +102,7 @@
             android:padding="24dp">
 
             <Button
-                android:fontFamily="@font/baloo_2_bold"
+                android:fontFamily="@font/poppins_bold"
                 android:includeFontPadding="false"
                 android:id="@+id/stepActionButton"
                 android:layout_width="match_parent"

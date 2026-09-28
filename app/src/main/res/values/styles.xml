@@ -42,22 +42,16 @@
         <item name="fontFamily">@font/poppins_bold</item>
     </style>
 
-    <!-- Two-font system.
-         Poppins (theme default): body copy, small caps labels, inputs,
-         nav labels, data values - anything read rather than felt.
-         Baloo 2: the voice of the app - screen titles, section headings,
-         big numbers (keys, streak, prices), usernames, list-item titles,
-         tabs and buttons. Use these instead of textStyle="bold" so the
-         font's real weight is used rather than a faux-bold. -->
-    <style name="TextAppearance.Baloo.ExtraBold" parent="android:TextAppearance">
-        <item name="android:fontFamily">@font/baloo_2_extrabold</item>
-        <item name="fontFamily">@font/baloo_2_extrabold</item>
+    <!-- Single-font system: Poppins everywhere. Headings use Poppins Bold. -->
+    <style name="TextAppearance.Poppins.ExtraBold" parent="android:TextAppearance">
+        <item name="android:fontFamily">@font/poppins_bold</item>
+        <item name="fontFamily">@font/poppins_bold</item>
         <item name="android:includeFontPadding">false</item>
     </style>
 
-    <style name="TextAppearance.Baloo.Bold" parent="android:TextAppearance">
-        <item name="android:fontFamily">@font/baloo_2_bold</item>
-        <item name="fontFamily">@font/baloo_2_bold</item>
+    <style name="TextAppearance.Poppins.BoldHeading" parent="android:TextAppearance">
+        <item name="android:fontFamily">@font/poppins_bold</item>
+        <item name="fontFamily">@font/poppins_bold</item>
         <item name="android:includeFontPadding">false</item>
     </style>
 
@@ -66,8 +60,8 @@
         <item name="backgroundTint">@color/vg_green</item>
         <item name="android:textColor">@color/white</item>
         <item name="cornerRadius">16dp</item>
-        <item name="android:fontFamily">@font/baloo_2_bold</item>
-        <item name="fontFamily">@font/baloo_2_bold</item>
+        <item name="android:fontFamily">@font/poppins_bold</item>
+        <item name="fontFamily">@font/poppins_bold</item>
         <item name="android:textAllCaps">true</item>
     </style>
 

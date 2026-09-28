@@ -69,7 +69,7 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:fontFamily="@font/baloo_2_bold"
+                        android:fontFamily="@font/poppins_bold"
                         android:includeFontPadding="false"
                         android:id="@+id/headerUsernameText"
                         android:layout_width="wrap_content"
@@ -210,7 +210,7 @@
                 android:visibility="gone">
 
                 <TextView
-                    android:fontFamily="@font/baloo_2_extrabold"
+                    android:fontFamily="@font/poppins_bold"
                     android:includeFontPadding="false"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -236,7 +236,7 @@
                     android:textColor="@color/text_muted" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:fontFamily="@font/baloo_2_bold"
+                    android:fontFamily="@font/poppins_bold"
                     android:includeFontPadding="false"
                     android:textSize="16sp"
                     android:id="@+id/home_intro_got_it"
@@ -282,7 +282,7 @@
                     android:contentDescription="@null" />
 
                 <TextView
-                    android:fontFamily="@font/baloo_2_extrabold"
+                    android:fontFamily="@font/poppins_bold"
                     android:includeFontPadding="false"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -351,7 +351,7 @@
                         android:orientation="vertical">
 
                         <TextView
-                            android:fontFamily="@font/baloo_2_extrabold"
+                            android:fontFamily="@font/poppins_bold"
                             android:includeFontPadding="false"
                             android:id="@+id/home_key_balance_text"
                             android:layout_width="wrap_content"
@@ -372,7 +372,7 @@
                     <!-- Opens BuyKeysActivity (buy keys only). Earning keys
                          by reposting lives on the Repost tab. -->
                     <com.google.android.material.button.MaterialButton
-                        android:fontFamily="@font/baloo_2_bold"
+                        android:fontFamily="@font/poppins_bold"
                         android:includeFontPadding="false"
                         android:textSize="16sp"
                         android:id="@+id/get_more_keys_btn"
@@ -403,7 +403,7 @@
                  live in DownloadsActivity (see confirmUnlock/unlockWithKey
                  in DownloadsActivity.kt), which this opens directly. -->
             <com.google.android.material.button.MaterialButton
-                android:fontFamily="@font/baloo_2_bold"
+                android:fontFamily="@font/poppins_bold"
                 android:includeFontPadding="false"
                 android:textSize="16sp"
                 android:id="@+id/unlock_contact_list_btn"
@@ -434,7 +434,7 @@
             <!-- Refer & Earn: opens the Referral page (code, link, how it
                  works, share). -->
             <com.google.android.material.button.MaterialButton
-                android:fontFamily="@font/baloo_2_bold"
+                android:fontFamily="@font/poppins_bold"
                 android:includeFontPadding="false"
                 android:textSize="16sp"
                 android:id="@+id/refer_earn_btn"
@@ -448,7 +448,7 @@
                 app:cornerRadius="16dp" />
 
             <Button
-                android:fontFamily="@font/baloo_2_bold"
+                android:fontFamily="@font/poppins_bold"
                 android:includeFontPadding="false"
                 android:textSize="16sp"
                 android:id="@+id/join_community_btn"

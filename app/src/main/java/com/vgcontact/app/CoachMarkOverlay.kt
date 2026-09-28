@@ -322,15 +322,14 @@ object CoachMarkOverlay {
 
             // Fonts: these are built in code, so the XML fontFamily
             // attributes used elsewhere in the app don't apply - set the
-            // same Baloo/Poppins faces the rest of the UI uses.
-            val baloo = ResourcesCompat.getFont(activity, R.font.baloo_2_extrabold)
-            val balooBold = ResourcesCompat.getFont(activity, R.font.baloo_2_bold)
+            // Poppins face the rest of the UI uses.
+            val poppinsBold = ResourcesCompat.getFont(activity, R.font.poppins_bold)
             val poppins = ResourcesCompat.getFont(activity, R.font.poppins)
 
             val title = TextView(activity).apply {
                 textSize = 17f
                 includeFontPadding = false
-                typeface = baloo
+                typeface = poppinsBold
                 setTextColor(ContextCompat.getColor(activity, R.color.vg_dark))
                 layoutParams = LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -395,7 +394,7 @@ object CoachMarkOverlay {
             val next = Button(activity).apply {
                 text = "Next"
                 textSize = 14f
-                typeface = balooBold
+                typeface = poppinsBold
                 setTextColor(Color.WHITE)
                 isAllCaps = false
                 background = ContextCompat.getDrawable(activity, R.drawable.coach_mark_button_background)

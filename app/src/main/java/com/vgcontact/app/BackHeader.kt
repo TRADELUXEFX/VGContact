@@ -12,8 +12,8 @@ import android.widget.TextView
 object BackHeader {
 
     /** Sets the title and makes Back call [onBack] (default: finish the screen). */
-    fun bind(activity: Activity, title: String, onBack: () -> Unit = { activity.finish() }) {
-        activity.findViewById<TextView>(R.id.back_header_title).text = title
+    fun bind(activity: Activity, title: String = "", onBack: () -> Unit = { activity.finish() }) {
+        activity.findViewById<TextView?>(R.id.back_header_title)?.text = title
         activity.findViewById<View>(R.id.back_header_btn).setOnClickListener { onBack() }
     }
 }

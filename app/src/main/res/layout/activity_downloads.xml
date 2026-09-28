@@ -27,7 +27,7 @@
             android:gravity="center">
 
             <TextView
-                android:fontFamily="@font/baloo_2_extrabold"
+                android:fontFamily="@font/poppins_bold"
                 android:includeFontPadding="false"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

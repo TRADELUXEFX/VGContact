@@ -34,8 +34,8 @@ object FloatingContactHelper {
 
     /**
      * Screens that must NOT show the floating button (auth / onboarding /
-     * splash / permissions / legal, the chat-support screen itself, and Buy Keys,
-     * which has its own WhatsApp checkout button).
+     * splash / permissions / legal, the chat-support screen itself, Referral, and
+     * Buy Keys, which has its own WhatsApp checkout button).
      */
     private val EXCLUDED: Set<Class<out Activity>> = setOf(
         SplashActivity::class.java,
@@ -44,7 +44,8 @@ object FloatingContactHelper {
         PermissionsActivity::class.java,
         LegalActivity::class.java,
         ChatSupportActivity::class.java,
-        BuyKeysActivity::class.java
+        BuyKeysActivity::class.java,
+        ReferralActivity::class.java
     )
 
     /**

@@ -35,7 +35,7 @@
                 android:paddingTop="20dp"
                 android:paddingBottom="16dp">
 
-                <!-- [Back] [Title ........] [balance]. Same Back + title look
+                <!-- [<-] [ ........ ] [balance]. Same back arrow
                      as every other screen (see layout_back_header.xml); the
                      key-balance pill is pinned to the far right. -->
                 <LinearLayout
@@ -44,36 +44,22 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical">
 
-                    <TextView
+                    <ImageView
                         android:id="@+id/back_header_btn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         android:background="@drawable/buy_header_pill"
                         android:clickable="true"
                         android:focusable="true"
-                        android:fontFamily="@font/poppins_medium"
-                        android:includeFontPadding="false"
-                        android:paddingStart="16dp"
-                        android:paddingEnd="16dp"
-                        android:paddingTop="8dp"
-                        android:paddingBottom="8dp"
-                        android:text="Back"
-                        android:textColor="@color/white"
-                        android:textSize="14sp" />
+                        android:contentDescription="Back"
+                        android:padding="9dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_arrow_back" />
 
-                    <TextView
-                        android:id="@+id/back_header_title"
+                    <View
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="14dp"
-                        android:ellipsize="end"
-                        android:fontFamily="@font/baloo_2_extrabold"
-                        android:gravity="start|center_vertical"
-                        android:includeFontPadding="false"
-                        android:maxLines="1"
-                        android:textColor="@color/white"
-                        android:textSize="20sp" />
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
 
                     <TextView
                         android:id="@+id/buy_key_balance_text"
@@ -104,7 +90,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:text="Get More Status\nViewers With VGContact"
-                    android:fontFamily="@font/baloo_2_extrabold"
+                    android:fontFamily="@font/poppins_bold"
                     android:includeFontPadding="false"
                     android:textSize="32sp"
                     android:textColor="@color/white"
@@ -155,7 +141,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="1 key"
-                            android:fontFamily="@font/baloo_2_bold"
+                            android:fontFamily="@font/poppins_bold"
                             android:includeFontPadding="false"
                             android:textSize="20sp"
                             android:textColor="@color/vg_dark" />
@@ -175,7 +161,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="₦1,000"
-                        android:fontFamily="@font/baloo_2_extrabold"
+                        android:fontFamily="@font/poppins_bold"
                         android:includeFontPadding="false"
                         android:textSize="22sp"
                         android:textColor="@color/vg_green_dark" />
@@ -210,7 +196,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="5 keys"
-                            android:fontFamily="@font/baloo_2_bold"
+                            android:fontFamily="@font/poppins_bold"
                             android:includeFontPadding="false"
                             android:textSize="20sp"
                             android:textColor="@color/vg_dark" />
@@ -230,7 +216,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="₦5,000"
-                        android:fontFamily="@font/baloo_2_extrabold"
+                        android:fontFamily="@font/poppins_bold"
                         android:includeFontPadding="false"
                         android:textSize="22sp"
                         android:textColor="@color/vg_green_dark" />
@@ -275,7 +261,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="10 keys"
-                            android:fontFamily="@font/baloo_2_bold"
+                            android:fontFamily="@font/poppins_bold"
                             android:includeFontPadding="false"
                             android:textSize="20sp"
                             android:textColor="@color/vg_dark" />
@@ -295,7 +281,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="₦8,000"
-                        android:fontFamily="@font/baloo_2_extrabold"
+                        android:fontFamily="@font/poppins_bold"
                         android:includeFontPadding="false"
                         android:textSize="22sp"
                         android:textColor="@color/vg_green_dark" />
@@ -323,7 +309,7 @@
                 android:layout_height="58dp"
                 android:text="Get 5 keys"
                 android:textAllCaps="false"
-                android:fontFamily="@font/baloo_2_bold"
+                android:fontFamily="@font/poppins_bold"
                 android:textSize="19sp"
                 android:textColor="@color/white"
                 android:backgroundTint="@color/vg_dark"

@@ -28,7 +28,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:fontFamily="@font/baloo_2_bold"
+            android:fontFamily="@font/poppins_bold"
             android:includeFontPadding="false"
             android:id="@+id/notification_title"
             android:layout_width="match_parent"

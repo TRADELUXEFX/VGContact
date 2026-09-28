@@ -55,7 +55,7 @@ class BuyKeysActivity : AppCompatActivity() {
             return
         }
 
-        BackHeader.bind(this, "Buy Keys")
+        BackHeader.bind(this)
 
         buyBtn = findViewById(R.id.buy_keys_whatsapp_btn)
         packViews[1] = findViewById(R.id.buy_pack_1)
