@@ -31,9 +31,33 @@ object SupabaseClient {
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
-    // No password, no Supabase auth session. Identity is the android_id;
-    // registering just upserts a row in `users` keyed on it (anon key + RLS,
-    // same pattern as the rest of the app's writes).
+    // Calls a Postgres function (RPC) with the anon key and returns the
+    // parsed JSON array, or null on any failure. All table access for
+    // private data now goes through these functions; the database no longer
+    // lets the anon key read or write those tables directly.
+    private fun rpc(name: String, params: JSONObject): org.json.JSONArray? {
+        if (!isConfigured()) return null
+        return try {
+            val request = Request.Builder()
+                .url("$supabaseUrl/rest/v1/rpc/$name")
+                .addHeader("apikey", anonKey)
+                .addHeader("Authorization", "Bearer $anonKey")
+                .addHeader("Content-Type", "application/json")
+                .post(params.toString().toRequestBody("application/json".toMediaType()))
+                .build()
+            client.newCall(request).execute().use { response ->
+                if (response.isSuccessful) org.json.JSONArray(response.body?.string() ?: "[]") else null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    // No password, no Supabase auth session. Identity is the android_id.
+    // register_or_fetch_user (server side) either returns the existing
+    // account for this device or creates one and drops it into a contact
+    // group. A duplicate username/phone makes the call fail, which the
+    // caller shows as "may already be registered".
     fun registerOrFetchUser(
         androidId: String,
         username: String,
@@ -41,159 +65,38 @@ object SupabaseClient {
         referredBy: String?,
         callback: (Boolean, JSONObject?) -> Unit
     ) {
-        if (!isConfigured()) {
-            callback(false, null)
-            return
+        val params = JSONObject().apply {
+            put("p_android_id", androidId)
+            put("p_username", username)
+            put("p_phone", phone)
+            put("p_referred_by", if (referredBy.isNullOrBlank()) JSONObject.NULL else referredBy)
         }
-
-        try {
-            // 1. Check if this android_id is already registered.
-            val lookupUrl = "$supabaseUrl/rest/v1/users?android_id=eq.$androidId&select=*"
-            val lookupRequest = Request.Builder()
-                .url(lookupUrl)
-                .addHeader("apikey", anonKey)
-                .addHeader("Authorization", "Bearer $anonKey")
-                .get()
-                .build()
-
-            client.newCall(lookupRequest).execute().use { response ->
-                if (response.isSuccessful) {
-                    val body = response.body?.string() ?: "[]"
-                    val arr = org.json.JSONArray(body)
-                    if (arr.length() > 0) {
-                        callback(true, arr.getJSONObject(0))
-                        return
-                    }
-                }
-            }
-
-            // 2. Not found - create it.
-            val insertUrl = "$supabaseUrl/rest/v1/users"
-            val body = JSONObject().apply {
-                put("android_id", androidId)
-                put("username", username)
-                put("phone", phone)
-                if (!referredBy.isNullOrBlank()) put("referred_by", referredBy)
-            }
-
-            val insertRequest = Request.Builder()
-                .url(insertUrl)
-                .addHeader("apikey", anonKey)
-                .addHeader("Authorization", "Bearer $anonKey")
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Prefer", "return=representation")
-                .post(body.toString().toRequestBody("application/json".toMediaType()))
-                .build()
-
-            client.newCall(insertRequest).execute().use { response ->
-                if (response.isSuccessful) {
-                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
-                    val newUser = if (arr.length() > 0) arr.getJSONObject(0) else null
-
-                    // Drop the brand-new user into a contact group. Best-effort:
-                    // if this fails, registration still succeeded and the user
-                    // just won't be grouped yet - not worth failing signup over.
-                    val newUserId = newUser?.optString("id")
-                    if (!newUserId.isNullOrBlank()) {
-                        addUserToGroup(newUserId) { _, _ -> }
-                    }
-
-                    callback(true, newUser)
-                } else {
-                    callback(false, null)
-                }
-            }
-        } catch (e: Exception) {
-            callback(false, null)
-        }
-    }
-
-    // Places a just-registered user into the oldest open contact group
-    // (or a fresh one) via the add_user_to_group RPC. Fire-and-forget from
-    // registerOrFetchUser; called synchronously (same thread) since
-    // registerOrFetchUser already runs off the UI thread.
-    fun addUserToGroup(userId: String, callback: (Boolean, Int) -> Unit) {
-        if (!isConfigured()) {
-            callback(false, 0)
-            return
-        }
-
-        try {
-            val url = "$supabaseUrl/rest/v1/rpc/add_user_to_group"
-            val body = JSONObject().apply {
-                put("p_user_id", userId)
-            }
-
-            val request = Request.Builder()
-                .url(url)
-                .addHeader("apikey", anonKey)
-                .addHeader("Authorization", "Bearer $anonKey")
-                .addHeader("Content-Type", "application/json")
-                .post(body.toString().toRequestBody("application/json".toMediaType()))
-                .build()
-
-            client.newCall(request).execute().use { response ->
-                if (response.isSuccessful) {
-                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
-                    if (arr.length() > 0) {
-                        callback(true, arr.getJSONObject(0).optInt("member_position", 0))
-                    } else {
-                        callback(false, 0)
-                    }
-                } else {
-                    callback(false, 0)
-                }
-            }
-        } catch (e: Exception) {
-            callback(false, 0)
-        }
+        val arr = rpc("register_or_fetch_user", params)
+        if (arr != null && arr.length() > 0) callback(true, arr.getJSONObject(0)) else callback(false, null)
     }
 
     // Looks an account up by phone number and confirms this device's
-    // android_id matches the one on file - that's what makes login
-    // "seamless" (no OTP, no password): if the phone number was
-    // registered from *this* physical device, we trust it and log
-    // them straight in. If the numbers match but the android_id
-    // doesn't (different phone), we refuse and report a mismatch so
-    // the caller can show the right message instead of silently
-    // logging in the wrong device.
+    // android_id matches the one on file (no OTP, no password). The server
+    // does the comparison and only returns account data when the device
+    // matches, so a different device learns nothing about the account.
     fun fetchUserByPhone(
         phone: String,
         androidId: String,
         callback: (found: Boolean, deviceMatches: Boolean, user: JSONObject?) -> Unit
     ) {
-        if (!isConfigured()) {
+        val params = JSONObject().apply {
+            put("p_phone", phone)
+            put("p_android_id", androidId)
+        }
+        val arr = rpc("login_by_phone", params)
+        if (arr == null || arr.length() == 0) {
             callback(false, false, null)
             return
         }
-
-        try {
-            val url = "$supabaseUrl/rest/v1/users?phone=eq.$phone&select=*"
-            val request = Request.Builder()
-                .url(url)
-                .addHeader("apikey", anonKey)
-                .addHeader("Authorization", "Bearer $anonKey")
-                .get()
-                .build()
-
-            client.newCall(request).execute().use { response ->
-                if (response.isSuccessful) {
-                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
-                    if (arr.length() > 0) {
-                        val user = arr.getJSONObject(0)
-                        val storedAndroidId = user.optString("android_id", "")
-                        val matches = storedAndroidId.isNotBlank() && storedAndroidId == androidId
-                        callback(true, matches, user)
-                    } else {
-                        callback(false, false, null)
-                    }
-                } else {
-                    callback(false, false, null)
-                }
-            }
-        } catch (e: Exception) {
-            callback(false, false, null)
-        }
+        val row = arr.getJSONObject(0)
+        val exists = row.optBoolean("account_exists", false)
+        val matches = row.optBoolean("device_matches", false)
+        callback(exists, matches, if (exists && matches) row else null)
     }
 
     // Published (full) contact groups, newest-filled first.
@@ -227,35 +130,14 @@ object SupabaseClient {
 
     // Set of group_ids this user has already unlocked.
     fun fetchUnlockedGroupIds(userId: String, callback: (Boolean, Set<String>) -> Unit) {
-        if (!isConfigured()) {
+        val arr = rpc("get_my_unlocked_group_ids", JSONObject().apply { put("p_user_id", userId) })
+        if (arr == null) {
             callback(false, emptySet())
             return
         }
-
-        try {
-            val url = "$supabaseUrl/rest/v1/group_unlocks?user_id=eq.$userId&select=group_id"
-            val request = Request.Builder()
-                .url(url)
-                .addHeader("apikey", anonKey)
-                .addHeader("Authorization", "Bearer $anonKey")
-                .get()
-                .build()
-
-            client.newCall(request).execute().use { response ->
-                if (response.isSuccessful) {
-                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
-                    val ids = mutableSetOf<String>()
-                    for (i in 0 until arr.length()) {
-                        ids.add(arr.getJSONObject(i).optString("group_id"))
-                    }
-                    callback(true, ids)
-                } else {
-                    callback(false, emptySet())
-                }
-            }
-        } catch (e: Exception) {
-            callback(false, emptySet())
-        }
+        val ids = mutableSetOf<String>()
+        for (i in 0 until arr.length()) ids.add(arr.getJSONObject(i).optString("group_id"))
+        callback(true, ids)
     }
 
     // The 3 members (username + phone) of an unlocked group, in position
@@ -301,38 +183,13 @@ object SupabaseClient {
         }
     }
 
-    // Current key balance. New users start with 3 (set server-side by the
-    // users.key_balance default); this just reads whatever the DB has now,
-    // since it may have changed since login (nightly verification, admin
-    // top-up, etc).
+    // Current key balance. New users start with 3 (set server-side); this
+    // reads whatever the DB has now, since it may have changed since login.
     fun fetchKeyBalance(userId: String, callback: (Boolean, Int) -> Unit) {
-        if (!isConfigured()) {
-            callback(false, 0)
-            return
-        }
-
-        try {
-            val url = "$supabaseUrl/rest/v1/users?id=eq.$userId&select=key_balance"
-            val request = Request.Builder()
-                .url(url)
-                .addHeader("apikey", anonKey)
-                .addHeader("Authorization", "Bearer $anonKey")
-                .get()
-                .build()
-
-            client.newCall(request).execute().use { response ->
-                if (response.isSuccessful) {
-                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
-                    if (arr.length() > 0) {
-                        callback(true, arr.getJSONObject(0).optInt("key_balance", 0))
-                    } else {
-                        callback(false, 0)
-                    }
-                } else {
-                    callback(false, 0)
-                }
-            }
-        } catch (e: Exception) {
+        val arr = rpc("get_my_balance", JSONObject().apply { put("p_user_id", userId) })
+        if (arr != null && arr.length() > 0) {
+            callback(true, arr.getJSONObject(0).optInt("key_balance", 0))
+        } else {
             callback(false, 0)
         }
     }
@@ -435,44 +292,14 @@ object SupabaseClient {
 
     // Whether today's daily repost has already been submitted (regardless
     // of verified/pending/rejected) - used to grey out the Repost Today
-    // button after the first tap of the day instead of relying only on
-    // the server rejecting a second attempt.
+    // button. The server decides what "today" is (UTC).
     fun fetchTodayRepostStatus(userId: String, callback: (Boolean, String?) -> Unit) {
-        if (!isConfigured()) {
+        val arr = rpc("get_today_repost_status", JSONObject().apply { put("p_user_id", userId) })
+        if (arr == null) {
             callback(false, null)
             return
         }
-
-        try {
-            val url = "$supabaseUrl/rest/v1/daily_reposts?user_id=eq.$userId&repost_date=eq.${todayIsoDate()}&select=status"
-            val request = Request.Builder()
-                .url(url)
-                .addHeader("apikey", anonKey)
-                .addHeader("Authorization", "Bearer $anonKey")
-                .get()
-                .build()
-
-            client.newCall(request).execute().use { response ->
-                if (response.isSuccessful) {
-                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
-                    if (arr.length() > 0) {
-                        callback(true, arr.getJSONObject(0).optString("status"))
-                    } else {
-                        callback(true, null)
-                    }
-                } else {
-                    callback(false, null)
-                }
-            }
-        } catch (e: Exception) {
-            callback(false, null)
-        }
-    }
-
-    private fun todayIsoDate(): String {
-        val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
-        sdf.timeZone = java.util.TimeZone.getTimeZone("UTC")
-        return sdf.format(java.util.Date())
+        callback(true, if (arr.length() > 0) arr.getJSONObject(0).optString("status") else null)
     }
 
     // A notification the user can see: their own targeted rows (a group
@@ -534,39 +361,15 @@ object SupabaseClient {
         }
     }
 
-    // Upserts this device's current FCM token onto the user's row, so the
-    // send-push Edge Function knows where to deliver notifications for
-    // them. Called on login/register and whenever FCM hands us a refreshed
-    // token (see VgFirebaseMessagingService.onNewToken). Best-effort: a
-    // failure here just means push delivery is stale until the next
-    // successful call - never worth interrupting the user over.
+    // Saves this device's current FCM token onto the user's row so the
+    // send-push Edge Function knows where to deliver notifications. Called
+    // on login/register and whenever FCM refreshes the token. Best-effort.
     fun saveFcmToken(userId: String, token: String, callback: (Boolean) -> Unit) {
-        if (!isConfigured()) {
-            callback(false)
-            return
+        val params = JSONObject().apply {
+            put("p_user_id", userId)
+            put("p_token", token)
         }
-
-        try {
-            val url = "$supabaseUrl/rest/v1/users?id=eq.$userId"
-            val body = JSONObject().apply {
-                put("fcm_token", token)
-            }
-
-            val request = Request.Builder()
-                .url(url)
-                .addHeader("apikey", anonKey)
-                .addHeader("Authorization", "Bearer $anonKey")
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Prefer", "return=minimal")
-                .patch(body.toString().toRequestBody("application/json".toMediaType()))
-                .build()
-
-            client.newCall(request).execute().use { response ->
-                callback(response.isSuccessful)
-            }
-        } catch (e: Exception) {
-            callback(false)
-        }
+        callback(rpc("save_fcm_token", params) != null)
     }
 
     // Marks every notification currently visible to this user as read
@@ -712,30 +515,11 @@ object SupabaseClient {
     // Date registered + referred by for accounts that logged in before
     // those were being saved (see SessionManager.saveRegistrationFrom).
     fun fetchUserProfile(userId: String, callback: (Boolean, JSONObject?) -> Unit) {
-        if (!isConfigured() || userId.isBlank()) {
+        if (userId.isBlank()) {
             callback(false, null)
             return
         }
-
-        try {
-            val url = "$supabaseUrl/rest/v1/users?id=eq.$userId&select=created_at,referred_by"
-            val request = Request.Builder()
-                .url(url)
-                .addHeader("apikey", anonKey)
-                .addHeader("Authorization", "Bearer $anonKey")
-                .get()
-                .build()
-
-            client.newCall(request).execute().use { response ->
-                if (response.isSuccessful) {
-                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
-                    if (arr.length() > 0) callback(true, arr.getJSONObject(0)) else callback(false, null)
-                } else {
-                    callback(false, null)
-                }
-            }
-        } catch (e: Exception) {
-            callback(false, null)
-        }
+        val arr = rpc("get_my_profile", JSONObject().apply { put("p_user_id", userId) })
+        if (arr != null && arr.length() > 0) callback(true, arr.getJSONObject(0)) else callback(false, null)
     }
 }
