@@ -7,6 +7,7 @@
     android:orientation="vertical"
     android:background="@color/background">
 
+    <!-- Gradient bar; the Back pill + title come from the shared header. -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,31 +17,7 @@
         android:paddingStart="20dp"
         android:paddingEnd="20dp">
 
-        <TextView
-            android:id="@+id/legal_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start|center_vertical"
-            android:background="@drawable/buy_header_pill"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:text="Back"
-            android:textSize="14sp"
-            android:textColor="@color/white"
-            android:clickable="true"
-            android:focusable="true" />
-
-        <TextView
-            android:fontFamily="@font/baloo_2_extrabold"
-            android:includeFontPadding="false"
-            android:id="@+id/legal_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textSize="20sp"
-            android:textColor="@color/white" />
+        <include layout="@layout/layout_back_header" />
 
     </FrameLayout>
 

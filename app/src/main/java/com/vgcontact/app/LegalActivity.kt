@@ -29,10 +29,8 @@ class LegalActivity : AppCompatActivity() {
         setContentView(R.layout.activity_legal)
 
         val isPrivacy = intent.getStringExtra(EXTRA_TYPE) == TYPE_PRIVACY
-        findViewById<TextView>(R.id.legal_title).text =
-            if (isPrivacy) "Privacy Policy" else "Terms & Conditions"
+        BackHeader.bind(this, if (isPrivacy) "Privacy Policy" else "Terms & Conditions")
         findViewById<TextView>(R.id.legal_body).text =
             if (isPrivacy) LegalContent.PRIVACY else LegalContent.TERMS
-        findViewById<TextView>(R.id.legal_back).setOnClickListener { finish() }
     }
 }

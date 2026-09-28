@@ -43,7 +43,7 @@ class ReferralActivity : AppCompatActivity() {
         val code = sessionManager.getPhone().orEmpty()
         val link = if (code.isNotBlank()) LINK_BASE + code else ""
 
-        findViewById<View>(R.id.referral_back_btn).setOnClickListener { finish() }
+        BackHeader.bind(this, "Refer & Earn")
 
         findViewById<TextView>(R.id.referral_code_text).text =
             if (code.isNotBlank()) code else "Unavailable"

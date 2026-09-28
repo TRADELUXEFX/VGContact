@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Shared "Back + title" header row. Back pill on the left, title sits
+     immediately to its right and stays left-aligned there on every screen,
+     so the title never overlaps the pill or drifts to the centre.
+
+     Usage (inside any screen):
+         <include layout="@layout/layout_back_header" />
+     Then in code:  BackHeader.bind(this, "Screen title")
+
+     Background is transparent so it works on both the gradient screens
+     (Legal) and the solid green screens (Buy Keys, Referral). Screens that
+     need a gradient wrap it in their own container. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/back_header_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical">
+
+    <TextView
+        android:id="@+id/back_header_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/buy_header_pill"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="@font/poppins_medium"
+        android:includeFontPadding="false"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:text="Back"
+        android:textColor="@color/white"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/back_header_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="14dp"
+        android:ellipsize="end"
+        android:fontFamily="@font/baloo_2_extrabold"
+        android:gravity="start|center_vertical"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:textColor="@color/white"
+        android:textSize="20sp" />
+
+</LinearLayout>

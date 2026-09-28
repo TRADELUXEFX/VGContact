@@ -29,32 +29,7 @@
                 android:paddingTop="20dp"
                 android:paddingBottom="24dp">
 
-                <TextView
-                    android:id="@+id/referral_back_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/buy_header_pill"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp"
-                    android:text="Back"
-                    android:fontFamily="@font/poppins_medium"
-                    android:includeFontPadding="false"
-                    android:textSize="14sp"
-                    android:textColor="@color/vg_green_tint"
-                    android:clickable="true"
-                    android:focusable="true" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Refer &amp; Earn"
-                    android:fontFamily="@font/baloo_2_extrabold"
-                    android:includeFontPadding="false"
-                    android:textSize="30sp"
-                    android:textColor="@color/white" />
+                <include layout="@layout/layout_back_header" />
 
                 <!-- Code + link in one card -->
                 <LinearLayout

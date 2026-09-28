@@ -3,6 +3,8 @@ package com.vgcontact.app
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
@@ -23,6 +25,12 @@ class BuyKeysActivity : AppCompatActivity() {
     private val packViews = mutableMapOf<Int, View>()
     private var selectedKeys = 5
 
+    // Loading gate: the screen stays behind a spinner until the key balance
+    // has loaded, then the whole thing is revealed at once.
+    private var contentRevealed = false
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private val revealFallback = Runnable { revealContent() }
+
     companion object {
         // 09110321143 in international format (Nigeria +234, no leading 0).
         const val SUPPORT_WHATSAPP = "2349110321143"
@@ -30,6 +38,8 @@ class BuyKeysActivity : AppCompatActivity() {
         private val PACK_PRICES = mapOf(1 to 1000, 5 to 5000, 10 to 8000)
         // Each key unlocks this many status viewers; a pack is keys * this.
         private const val VIEWERS_PER_KEY = 250
+        // Never leave the user on a spinner if the network stalls.
+        private const val LOAD_TIMEOUT_MS = 4000L
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +55,7 @@ class BuyKeysActivity : AppCompatActivity() {
             return
         }
 
-        findViewById<View>(R.id.buy_back_btn).setOnClickListener { finish() }
+        BackHeader.bind(this, "Buy Keys")
 
         buyBtn = findViewById(R.id.buy_keys_whatsapp_btn)
         packViews[1] = findViewById(R.id.buy_pack_1)
@@ -58,6 +68,19 @@ class BuyKeysActivity : AppCompatActivity() {
         selectPack(selectedKeys)
 
         buyBtn.setOnClickListener { openWhatsApp() }
+
+        // Fallback so the screen always appears even if the balance call
+        // hangs. Normally the balance callback reveals it first.
+        mainHandler.postDelayed(revealFallback, LOAD_TIMEOUT_MS)
+    }
+
+    /** Swap the spinner for the fully-ready content. Safe to call repeatedly. */
+    private fun revealContent() {
+        if (contentRevealed) return
+        contentRevealed = true
+        mainHandler.removeCallbacks(revealFallback)
+        findViewById<View>(R.id.buy_content).visibility = View.VISIBLE
+        findViewById<View>(R.id.buy_loading).visibility = View.GONE
     }
 
     private fun bindViewerCounts() {
@@ -100,7 +123,10 @@ class BuyKeysActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         val userId = sessionManager.getUserId()
-        if (userId.isNullOrBlank()) return
+        if (userId.isNullOrBlank()) {
+            revealContent()
+            return
+        }
         val balanceText = findViewById<TextView>(R.id.buy_key_balance_text)
         Thread {
             SupabaseClient.fetchKeyBalance(userId) { success, balance ->
@@ -108,8 +134,18 @@ class BuyKeysActivity : AppCompatActivity() {
                     if (success) {
                         balanceText.text = "$balance ${if (balance == 1) "key" else "keys"} left"
                     }
+                    // Reveal on success and on failure, so a network error
+                    // never traps the user behind the spinner. On later
+                    // resumes (e.g. back from WhatsApp) this is a no-op and
+                    // the balance just refreshes silently.
+                    revealContent()
                 }
             }
         }.start()
+    }
+
+    override fun onDestroy() {
+        mainHandler.removeCallbacks(revealFallback)
+        super.onDestroy()
     }
 }

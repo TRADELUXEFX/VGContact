@@ -10,10 +10,15 @@
     android:layout_height="match_parent"
     android:background="@color/vg_green_dark">
 
+    <!-- All screen content. Starts invisible and is revealed by
+         BuyKeysActivity only once the key balance has loaded, so the
+         user never sees a half-empty screen fill in piece by piece. -->
     <LinearLayout
+        android:id="@+id/buy_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="invisible">
 
         <ScrollView
             android:layout_width="match_parent"
@@ -30,31 +35,51 @@
                 android:paddingTop="20dp"
                 android:paddingBottom="16dp">
 
-                <FrameLayout
+                <!-- [Back] [Title ........] [balance]. Same Back + title look
+                     as every other screen (see layout_back_header.xml); the
+                     key-balance pill is pinned to the far right. -->
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
                     <TextView
-                        android:id="@+id/buy_back_btn"
+                        android:id="@+id/back_header_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="start|center_vertical"
                         android:background="@drawable/buy_header_pill"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/poppins_medium"
+                        android:includeFontPadding="false"
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp"
                         android:paddingTop="8dp"
                         android:paddingBottom="8dp"
                         android:text="Back"
-                        android:textSize="14sp"
-                        android:textColor="@color/vg_green_tint"
-                        android:clickable="true"
-                        android:focusable="true" />
+                        android:textColor="@color/white"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/back_header_title"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="14dp"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/baloo_2_extrabold"
+                        android:gravity="start|center_vertical"
+                        android:includeFontPadding="false"
+                        android:maxLines="1"
+                        android:textColor="@color/white"
+                        android:textSize="20sp" />
 
                     <TextView
                         android:id="@+id/buy_key_balance_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="end|center_vertical"
+                        android:layout_marginStart="10dp"
                         android:background="@drawable/buy_header_pill"
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp"
@@ -64,7 +89,7 @@
                         android:textSize="14sp"
                         android:textColor="@color/vg_green_tint" />
 
-                </FrameLayout>
+                </LinearLayout>
 
                 <ImageView
                     android:layout_width="56dp"
@@ -307,5 +332,24 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <!-- Shown first (default), hidden once the content is ready. -->
+    <FrameLayout
+        android:id="@+id/buy_loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/vg_green_dark"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="visible">
+
+        <ProgressBar
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/white" />
+
+    </FrameLayout>
 
 </FrameLayout>
