@@ -386,7 +386,11 @@ object SupabaseClient {
             put("p_user_id", userId)
             put("p_token", token)
         }
-        callback(rpc("save_fcm_token", params) != null)
+        // Network calls must not run on the main thread, and the callers
+        // (cold start, post-login flush) are on it - so hop off here.
+        kotlin.concurrent.thread {
+            callback(rpc("save_fcm_token", params) != null)
+        }
     }
 
     // Marks every notification currently visible to this user as read
