@@ -77,6 +77,8 @@ class RegisterActivity : AppCompatActivity() {
         registerBtn = findViewById(R.id.register_btn)
         progressBar = findViewById(R.id.progressBar)
 
+        setupConsentText()
+
         // Entry point for someone who already has an account (e.g.
         // reinstalled the app) rather than signing up fresh.
         val loginLink = findViewById<TextView>(R.id.login_link)
@@ -143,4 +145,31 @@ class RegisterActivity : AppCompatActivity() {
         progressBar.visibility = if (loading) View.VISIBLE else View.GONE
     }
 
+
+    /** "By continuing you agree to our Terms & Conditions and Privacy Policy" with tappable links. */
+    private fun setupConsentText() {
+        val consent = findViewById<TextView>(R.id.register_consent)
+        val full = "By continuing you agree to our Terms & Conditions and Privacy Policy."
+        val span = android.text.SpannableString(full)
+        val linkColor = androidx.core.content.ContextCompat.getColor(this, R.color.vg_green_dark)
+
+        fun link(label: String, onClick: () -> Unit) {
+            val start = full.indexOf(label)
+            if (start < 0) return
+            val end = start + label.length
+            span.setSpan(object : android.text.style.ClickableSpan() {
+                override fun onClick(widget: View) = onClick()
+                override fun updateDrawState(ds: android.text.TextPaint) {
+                    ds.color = linkColor
+                    ds.isUnderlineText = false
+                    ds.isFakeBoldText = true
+                }
+            }, start, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        link("Terms & Conditions") { LegalActivity.openTerms(this) }
+        link("Privacy Policy") { LegalActivity.openPrivacy(this) }
+
+        consent.text = span
+        consent.movementMethod = android.text.method.LinkMovementMethod.getInstance()
+    }
 }

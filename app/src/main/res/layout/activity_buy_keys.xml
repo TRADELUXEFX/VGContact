@@ -70,7 +70,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:adjustViewBounds="true"
-                    android:src="@drawable/buy_keys_logo"
+                    android:src="@drawable/ic_buy_keys_tile"
                     android:contentDescription="VGContact" />
 
                 <TextView

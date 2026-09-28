@@ -49,6 +49,10 @@ class ProfileActivity : AppCompatActivity() {
             Toast.makeText(this, "Username copied", Toast.LENGTH_SHORT).show()
         }
 
+        // Legal
+        findViewById<LinearLayout>(R.id.profile_terms_row).setOnClickListener { LegalActivity.openTerms(this) }
+        findViewById<LinearLayout>(R.id.profile_privacy_row).setOnClickListener { LegalActivity.openPrivacy(this) }
+
         // Logout button
         val logoutBtn = findViewById<Button>(R.id.logout_btn)
         logoutBtn.setOnClickListener {

@@ -253,6 +253,16 @@
 
             </FrameLayout>
 
+            <TextView
+                android:id="@+id/register_consent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:textSize="12sp"
+                android:textColor="@color/text_secondary"
+                android:linksClickable="true" />
+
             <!-- Entry point for someone who already has an account
                  (e.g. reinstalled the app) rather than signing up
                  fresh - matches VGKontact's onboarding_recover_account

@@ -94,6 +94,12 @@
             android:exported="false"
             android:screenOrientation="portrait" />
 
+        <!-- Terms & Conditions / Privacy Policy: reached from the floating help button -->
+        <activity
+            android:name=".LegalActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
         <!-- Receives pushes sent by the send-push Supabase Edge Function. -->
         <service
             android:name=".VgFirebaseMessagingService"
