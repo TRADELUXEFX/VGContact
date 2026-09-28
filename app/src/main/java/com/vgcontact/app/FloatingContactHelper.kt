@@ -1,6 +1,8 @@
 package com.vgcontact.app
 
 import android.app.Activity
+import android.app.Application
+import android.os.Bundle
 import android.content.Intent
 import android.net.Uri
 import android.view.Gravity
@@ -29,6 +31,43 @@ import androidx.core.content.ContextCompat
 object FloatingContactHelper {
 
     private const val FAB_TAG = "floating_contact_fab"
+
+    /**
+     * Screens that must NOT show the floating button (auth / onboarding /
+     * splash / permissions / legal, plus the chat-support screen itself).
+     */
+    private val EXCLUDED: Set<Class<out Activity>> = setOf(
+        SplashActivity::class.java,
+        RegisterActivity::class.java,
+        LoginActivity::class.java,
+        PermissionsActivity::class.java,
+        LegalActivity::class.java,
+        ChatSupportActivity::class.java
+    )
+
+    /**
+     * Call once from Application.onCreate(). After this, every screen gets
+     * the floating button automatically as it is created, so individual
+     * activities no longer need their own attach() call (existing calls are
+     * harmless: attach() de-duplicates by tag).
+     */
+    fun register(app: Application) {
+        app.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
+            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
+            override fun onActivityStarted(activity: Activity) {
+                // Content view is guaranteed set by onStart, so android.R.id.content exists.
+                if (activity.javaClass in EXCLUDED) return
+                // Nav-bar screens get lifted above the pill; others sit low.
+                val hasBottomNav = activity.findViewById<View>(R.id.bottomNavBar) != null
+                attach(activity, if (hasBottomNav) 110 else 0)
+            }
+            override fun onActivityResumed(activity: Activity) {}
+            override fun onActivityPaused(activity: Activity) {}
+            override fun onActivityStopped(activity: Activity) {}
+            override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
+            override fun onActivityDestroyed(activity: Activity) {}
+        })
+    }
 
     /**
      * @param bottomMarginDp extra bottom margin (in dp) to lift the button
