@@ -95,4 +95,15 @@
 
 
 
+    <!-- Rounded pop-up (used by the out-of-keys dialog). -->
+    <style name="ShapeAppearance.VG.RoundedDialog" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">24dp</item>
+    </style>
+
+    <style name="VGRoundedAlertDialog" parent="MaterialAlertDialog.MaterialComponents">
+        <item name="shapeAppearance">@style/ShapeAppearance.VG.RoundedDialog</item>
+        <item name="shapeAppearanceOverlay">@null</item>
+    </style>
+
 </resources>

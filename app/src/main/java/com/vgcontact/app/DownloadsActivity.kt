@@ -5,11 +5,13 @@ import android.os.Bundle
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.io.File
 import kotlin.concurrent.thread
 
@@ -116,30 +118,28 @@ class DownloadsActivity : AppCompatActivity() {
             val isLocked = !unlockedGroupIds.contains(groupId)
 
             val groupView = layoutInflater.inflate(R.layout.item_file, fileListContainer, false)
-            val groupIconView = groupView.findViewById<ImageView>(R.id.file_icon)
-            val groupNameView = groupView.findViewById<TextView>(R.id.file_name)
-            val groupCountView = groupView.findViewById<TextView>(R.id.file_count)
-            val statusDot = groupView.findViewById<android.view.View>(R.id.file_status_dot)
-            val downloadBtn = groupView.findViewById<FrameLayout>(R.id.download_btn)
-            val downloadBtnIcon = groupView.findViewById<ImageView>(R.id.download_btn_icon)
-
-            groupNameView.text = "Contact List #$groupNumber"
-            groupCountView.text = if (isLocked) "Locked, $memberCount contacts" else "Verified, $memberCount contacts"
-
-            groupIconView.setImageResource(if (isLocked) R.drawable.ic_lock else R.drawable.ic_unlock)
-            statusDot.setBackgroundResource(if (isLocked) R.drawable.status_dot_locked else R.drawable.status_dot_unlocked)
-
-            downloadBtn.setBackgroundResource(if (isLocked) R.drawable.file_row_action_locked_background else R.drawable.file_row_action_background)
-            downloadBtnIcon.setImageResource(if (isLocked) R.drawable.ic_lock else R.drawable.ic_download)
-            downloadBtnIcon.setColorFilter(
-                ContextCompat.getColor(this, if (isLocked) R.color.locked_text else R.color.white)
+            val row = RowViews(
+                icon = groupView.findViewById(R.id.file_icon),
+                dot = groupView.findViewById(R.id.file_status_dot),
+                count = groupView.findViewById(R.id.file_count),
+                btn = groupView.findViewById(R.id.download_btn),
+                btnIcon = groupView.findViewById(R.id.download_btn_icon),
+                btnText = groupView.findViewById(R.id.download_btn_text)
             )
+            groupView.findViewById<TextView>(R.id.file_name).text = "Contact List #$groupNumber"
+            row.count.text = if (isLocked) "Locked, $memberCount contacts" else "Verified, $memberCount contacts"
+            row.icon.setImageResource(if (isLocked) R.drawable.ic_lock else R.drawable.ic_unlock)
+            row.dot.setBackgroundResource(if (isLocked) R.drawable.status_dot_locked else R.drawable.status_dot_unlocked)
+            applyActionButton(row, groupId)
 
-            downloadBtn.setOnClickListener {
-                if (isLocked) {
-                    confirmUnlock(groupId, groupIconView, statusDot, groupCountView, downloadBtn, downloadBtnIcon)
+            // Locked: UNLOCK spins while it checks keys, spends one, and goes
+            // straight to the import screen (no confirmation question).
+            // Unlocked: same spinner, then the import screen.
+            row.btn.setOnClickListener {
+                if (unlockedGroupIds.contains(groupId)) {
+                    generateVcfAndImport(row, groupId)
                 } else {
-                    generateVcfAndImport(downloadBtn, downloadBtnIcon, groupId)
+                    startUnlock(row, groupId)
                 }
             }
 
@@ -147,37 +147,73 @@ class DownloadsActivity : AppCompatActivity() {
         }
     }
 
+    private class RowViews(
+        val icon: ImageView,
+        val dot: android.view.View,
+        val count: TextView,
+        val btn: FrameLayout,
+        val btnIcon: ImageView,
+        val btnText: TextView
+    )
+
+    private val spinners = mutableMapOf<android.view.View, ProgressBar>()
+
+    // Locked -> green UNLOCK pill. Unlocked -> green download button.
+    private fun applyActionButton(row: RowViews, groupId: String) {
+        val locked = !unlockedGroupIds.contains(groupId)
+        if (locked) {
+            row.btn.setBackgroundResource(R.drawable.file_row_unlock_pill_background)
+            row.btnText.visibility = android.view.View.VISIBLE
+            row.btnIcon.visibility = android.view.View.GONE
+        } else {
+            row.btn.setBackgroundResource(R.drawable.file_row_action_background)
+            row.btnText.visibility = android.view.View.GONE
+            row.btnIcon.setImageResource(R.drawable.ic_download)
+            row.btnIcon.setColorFilter(ContextCompat.getColor(this, R.color.white))
+            row.btnIcon.visibility = android.view.View.VISIBLE
+        }
+        row.btn.isEnabled = true
+    }
+
+    // Rotating spinner inside the button (keeps the button's size).
+    private fun setRowLoading(row: RowViews, loading: Boolean, groupId: String) {
+        if (loading) {
+            if (spinners.containsKey(row.btn)) return
+            row.btn.isEnabled = false
+            if (row.btnIcon.visibility == android.view.View.VISIBLE) row.btnIcon.visibility = android.view.View.INVISIBLE
+            if (row.btnText.visibility == android.view.View.VISIBLE) row.btnText.visibility = android.view.View.INVISIBLE
+            val spinner = ProgressBar(this).apply {
+                isIndeterminate = true
+                indeterminateTintList = android.content.res.ColorStateList.valueOf(
+                    ContextCompat.getColor(this@DownloadsActivity, R.color.white)
+                )
+            }
+            val params = FrameLayout.LayoutParams(18.dpToPx(), 18.dpToPx())
+            params.gravity = android.view.Gravity.CENTER
+            row.btn.addView(spinner, params)
+            spinners[row.btn] = spinner
+        } else {
+            spinners.remove(row.btn)?.let { row.btn.removeView(it) }
+            applyActionButton(row, groupId)
+        }
+    }
+
     // Pulls the group's 3 members (username + phone, only reachable because
     // this group is unlocked - see get_group_contacts RPC), builds a .vcf
     // on device, and hands it to Android's native "save contact" screen.
-    // Keeps the same visible spinner/disable feedback as before so the tap
-    // never looks unresponsive while the RPC call is in flight.
-    private fun generateVcfAndImport(downloadBtn: FrameLayout, downloadBtnIcon: ImageView, groupId: String) {
+    private fun generateVcfAndImport(row: RowViews, groupId: String) {
         val userId = sessionManager.getUserId()
         if (userId.isNullOrBlank()) {
             Toast.makeText(this, "Couldn't verify your account. Please restart the app.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        downloadBtn.isEnabled = false
-        downloadBtnIcon.visibility = android.view.View.INVISIBLE
-
-        val spinner = android.widget.ProgressBar(this).apply {
-            isIndeterminate = true
-            indeterminateTintList = android.content.res.ColorStateList.valueOf(
-                ContextCompat.getColor(this@DownloadsActivity, R.color.white)
-            )
-        }
-        val spinnerParams = FrameLayout.LayoutParams(16.dpToPx(), 16.dpToPx())
-        spinnerParams.gravity = android.view.Gravity.CENTER
-        downloadBtn.addView(spinner, spinnerParams)
+        setRowLoading(row, true, groupId)
 
         thread {
             SupabaseClient.getGroupContacts(userId, groupId) { success, contacts ->
                 runOnUiThread {
-                    downloadBtn.removeView(spinner)
-                    downloadBtnIcon.visibility = android.view.View.VISIBLE
-                    downloadBtn.isEnabled = true
+                    setRowLoading(row, false, groupId)
 
                     if (!success || contacts.isEmpty()) {
                         Toast.makeText(this, "Couldn't load this contact list. Try again.", Toast.LENGTH_SHORT).show()
@@ -226,107 +262,77 @@ class DownloadsActivity : AppCompatActivity() {
 
     private fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()
 
-    // Tap on a locked file: check the balance first, then either confirm the
-    // spend ("This uses 1 key. You have 3 -> 2 after.") or, with 0 keys,
-    // point to the two ways to get one (repost free / buy for N1,000).
-    // If the balance can't be read, falls back to the direct unlock, which
-    // still handles NO_KEYS server-side.
-    private fun confirmUnlock(
-        groupId: String,
-        groupIconView: ImageView,
-        statusDot: android.view.View,
-        groupCountView: TextView,
-        downloadBtn: FrameLayout,
-        downloadBtnIcon: ImageView
-    ) {
+    // Tap on UNLOCK: the button spins while we check the key balance.
+    //  - Has a key -> spend it and open the import screen straight away.
+    //  - No keys   -> stop spinning and show the out-of-keys pop-up.
+    // If the balance can't be read we still try the unlock; the server
+    // answers NO_KEYS when there are none.
+    private fun startUnlock(row: RowViews, groupId: String) {
         val userId = sessionManager.getUserId()
         if (userId.isNullOrBlank()) {
             Toast.makeText(this, "Couldn't verify your account. Please restart the app.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        downloadBtn.isEnabled = false
+        setRowLoading(row, true, groupId)
         thread {
             SupabaseClient.fetchKeyBalance(userId) { ok, balance ->
                 runOnUiThread {
-                    downloadBtn.isEnabled = true
-                    when {
-                        !ok -> unlockWithKey(groupId, groupIconView, statusDot, groupCountView, downloadBtn, downloadBtnIcon)
-                        balance <= 0 -> androidx.appcompat.app.AlertDialog.Builder(this)
-                            .setTitle("You're out of keys")
-                            .setMessage("Repost today for a free key, or buy one for \u20A61,000. Keys are added within 24 hours.")
-                            .setPositiveButton("Repost free") { _, _ ->
-                                startActivity(Intent(this, RepostActivity::class.java))
-                            }
-                            .setNegativeButton("Buy a key") { _, _ ->
-                                startActivity(Intent(this, BuyKeysActivity::class.java))
-                            }
-                            .show()
-                        else -> androidx.appcompat.app.AlertDialog.Builder(this)
-                            .setTitle("Unlock this file?")
-                            .setMessage("This uses 1 key. You have $balance \u2192 ${balance - 1} after.")
-                            .setPositiveButton("Unlock") { _, _ ->
-                                unlockWithKey(groupId, groupIconView, statusDot, groupCountView, downloadBtn, downloadBtnIcon)
-                            }
-                            .setNegativeButton("Cancel", null)
-                            .show()
+                    if (ok && balance <= 0) {
+                        setRowLoading(row, false, groupId)
+                        showOutOfKeysDialog()
+                    } else {
+                        unlockWithKey(row, groupId)
                     }
                 }
             }
         }
     }
 
+    // Rounded pop-up: ways to get a key.
+    private fun showOutOfKeysDialog() {
+        MaterialAlertDialogBuilder(this, R.style.VGRoundedAlertDialog)
+            .setTitle("You're out of keys")
+            .setMessage("Repost today for a free key, or buy one for \u20A61,000. Keys are added within 24 hours.")
+            .setPositiveButton("Repost free") { _, _ ->
+                startActivity(Intent(this, RepostActivity::class.java))
+            }
+            .setNegativeButton("Buy a key") { _, _ ->
+                startActivity(Intent(this, BuyKeysActivity::class.java))
+            }
+            .show()
+    }
+
     // Spends one key (via the spend_key_unlock_group RPC, atomic on the
-    // server - see SupabaseClient.spendKeyToUnlockGroup) to unlock this
-    // specific contact group. On success, flips this row to "Unlocked" in
-    // place rather than re-fetching the whole list.
-    private fun unlockWithKey(
-        groupId: String,
-        groupIconView: ImageView,
-        statusDot: android.view.View,
-        groupCountView: TextView,
-        downloadBtn: FrameLayout,
-        downloadBtnIcon: ImageView
-    ) {
+    // server - see SupabaseClient.spendKeyToUnlockGroup). On success the row
+    // flips to "Verified" and the import screen opens right away; the button
+    // keeps spinning until then.
+    private fun unlockWithKey(row: RowViews, groupId: String) {
         val userId = sessionManager.getUserId()
         if (userId.isNullOrBlank()) {
+            setRowLoading(row, false, groupId)
             Toast.makeText(this, "Couldn't verify your account. Please restart the app.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        downloadBtn.isEnabled = false
-
         thread {
             SupabaseClient.spendKeyToUnlockGroup(userId, groupId) { success, message, _ ->
                 runOnUiThread {
-                    downloadBtn.isEnabled = true
-
                     if (success) {
                         unlockedGroupIds = unlockedGroupIds + groupId
 
                         val memberCount = allGroups.firstOrNull { it.optString("id") == groupId }
                             ?.optInt("member_count", 0) ?: 0
-                        groupCountView.text = "Verified, $memberCount contacts"
-
-                        groupIconView.setImageResource(R.drawable.ic_unlock)
-                        statusDot.setBackgroundResource(R.drawable.status_dot_unlocked)
-
-                        downloadBtn.setBackgroundResource(R.drawable.file_row_action_background)
-                        downloadBtnIcon.setImageResource(R.drawable.ic_download)
-                        downloadBtnIcon.setColorFilter(ContextCompat.getColor(this, R.color.white))
-
-                        downloadBtn.setOnClickListener {
-                            generateVcfAndImport(downloadBtn, downloadBtnIcon, groupId)
-                        }
+                        row.count.text = "Verified, $memberCount contacts"
+                        row.icon.setImageResource(R.drawable.ic_unlock)
+                        row.dot.setBackgroundResource(R.drawable.status_dot_unlocked)
 
                         Toast.makeText(this, "Unlocked! 1 key used.", Toast.LENGTH_SHORT).show()
+                        generateVcfAndImport(row, groupId)
                     } else {
+                        setRowLoading(row, false, groupId)
                         when (message) {
-                            "NO_KEYS" -> {
-                                Toast.makeText(this, "You're out of keys. Repost today or buy more to unlock this list.", Toast.LENGTH_LONG).show()
-                                val intent = Intent(this, RepostActivity::class.java)
-                                startActivity(intent)
-                            }
+                            "NO_KEYS" -> showOutOfKeysDialog()
                             "ALREADY_UNLOCKED" -> {
                                 Toast.makeText(this, "Already unlocked - refreshing.", Toast.LENGTH_SHORT).show()
                                 fetchGroupsFromSupabase()

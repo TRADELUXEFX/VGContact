@@ -54,12 +54,6 @@ class HomeActivity : AppCompatActivity() {
         }
         refreshKeyBalance(keyBalanceText)
 
-        // Total referrals card: opens the referral page.
-        findViewById<android.view.View>(R.id.home_referrals_card).setOnClickListener {
-            startActivity(Intent(this, ReferralActivity::class.java))
-        }
-        refreshReferralCount()
-
         // Header badge + red banner: shown when a required permission is off;
         // tapping either (or FIX) goes straight to the system prompt / settings.
         findViewById<LinearLayout>(R.id.permissionBadge).setOnClickListener {
@@ -261,27 +255,6 @@ class HomeActivity : AppCompatActivity() {
         }.start()
     }
 
-    // Live referral count for the "Total referrals" card. Uses the same call as
-    // the Referral page (it also pays any milestone keys that are due, and
-    // never pays the same key twice), so a new key shows up here right away.
-    private fun refreshReferralCount() {
-        val userId = sessionManager.getUserId()
-        if (userId.isNullOrBlank()) return
-        Thread {
-            SupabaseClient.claimReferralKeys(userId) { ok, referrals, keysAdded ->
-                runOnUiThread {
-                    if (isFinishing || !ok) return@runOnUiThread
-                    findViewById<TextView>(R.id.home_referrals_count_text).text = referrals.toString()
-                    if (keysAdded > 0) {
-                        refreshKeyBalance(findViewById(R.id.home_key_balance_text))
-                        val word = if (keysAdded == 1) "key" else "keys"
-                        Toast.makeText(this, "You earned $keysAdded $word!", Toast.LENGTH_LONG).show()
-                    }
-                }
-            }
-        }.start()
-    }
-
     override fun onResume() {
         super.onResume()
         // Covers coming back from the Keys screen (a repost just got
@@ -289,7 +262,6 @@ class HomeActivity : AppCompatActivity() {
         // dashboard balance doesn't go stale.
         val keyBalanceText = findViewById<TextView>(R.id.home_key_balance_text)
         refreshKeyBalance(keyBalanceText)
-        refreshReferralCount()
         updatePermissionBadge()
     }
 

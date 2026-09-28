@@ -144,8 +144,8 @@
 
             </LinearLayout>
 
-            <!-- Referral link container: the long link is cut off with "..."
-                 before it reaches the Copy button, which stays visible. -->
+            <!-- Referral link container: the long link scrolls sideways and
+                 slides under the edge before the Copy button, which stays visible. -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -172,16 +172,28 @@
                         android:textSize="11sp"
                         android:textColor="#CCFFFFFF" />
 
-                    <TextView
-                        android:id="@+id/headerPhoneText"
+                    <!-- Swipe sideways to read the whole link. -->
+                    <HorizontalScrollView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:textSize="13sp"
-                        android:textColor="@color/white"
-                        android:singleLine="true"
-                        android:maxLines="1"
-                        android:ellipsize="end" />
+                        android:scrollbars="none"
+                        android:overScrollMode="never"
+                        android:fadingEdge="horizontal"
+                        android:fadingEdgeLength="20dp"
+                        android:requiresFadingEdge="horizontal">
+
+                        <TextView
+                            android:id="@+id/headerPhoneText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingEnd="16dp"
+                            android:textSize="13sp"
+                            android:textColor="@color/white"
+                            android:singleLine="true"
+                            android:maxLines="1" />
+
+                    </HorizontalScrollView>
 
                 </LinearLayout>
 
@@ -463,70 +475,6 @@
                 android:text="1 key unlocks 1 contact file"
                 android:textSize="12sp"
                 android:textColor="@color/text_muted" />
-
-            <!-- Total referrals card: same style as the keys card. Tap opens
-                 the Referral page. -->
-            <LinearLayout
-                android:id="@+id/home_referrals_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="16dp"
-                android:background="@drawable/card_background"
-                android:clickable="true"
-                android:focusable="true">
-
-                <FrameLayout
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
-                    android:background="@drawable/file_row_icon_background">
-
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_people"
-                        app:tint="@color/vg_green_dark"
-                        android:contentDescription="@null" />
-
-                </FrameLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="14dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:fontFamily="@font/poppins_bold"
-                        android:includeFontPadding="false"
-                        android:id="@+id/home_referrals_count_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textSize="30sp"
-                        android:textColor="@color/vg_green_dark" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Total referrals"
-                        android:textSize="13sp"
-                        android:textColor="@color/text_secondary" />
-
-                </LinearLayout>
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_chevron_right"
-                    app:tint="@color/text_muted"
-                    android:contentDescription="@null" />
-
-            </LinearLayout>
 
             <!-- Single entry point into the unlock flow. No file preview,
                  no contact counts here - just the action. The real list,
