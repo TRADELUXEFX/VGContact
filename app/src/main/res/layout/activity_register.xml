@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/register_bg">
+    android:background="@color/white">
 
     <!-- ===================== FORM SCREEN ===================== -->
     <LinearLayout
@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="@color/register_bg">
+        android:background="@color/white">
 
         <!-- ==== GREEN HEADER ==== -->
         <LinearLayout
@@ -64,7 +64,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:background="@drawable/register_card_background"
+                    android:background="@drawable/card_background"
                     android:padding="20dp">
 
                     <!-- ==== Field 00: Username (required) ==== -->
@@ -74,7 +74,7 @@
                         android:text="@string/login_username"
                         android:textSize="12sp"
                         android:textStyle="normal"
-                        android:textColor="@color/vg_green"
+                        android:textColor="@color/vg_green_dark"
                         android:gravity="center"
                         android:layout_marginBottom="6dp" />
 
@@ -82,10 +82,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/login_username"
-                        android:textColorHint="@color/register_text_muted"
-                        app:hintTextColor="@color/vg_green"
+                        android:textColorHint="@color/text_muted"
+                        app:hintTextColor="@color/vg_green_dark"
                         app:boxBackgroundMode="outline"
-                        app:boxBackgroundColor="@color/register_field_bg"
+                        app:boxBackgroundColor="@color/field_bg"
                         app:boxStrokeColor="@color/vg_green"
                         app:boxStrokeWidth="1.5dp"
                         app:boxCornerRadiusTopStart="14dp"
@@ -101,8 +101,8 @@
                             android:gravity="center"
                             android:inputType="text"
                             android:textSize="15sp"
-                            android:textColor="@color/register_text_primary"
-                            android:textColorHint="@color/register_text_muted"
+                            android:textColor="@color/vg_dark"
+                            android:textColorHint="@color/text_muted"
                             android:includeFontPadding="false"
                             android:paddingStart="14dp"
                             android:paddingEnd="14dp"
@@ -114,7 +114,7 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="@color/register_divider"
+                        android:background="@color/stats_card_border"
                         android:layout_marginTop="20dp"
                         android:layout_marginBottom="20dp" />
 
@@ -125,7 +125,7 @@
                         android:text="@string/login_phone"
                         android:textSize="12sp"
                         android:textStyle="normal"
-                        android:textColor="@color/vg_green"
+                        android:textColor="@color/vg_green_dark"
                         android:gravity="center"
                         android:layout_marginBottom="6dp" />
 
@@ -133,10 +133,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/login_phone"
-                        android:textColorHint="@color/register_text_muted"
-                        app:hintTextColor="@color/vg_green"
+                        android:textColorHint="@color/text_muted"
+                        app:hintTextColor="@color/vg_green_dark"
                         app:boxBackgroundMode="outline"
-                        app:boxBackgroundColor="@color/register_field_bg"
+                        app:boxBackgroundColor="@color/field_bg"
                         app:boxStrokeColor="@color/vg_green"
                         app:boxStrokeWidth="1.5dp"
                         app:boxCornerRadiusTopStart="14dp"
@@ -152,8 +152,8 @@
                             android:gravity="center"
                             android:inputType="phone"
                             android:textSize="15sp"
-                            android:textColor="@color/register_text_primary"
-                            android:textColorHint="@color/register_text_muted"
+                            android:textColor="@color/vg_dark"
+                            android:textColorHint="@color/text_muted"
                             android:includeFontPadding="false"
                             android:paddingStart="14dp"
                             android:paddingEnd="14dp"
@@ -165,7 +165,7 @@
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="@color/register_divider"
+                        android:background="@color/stats_card_border"
                         android:layout_marginTop="20dp"
                         android:layout_marginBottom="20dp" />
 
@@ -176,7 +176,7 @@
                         android:text="@string/login_referral"
                         android:textSize="12sp"
                         android:textStyle="normal"
-                        android:textColor="@color/vg_green"
+                        android:textColor="@color/vg_green_dark"
                         android:gravity="center"
                         android:layout_marginBottom="6dp" />
 
@@ -184,10 +184,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/login_referral"
-                        android:textColorHint="@color/register_text_muted"
-                        app:hintTextColor="@color/vg_green"
+                        android:textColorHint="@color/text_muted"
+                        app:hintTextColor="@color/vg_green_dark"
                         app:boxBackgroundMode="outline"
-                        app:boxBackgroundColor="@color/register_field_bg"
+                        app:boxBackgroundColor="@color/white"
                         app:boxStrokeColor="@color/vg_green"
                         app:boxStrokeWidth="1.5dp"
                         app:boxCornerRadiusTopStart="14dp"
@@ -203,8 +203,8 @@
                             android:gravity="center"
                             android:inputType="text"
                             android:textSize="15sp"
-                            android:textColor="@color/register_text_primary"
-                            android:textColorHint="@color/register_text_muted"
+                            android:textColor="@color/vg_dark"
+                            android:textColorHint="@color/text_muted"
                             android:includeFontPadding="false"
                             android:paddingStart="14dp"
                             android:paddingEnd="14dp"
@@ -264,7 +264,7 @@
                 android:text="Already have an account? Log in"
                 android:textSize="13sp"
                 android:textStyle="bold"
-                android:textColor="@color/vg_green"
+                android:textColor="@color/vg_green_dark"
                 android:gravity="center"
                 android:clickable="true"
                 android:focusable="true"
@@ -278,7 +278,7 @@
                 android:layout_height="wrap_content"
                 android:text="Powered by VGContact"
                 android:textSize="12sp"
-                android:textColor="@color/register_text_muted"
+                android:textColor="@color/text_muted"
                 android:gravity="center"
                 android:layout_marginTop="6dp" />
 

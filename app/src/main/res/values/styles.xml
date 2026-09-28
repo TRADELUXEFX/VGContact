@@ -5,7 +5,7 @@
         <item name="colorPrimaryVariant">@color/vg_green_dark</item>
         <item name="colorSecondary">@color/vg_green</item>
         <item name="colorSecondaryVariant">@color/vg_green_dark</item>
-        <item name="android:windowBackground">@color/register_bg</item>
+        <item name="android:windowBackground">@color/background</item>
         <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:statusBarColor">@color/vg_green</item>
         <item name="android:windowLightStatusBar">false</item>

@@ -138,6 +138,58 @@
 
                 </LinearLayout>
 
+                <!-- Verification status panel: its own card, shown only once -->
+                <!-- the user has reposted today. Sits right under the keys -->
+                <!-- readout (above Today's Task) so the pending/approved -->
+                <!-- feedback is visible immediately after tapping Repost, -->
+                <!-- instead of hiding below the fold under the nav bar. -->
+                <LinearLayout
+                    android:id="@+id/repost_status_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/card_background"
+                    android:padding="18dp"
+                    android:layout_marginBottom="16dp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/repost_status_icon"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_pending"
+                        app:tint="@color/warning_amber"
+                        android:contentDescription="@null" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="14dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/repost_status_title"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Verification pending"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/vg_dark" />
+
+                        <TextView
+                            android:id="@+id/repost_status"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Repost once a day to earn a key. Verified reposts add a key to your balance the next day."
+                            android:textColor="@color/text_muted"
+                            android:textSize="13sp" />
+
+                    </LinearLayout>
+                </LinearLayout>
+
                 <!-- Today's Task: daily repost flow, matching the streak-card design -->
                 <LinearLayout
                     android:id="@+id/todays_task_card"
@@ -417,56 +469,6 @@
 
                     </LinearLayout>
 
-                </LinearLayout>
-
-                <!-- Verification status panel: its own card, shown only once -->
-                <!-- the user has reposted today, so it reads as a distinct -->
-                <!-- pending/approved "screen" rather than a small text line. -->
-                <LinearLayout
-                    android:id="@+id/repost_status_card"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="@drawable/card_background"
-                    android:padding="18dp"
-                    android:layout_marginBottom="16dp"
-                    android:visibility="gone">
-
-                    <ImageView
-                        android:id="@+id/repost_status_icon"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:src="@drawable/ic_pending"
-                        app:tint="@color/warning_amber"
-                        android:contentDescription="@null" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="14dp"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/repost_status_title"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Verification pending"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/vg_dark" />
-
-                        <TextView
-                            android:id="@+id/repost_status"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Repost once a day to earn a key. Verified reposts add a key to your balance the next day."
-                            android:textColor="@color/text_muted"
-                            android:textSize="13sp" />
-
-                    </LinearLayout>
                 </LinearLayout>
 
                 <!-- Buy keys directly -->

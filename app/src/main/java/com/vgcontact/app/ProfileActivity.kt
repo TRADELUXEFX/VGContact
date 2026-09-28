@@ -4,7 +4,6 @@ import android.content.Intent
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.os.Bundle
-import android.provider.Settings
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -33,7 +32,6 @@ class ProfileActivity : AppCompatActivity() {
         val emailText = findViewById<TextView>(R.id.profile_email)
         val phoneText = findViewById<TextView>(R.id.profile_phone)
         val createdText = findViewById<TextView>(R.id.profile_created)
-        val androidIdText = findViewById<TextView>(R.id.profile_android_id)
         val appVersionText = findViewById<TextView>(R.id.profile_app_version)
 
         emailText.text = sessionManager.getUsername()
@@ -42,8 +40,6 @@ class ProfileActivity : AppCompatActivity() {
         val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
         createdText.text = dateFormat.format(Date())
 
-        val androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
-        androidIdText.text = androidId
         appVersionText.text = BuildInfo.displayVersion()
 
         // Copy username
