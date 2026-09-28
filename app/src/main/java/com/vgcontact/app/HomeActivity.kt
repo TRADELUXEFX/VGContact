@@ -11,10 +11,12 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.core.widget.NestedScrollView
 
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var sessionManager: SessionManager
+    private var contactUsFab: android.view.View? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,12 +78,80 @@ class HomeActivity : AppCompatActivity() {
         findViewById<Button>(R.id.home_intro_got_it).setOnClickListener {
             tips.edit().putBoolean("home_intro_seen", true).apply()
             introCard.visibility = android.view.View.GONE
+            // The intro card was pushing the page down; once it's gone the
+            // layout shifts, so start the tour after that reflow.
+            introCard.post { showHomeTourIfNeeded() }
         }
 
         // Shared profile header (username, phone/referral row, bell)
         setupProfileHeader()
         setupBottomNav()
-        FloatingContactHelper.attach(this)
+        contactUsFab = FloatingContactHelper.attach(this)
+
+        // First-run tour (register or login -> permissions -> here). Runs
+        // once per install. If the intro card is still showing, the tour
+        // waits for its "Got it" instead (see above) so they don't stack.
+        if (introCard.visibility != android.view.View.VISIBLE) {
+            findViewById<android.view.View>(R.id.home_content_scroll).post { showHomeTourIfNeeded() }
+        }
+    }
+
+    private fun showHomeTourIfNeeded() {
+        if (CoachMarkOverlay.isTourDone(this)) return
+
+        val scroller = findViewById<NestedScrollView>(R.id.home_content_scroll)
+        // Start from the top so step 1 is measured in a known position.
+        scroller.scrollTo(0, 0)
+
+        val steps = mutableListOf(
+            CoachMarkOverlay.Step(
+                findViewById(R.id.today_repost_banner),
+                "Earn a free key daily",
+                "Repost today's status to earn a key for free. Tap here to start.",
+                dockAtBottom = true
+            ),
+            CoachMarkOverlay.Step(
+                findViewById(R.id.get_more_keys_btn),
+                "Your keys",
+                "This is your key balance. Need more? Tap Buy Keys.",
+                dockAtBottom = true,
+                scrollParent = scroller
+            ),
+            CoachMarkOverlay.Step(
+                findViewById(R.id.unlock_contact_list_btn),
+                "Unlock contacts",
+                "1 key unlocks 1 contact file. Tap here to pick a file and unlock it.",
+                dockAtBottom = true,
+                scrollParent = scroller
+            ),
+            CoachMarkOverlay.Step(
+                findViewById(R.id.refer_earn_btn),
+                "Refer & Earn",
+                "Share your code. Earn when people join with it.",
+                scrollParent = scroller
+            ),
+            CoachMarkOverlay.Step(
+                findViewById(R.id.navDownloadsTab),
+                "Get Viewers",
+                "Your unlocked contact files live here. Download and save them."
+            ),
+            CoachMarkOverlay.Step(
+                findViewById(R.id.navRepostTab),
+                "Repost",
+                "Come back here anytime to repost and earn keys."
+            )
+        )
+        contactUsFab?.let { fab ->
+            steps.add(
+                CoachMarkOverlay.Step(
+                    fab,
+                    "Need help?",
+                    "Tap the chat button anytime to contact us if you run into issues."
+                )
+            )
+        }
+
+        CoachMarkOverlay.showIfNeeded(this, steps)
     }
 
 
