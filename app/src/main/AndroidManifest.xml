@@ -64,6 +64,12 @@
             android:exported="false"
             android:screenOrientation="portrait" />
 
+        <!-- Buy Keys Screen: reached from "Get more" on Home -->
+        <activity
+            android:name=".BuyKeysActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
         <!-- Community Screen -->
         <activity
             android:name=".CommunityActivity"

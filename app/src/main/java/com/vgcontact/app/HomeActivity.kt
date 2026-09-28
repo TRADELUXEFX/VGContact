@@ -29,26 +29,25 @@ class HomeActivity : AppCompatActivity() {
             return
         }
 
-        // Stats
-        val downloadsCount = findViewById<TextView>(R.id.downloads_count)
-        val repostsCount = findViewById<TextView>(R.id.reposts_count)
-        downloadsCount.text = sessionManager.getTotalDownloads().toString()
-        repostsCount.text = sessionManager.getTotalReposts().toString()
-
-        // Key balance row + "Get More Keys" button both open the Keys
-        // screen (RepostActivity), same destination as the bottom-nav
-        // Repost tab.
-        val keyBalanceRow = findViewById<LinearLayout>(R.id.home_key_balance_row)
+        // Keys card: "Get more" opens the buy-keys page only. Earning keys
+        // by reposting is the Repost tab / today banner below.
         val keyBalanceText = findViewById<TextView>(R.id.home_key_balance_text)
-        val getMoreKeysBtn = findViewById<Button>(R.id.repost_btn)
-
-        keyBalanceRow.setOnClickListener {
-            startActivity(Intent(this, RepostActivity::class.java))
-        }
-        getMoreKeysBtn.setOnClickListener {
-            startActivity(Intent(this, RepostActivity::class.java))
+        findViewById<Button>(R.id.get_more_keys_btn).setOnClickListener {
+            startActivity(Intent(this, BuyKeysActivity::class.java))
         }
         refreshKeyBalance(keyBalanceText)
+
+        // TODAY banner -> Repost screen
+        findViewById<LinearLayout>(R.id.today_repost_banner).setOnClickListener {
+            startActivity(Intent(this, RepostActivity::class.java))
+        }
+
+        // READY FOR YOU: 3 placeholder rows right away, real groups
+        // replace them once fetched (see refreshReadyGroups in onResume).
+        findViewById<TextView>(R.id.see_all_groups).setOnClickListener {
+            startActivity(Intent(this, DownloadsActivity::class.java))
+        }
+        renderReadyGroups(emptyList(), emptySet())
 
         // Community button
         val joinBtn = findViewById<Button>(R.id.join_community_btn)
@@ -154,6 +153,72 @@ class HomeActivity : AppCompatActivity() {
         // dashboard balance doesn't go stale.
         val keyBalanceText = findViewById<TextView>(R.id.home_key_balance_text)
         refreshKeyBalance(keyBalanceText)
+        refreshReadyGroups()
+    }
+
+    // Always shows exactly 3 rows. Real groups (from Supabase) take the
+    // first slots; any slot without a real group stays a placeholder until
+    // one exists. Placeholder "Group 1" looks unlocked, the rest locked.
+    private fun renderReadyGroups(groups: List<org.json.JSONObject>, unlockedIds: Set<String>) {
+        val container = findViewById<LinearLayout>(R.id.ready_groups_container)
+        container.removeAllViews()
+
+        for (i in 0 until 3) {
+            val group = groups.getOrNull(i)
+            val isPlaceholder = group == null
+            val groupId = group?.optString("id").orEmpty()
+            val isLocked = if (group == null) i != 0 else !unlockedIds.contains(groupId)
+            val memberCount = group?.optInt("member_count", 0) ?: 250
+
+            val row = layoutInflater.inflate(R.layout.item_file, container, false)
+            val icon = row.findViewById<ImageView>(R.id.file_icon)
+            val name = row.findViewById<TextView>(R.id.file_name)
+            val count = row.findViewById<TextView>(R.id.file_count)
+            val dot = row.findViewById<android.view.View>(R.id.file_status_dot)
+            val btn = row.findViewById<android.widget.FrameLayout>(R.id.download_btn)
+            val btnIcon = row.findViewById<ImageView>(R.id.download_btn_icon)
+
+            name.text = if (group == null) "Group ${i + 1}" else "Contact List #${group.optInt("group_number", i + 1)}"
+            count.text = if (isLocked) "Locked, $memberCount contacts" else "Verified, $memberCount contacts"
+
+            icon.setImageResource(if (isLocked) R.drawable.ic_lock else R.drawable.ic_unlock)
+            dot.setBackgroundResource(if (isLocked) R.drawable.status_dot_locked else R.drawable.status_dot_unlocked)
+            btn.setBackgroundResource(if (isLocked) R.drawable.file_row_action_locked_background else R.drawable.file_row_action_background)
+            btnIcon.setImageResource(if (isLocked) R.drawable.ic_lock else R.drawable.ic_download)
+            btnIcon.setColorFilter(
+                androidx.core.content.ContextCompat.getColor(this, if (isLocked) R.color.locked_text else R.color.white)
+            )
+
+            // Real groups: unlock/download lives in DownloadsActivity.
+            val onTap = android.view.View.OnClickListener {
+                if (isPlaceholder) {
+                    Toast.makeText(this, "Contact groups are coming soon", Toast.LENGTH_SHORT).show()
+                } else {
+                    startActivity(Intent(this, DownloadsActivity::class.java))
+                }
+            }
+            row.setOnClickListener(onTap)
+            btn.setOnClickListener(onTap)
+
+            container.addView(row)
+        }
+    }
+
+    private fun refreshReadyGroups() {
+        val userId = sessionManager.getUserId()
+        Thread {
+            SupabaseClient.fetchGroups { ok, arr ->
+                if (!ok || arr == null || arr.length() == 0) return@fetchGroups
+                val groups = (0 until arr.length()).map { arr.getJSONObject(it) }
+                if (userId.isNullOrBlank()) {
+                    runOnUiThread { renderReadyGroups(groups, emptySet()) }
+                    return@fetchGroups
+                }
+                SupabaseClient.fetchUnlockedGroupIds(userId) { _, ids ->
+                    runOnUiThread { renderReadyGroups(groups, ids) }
+                }
+            }
+        }.start()
     }
 
     private fun setupBottomNav() {

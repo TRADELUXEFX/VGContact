@@ -32,7 +32,7 @@
             android:orientation="vertical"
             android:background="@drawable/header_gradient"
             android:paddingTop="48dp"
-            android:paddingBottom="18dp"
+            android:paddingBottom="44dp"
             android:paddingStart="20dp"
             android:paddingEnd="20dp">
 
@@ -192,169 +192,183 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="20dp"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:paddingBottom="8dp">
 
-            <!-- Stats card. The spinner lives INSIDE this white card: while
-                 the data loads, the card contents are hidden (they keep
-                 their space so the card never resizes) and the spinner is
-                 centered in the card. -->
+            <!-- Keys card, overlapping the header. The spinner lives INSIDE
+                 the card: while the balance loads, the contents stay
+                 invisible (they keep their space so the card never
+                 resizes) and the spinner is centered in the card. -->
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="-30dp"
+                android:elevation="2dp"
                 android:background="@drawable/card_background">
 
-            <ProgressBar
-                android:id="@+id/home_card_loading"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_gravity="center"
-                android:indeterminateTint="@color/vg_green"
-                android:visibility="visible" />
+                <ProgressBar
+                    android:id="@+id/home_card_loading"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_gravity="center"
+                    android:indeterminateTint="@color/vg_green"
+                    android:visibility="visible" />
 
-            <LinearLayout
-                android:id="@+id/home_card_content"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp"
-                android:visibility="invisible">
-
-                <!-- Key balance row - shows the same key_balance the Keys
-                     screen shows, via SupabaseClient.fetchKeyBalance(), so
-                     the user sees it at a glance without leaving the
-                     dashboard. Tapping opens RepostActivity (Keys), same
-                     destination as repost_btn below. -->
                 <LinearLayout
-                    android:id="@+id/home_key_balance_row"
+                    android:id="@+id/home_card_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="14dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:background="?android:attr/selectableItemBackgroundBorderless">
+                    android:padding="16dp"
+                    android:visibility="invisible">
 
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:src="@drawable/ic_unlock"
-                        app:tint="@color/vg_green_dark"
-                        android:layout_marginEnd="10dp"
-                        android:contentDescription="@null" />
+                    <FrameLayout
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:background="@drawable/file_row_icon_background">
 
-                    <TextView
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_key"
+                            app:tint="@color/vg_green_dark"
+                            android:contentDescription="@null" />
+
+                    </FrameLayout>
+
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Your Keys"
-                        android:textSize="14sp"
-                        android:textColor="@color/text_secondary" />
+                        android:layout_marginStart="14dp"
+                        android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/home_key_balance_text"
+                        <TextView
+                            android:id="@+id/home_key_balance_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="28sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/vg_green_dark" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Your keys"
+                            android:textSize="13sp"
+                            android:textColor="@color/text_secondary" />
+
+                    </LinearLayout>
+
+                    <!-- Opens BuyKeysActivity (buy keys only). Earning keys
+                         by reposting lives on the Repost tab. -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/get_more_keys_btn"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textSize="18sp"
+                        android:layout_height="44dp"
+                        android:text="Get more"
+                        android:textAllCaps="false"
                         android:textStyle="bold"
-                        android:textColor="@color/vg_green_dark" />
+                        android:textColor="@color/white"
+                        android:backgroundTint="@color/vg_green"
+                        app:cornerRadius="22dp" />
 
                 </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/stats_card_border"
-                    android:layout_marginBottom="14dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center">
-                        <TextView
-                            android:id="@+id/downloads_count"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0"
-                            android:textSize="22sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/vg_green_dark" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Downloads"
-                            android:textSize="12sp"
-                            android:textColor="@color/text_muted"
-                            android:layout_marginTop="2dp" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="1dp"
-                        android:layout_height="match_parent"
-                        android:background="@color/stats_card_border" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center">
-                        <TextView
-                            android:id="@+id/reposts_count"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0"
-                            android:textSize="22sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/vg_green_dark" />
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Reposts"
-                            android:textSize="12sp"
-                            android:textColor="@color/text_muted"
-                            android:layout_marginTop="2dp" />
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <Button
-                    android:id="@+id/repost_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:layout_marginTop="18dp"
-                    android:text="Get More Keys"
-                    android:textAllCaps="true"
-                    android:letterSpacing="0.02"
-                    android:backgroundTint="@color/vg_green"
-                    android:textColor="@color/white"
-                    android:textStyle="bold"
-                    app:icon="@drawable/ic_sync"
-                    app:iconTint="@color/white"
-                    app:iconGravity="textStart"
-                    app:cornerRadius="16dp" />
-
-            </LinearLayout>
 
             </FrameLayout>
 
+            <!-- TODAY: repost banner, above the groups -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:text="TODAY"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08"
+                android:textColor="@color/text_muted" />
+
             <LinearLayout
-                android:id="@+id/content_container"
+                android:id="@+id/today_repost_banner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="20dp" />
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="16dp"
+                android:background="@drawable/today_banner_background"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_repost"
+                    app:tint="@color/warning_amber"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:text="Repost to earn today's key"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/vg_dark" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/text_muted"
+                    android:contentDescription="@null" />
+
+            </LinearLayout>
+
+            <!-- READY FOR YOU: always 3 rows. Real groups fill in as they
+                 exist, placeholders cover the rest (see HomeActivity). -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:layout_marginBottom="10dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="READY FOR YOU"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08"
+                    android:textColor="@color/text_muted" />
+
+                <TextView
+                    android:id="@+id/see_all_groups"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="See all"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/vg_green_dark"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ready_groups_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
 
         </LinearLayout>
 
