@@ -132,9 +132,9 @@ class DownloadsActivity : AppCompatActivity() {
             row.dot.setBackgroundResource(if (isLocked) R.drawable.status_dot_locked else R.drawable.status_dot_unlocked)
             applyActionButton(row, groupId)
 
-            // Locked: UNLOCK spins while it checks keys, spends one, and goes
-            // straight to the import screen (no confirmation question).
-            // Unlocked: same spinner, then the import screen.
+            // Locked: UNLOCK spins while it checks keys, spends one, and opens the
+            // save-contact screen by itself (no confirmation question).
+            // Unlocked: SAVE spins briefly, then opens the save-contact screen.
             row.btn.setOnClickListener {
                 if (unlockedGroupIds.contains(groupId)) {
                     generateVcfAndImport(row, groupId)
@@ -158,20 +158,14 @@ class DownloadsActivity : AppCompatActivity() {
 
     private val spinners = mutableMapOf<android.view.View, ProgressBar>()
 
-    // Locked -> green UNLOCK pill. Unlocked -> green download button.
+    // Locked -> green UNLOCK pill. Unlocked -> green SAVE pill (tapping it
+    // opens the save-contact screen again if it didn't open by itself).
     private fun applyActionButton(row: RowViews, groupId: String) {
         val locked = !unlockedGroupIds.contains(groupId)
-        if (locked) {
-            row.btn.setBackgroundResource(R.drawable.file_row_unlock_pill_background)
-            row.btnText.visibility = android.view.View.VISIBLE
-            row.btnIcon.visibility = android.view.View.GONE
-        } else {
-            row.btn.setBackgroundResource(R.drawable.file_row_action_background)
-            row.btnText.visibility = android.view.View.GONE
-            row.btnIcon.setImageResource(R.drawable.ic_download)
-            row.btnIcon.setColorFilter(ContextCompat.getColor(this, R.color.white))
-            row.btnIcon.visibility = android.view.View.VISIBLE
-        }
+        row.btn.setBackgroundResource(R.drawable.file_row_unlock_pill_background)
+        row.btnText.text = if (locked) "UNLOCK" else "SAVE"
+        row.btnText.visibility = android.view.View.VISIBLE
+        row.btnIcon.visibility = android.view.View.GONE
         row.btn.isEnabled = true
     }
 
