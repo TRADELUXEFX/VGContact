@@ -6,7 +6,8 @@ name: Deploy
 #   3. Tap "Add file" -> "Upload files".
 #   4. Upload ANY zip file, any name (deploy.zip, update1.zip, whatever).
 #   5. Commit directly to main.
-#   6. This workflow runs: if there's a zip in incoming/, it extracts it,
+#   6. This workflow runs: if there's a zip in incoming/, it extracts it
+#      (an extra wrapper folder inside the zip is removed automatically),
 #      commits the result, and deletes the zip. Either way (zip or plain
 #      code push) it then builds the APK from whatever is currently in
 #      the repo and publishes a release.
@@ -45,9 +46,11 @@ jobs:
 
       - name: Extract any zip(s) found in incoming/ into repo root
         id: extract
+        env:
+          REPO_NAME: ${{ github.event.repository.name }}
         run: |
           set -e
-          shopt -s nullglob
+          shopt -s nullglob dotglob
           zips=(incoming/*.zip)
           if [ ${#zips[@]} -eq 0 ]; then
             echo "No zip files found in incoming/. Nothing to unpack."
@@ -55,9 +58,49 @@ jobs:
             exit 0
           fi
           echo "found=true" >> "$GITHUB_OUTPUT"
+
+          repo_lc=$(echo "$REPO_NAME" | tr '[:upper:]' '[:lower:]')
+
           for z in "${zips[@]}"; do
-            echo "Extracting $z (excluding .github/workflows/ - GitHub blocks the default token from modifying that folder, so any workflow files inside the zip are skipped rather than causing the whole deploy to fail) ..."
-            unzip -o "$z" -x ".github/workflows/*" -d .
+            echo "Unpacking $z ..."
+            stage=$(mktemp -d)
+            unzip -q -o "$z" -x "__MACOSX/*" "*/.DS_Store" ".DS_Store" -d "$stage"
+
+            # If the zip is wrapped in one extra top-level folder (for example
+            # VGContact-main/app/... instead of app/...), step inside it so the
+            # files land in the right place. Real repo folders (app, supabase,
+            # etc.) and brand-new folders are never treated as wrappers.
+            for pass in 1 2 3; do
+              entries=("$stage"/*)
+              [ ${#entries[@]} -eq 1 ] && [ -d "${entries[0]}" ] || break
+              inner="${entries[0]}"
+              name=$(basename "$inner")
+              name_lc=$(echo "$name" | tr '[:upper:]' '[:lower:]')
+
+              case "$name_lc" in
+                app|supabase|incoming|.github|gradle) break ;;
+              esac
+
+              wrapper=false
+              if [ "$name_lc" = "$repo_lc" ] || [[ "$name_lc" == "$repo_lc"-* ]] || [[ "$name_lc" == *-main ]] || [[ "$name_lc" == *-master ]]; then
+                wrapper=true
+              fi
+              for marker in app supabase incoming .github build.gradle settings.gradle gradle.properties; do
+                [ -e "$inner/$marker" ] && wrapper=true
+              done
+
+              [ "$wrapper" = true ] || break
+              echo "Removing wrapper folder: $name/"
+              stage="$inner"
+            done
+
+            # GitHub blocks the default token from changing workflow files.
+            rm -rf "$stage/.github/workflows"
+
+            echo "Files being deployed:"
+            (cd "$stage" && find . -type f | sed 's|^\./||' | head -200)
+
+            cp -a "$stage"/. .
             rm -f "$z"
           done
 
