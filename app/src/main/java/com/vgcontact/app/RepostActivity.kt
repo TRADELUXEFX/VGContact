@@ -67,6 +67,10 @@ class RepostActivity : AppCompatActivity() {
     private var todayStatusLoaded = false
     private var initialContentRevealed = false
 
+    // True once a repost is logged for today (any status). The button stays
+    // tappable; taps then only re-open WhatsApp and re-show today's status.
+    private var repostedToday = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_repost)
@@ -195,13 +199,14 @@ class RepostActivity : AppCompatActivity() {
                     }
                     when (status) {
                         null -> {
-                            repostTodayBtn.isEnabled = true
+                            repostedToday = false
+                            repostTodayBtn.isActivated = false
                             repostTodayBtn.text = "REPOST TODAY"
                             repostTodayBtn.icon = null
                             statusCard.visibility = android.view.View.GONE
                         }
                         "pending" -> {
-                            repostTodayBtn.isEnabled = false
+                            repostedToday = true
                             showRepostSent()
                             showStatusCard(
                                 title = "Verification pending",
@@ -211,7 +216,7 @@ class RepostActivity : AppCompatActivity() {
                             )
                         }
                         "verified" -> {
-                            repostTodayBtn.isEnabled = false
+                            repostedToday = true
                             showRepostSent()
                             showStatusCard(
                                 title = "Repost verified",
@@ -221,7 +226,7 @@ class RepostActivity : AppCompatActivity() {
                             )
                         }
                         "rejected" -> {
-                            repostTodayBtn.isEnabled = false
+                            repostedToday = true
                             showRepostSent()
                             showStatusCard(
                                 title = "Couldn't verify",
@@ -261,7 +266,13 @@ class RepostActivity : AppCompatActivity() {
             Toast.makeText(this, "Error opening WhatsApp", Toast.LENGTH_SHORT).show()
         }
 
-        repostTodayBtn.isEnabled = false
+        if (repostedToday) {
+            // Already logged today: no second submit, just re-show status.
+            refreshTodayStatus()
+            return
+        }
+
+        repostedToday = true
         showStatusCard(
             title = "Verification pending",
             message = "We'll add your key within 24 hours.",
@@ -283,7 +294,8 @@ class RepostActivity : AppCompatActivity() {
                     } else if (message == "ALREADY_REPOSTED_TODAY") {
                         refreshTodayStatus()
                     } else {
-                        repostTodayBtn.isEnabled = true
+                        repostedToday = false
+                        repostTodayBtn.isActivated = false
                         statusCard.visibility = android.view.View.GONE
                         Toast.makeText(this, "Couldn't log your repost. Try again.", Toast.LENGTH_SHORT).show()
                     }
@@ -292,8 +304,9 @@ class RepostActivity : AppCompatActivity() {
         }
     }
 
-    // Sent state: repost icon + "REPOST" (button is disabled by the callers).
+    // Sent state: repost icon + "REPOST" (button stays enabled, shown via activated state).
     private fun showRepostSent() {
+        repostTodayBtn.isActivated = true
         repostTodayBtn.text = "REPOST"
         repostTodayBtn.setIconResource(R.drawable.ic_repost)
         repostTodayBtn.iconGravity = com.google.android.material.button.MaterialButton.ICON_GRAVITY_TEXT_START

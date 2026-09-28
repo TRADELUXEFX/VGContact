@@ -96,131 +96,6 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- Verification status: its own card, shown at the very
-                     top (above Your Keys / Streak) once the user has
-                     reposted today. Icon on the left, text on the right,
-                     the pair centered in the card. -->
-                <LinearLayout
-                    android:id="@+id/repost_status_card"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center"
-                    android:background="@drawable/card_background"
-                    android:padding="18dp"
-                    android:layout_marginBottom="12dp"
-                    android:visibility="gone">
-
-                    <ImageView
-                        android:id="@+id/repost_status_icon"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:src="@drawable/ic_pending"
-                        app:tint="@color/warning_amber"
-                        android:contentDescription="@null" />
-
-                    <TextView
-                        android:id="@+id/repost_status_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:text="Verification pending"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/vg_dark" />
-
-                    <!-- Kept (same id) so existing code that sets it keeps
-                         working, but never shown. -->
-                    <TextView
-                        android:id="@+id/repost_status"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:visibility="gone" />
-
-                </LinearLayout>
-
-                <!-- Two stat cards side by side: keys + streak -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="12dp">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:background="@drawable/card_background"
-                        android:padding="16dp"
-                        android:layout_marginEnd="6dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="YOUR KEYS"
-                            android:textSize="11sp"
-                            android:textStyle="bold"
-                            android:letterSpacing="0.05"
-                            android:textColor="@color/text_muted" />
-
-                        <TextView
-                            android:id="@+id/key_balance_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0"
-                            android:textSize="30sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/vg_green_dark" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:background="@drawable/card_background"
-                        android:padding="16dp"
-                        android:layout_marginStart="6dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="STREAK"
-                            android:textSize="11sp"
-                            android:textStyle="bold"
-                            android:letterSpacing="0.05"
-                            android:textColor="@color/text_muted" />
-
-                        <TextView
-                            android:id="@+id/streak_days_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="1 day"
-                            android:textSize="24sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/vg_green_dark" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <!-- 1. Repost button: stands on its own, not inside any card. -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/repost_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:layout_marginBottom="12dp"
-                    android:text="REPOST TODAY"
-                    android:textAllCaps="true"
-                    android:letterSpacing="0.02"
-                    android:textStyle="bold"
-                    android:backgroundTint="@color/repost_btn_bg"
-                    android:textColor="@color/repost_btn_text"
-                    app:cornerRadius="16dp"
-                    app:elevation="0dp" />
-
                 <!-- 3. How it works: its own card, three numbered steps.
                      The X hides the whole card; "Show how it works"
                      below brings it back. -->
@@ -355,6 +230,131 @@
                     android:focusable="true"
                     android:layout_marginBottom="12dp"
                     android:visibility="gone" />
+
+                <!-- Verification status: its own card, shown at the very
+                     top (above Your Keys / Streak) once the user has
+                     reposted today. Icon on the left, text on the right,
+                     the pair centered in the card. -->
+                <LinearLayout
+                    android:id="@+id/repost_status_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:background="@drawable/card_background"
+                    android:padding="18dp"
+                    android:layout_marginBottom="12dp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/repost_status_icon"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_pending"
+                        app:tint="@color/warning_amber"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:id="@+id/repost_status_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:text="Verification pending"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/vg_dark" />
+
+                    <!-- Kept (same id) so existing code that sets it keeps
+                         working, but never shown. -->
+                    <TextView
+                        android:id="@+id/repost_status"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+                <!-- Two stat cards side by side: keys + streak -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:background="@drawable/card_background"
+                        android:padding="16dp"
+                        android:layout_marginEnd="6dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="YOUR KEYS"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.05"
+                            android:textColor="@color/text_muted" />
+
+                        <TextView
+                            android:id="@+id/key_balance_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="30sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/vg_green_dark" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:background="@drawable/card_background"
+                        android:padding="16dp"
+                        android:layout_marginStart="6dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="STREAK"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.05"
+                            android:textColor="@color/text_muted" />
+
+                        <TextView
+                            android:id="@+id/streak_days_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="1 day"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/vg_green_dark" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- 1. Repost button: stands on its own, not inside any card. -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/repost_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginBottom="12dp"
+                    android:text="REPOST TODAY"
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.02"
+                    android:textStyle="bold"
+                    android:backgroundTint="@color/repost_btn_bg"
+                    android:textColor="@color/repost_btn_text"
+                    app:cornerRadius="16dp"
+                    app:elevation="0dp" />
 
                 <!-- Milestones: same chips as before, tighter card -->
                 <LinearLayout

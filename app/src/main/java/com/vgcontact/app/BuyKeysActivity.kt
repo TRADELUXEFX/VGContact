@@ -3,28 +3,36 @@ package com.vgcontact.app
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 
 /**
- * Buy-keys page, opened from the "Get more" button on Home. Only for
+ * Buy-keys paywall, opened from the "Get more" button on Home. Only for
  * buying keys - earning them by reposting stays on RepostActivity.
- * No in-app payment yet, so buying opens a WhatsApp chat with support
- * (SUPPORT_WHATSAPP) with a prefilled message.
+ * No in-app payment yet, so the buy button opens a WhatsApp chat with
+ * support (SUPPORT_WHATSAPP) with the chosen pack prefilled.
  */
 class BuyKeysActivity : AppCompatActivity() {
 
     private lateinit var sessionManager: SessionManager
 
+    private lateinit var buyBtn: com.google.android.material.button.MaterialButton
+    private val packViews = mutableMapOf<Int, View>()
+    private var selectedKeys = 5
+
     companion object {
         // 09110321143 in international format (Nigeria +234, no leading 0).
         const val SUPPORT_WHATSAPP = "2349110321143"
+        private const val PRICE_PER_KEY = 1000
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_buy_keys)
+        window.statusBarColor = ContextCompat.getColor(this, R.color.vg_green_dark)
 
         sessionManager = SessionManager(this)
 
@@ -34,23 +42,43 @@ class BuyKeysActivity : AppCompatActivity() {
             return
         }
 
-        findViewById<android.view.View>(R.id.buy_back_btn).setOnClickListener { finish() }
+        findViewById<View>(R.id.buy_back_btn).setOnClickListener { finish() }
 
-        findViewById<android.view.View>(R.id.buy_keys_whatsapp_btn).setOnClickListener {
-            try {
-                val intent = Intent(Intent.ACTION_VIEW)
-                val username = sessionManager.getUsername()
-                val message = "Hi, I'd like to buy more VGContact keys." +
-                    if (username.isNullOrBlank()) "" else " My username is $username."
-                intent.data = Uri.parse("https://wa.me/$SUPPORT_WHATSAPP?text=${Uri.encode(message)}")
-                startActivity(intent)
-            } catch (e: Exception) {
-                Toast.makeText(this, "WhatsApp not installed", Toast.LENGTH_SHORT).show()
-            }
+        buyBtn = findViewById(R.id.buy_keys_whatsapp_btn)
+        packViews[1] = findViewById(R.id.buy_pack_1)
+        packViews[5] = findViewById(R.id.buy_pack_5)
+        packViews[10] = findViewById(R.id.buy_pack_10)
+        for ((keys, view) in packViews) {
+            view.setOnClickListener { selectPack(keys) }
         }
+        selectPack(selectedKeys)
 
-        BottomNavHelper.setup(this, BottomNavHelper.Tab.HOME)
-        ChatSupportHelper.attach(this)
+        buyBtn.setOnClickListener { openWhatsApp() }
+    }
+
+    private fun selectPack(keys: Int) {
+        selectedKeys = keys
+        for ((k, view) in packViews) {
+            view.setBackgroundResource(
+                if (k == keys) R.drawable.buy_pack_selected else R.drawable.buy_pack_unselected
+            )
+        }
+        buyBtn.text = "Get $keys ${if (keys == 1) "key" else "keys"}"
+    }
+
+    private fun openWhatsApp() {
+        try {
+            val intent = Intent(Intent.ACTION_VIEW)
+            val username = sessionManager.getUsername()
+            val total = String.format(java.util.Locale.US, "%,d", selectedKeys * PRICE_PER_KEY)
+            val message = "Hi, I'd like to buy $selectedKeys VGContact " +
+                (if (selectedKeys == 1) "key" else "keys") + " (₦$total)." +
+                if (username.isNullOrBlank()) "" else " My username is $username."
+            intent.data = Uri.parse("https://wa.me/$SUPPORT_WHATSAPP?text=${Uri.encode(message)}")
+            startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(this, "WhatsApp not installed", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onResume() {
@@ -61,7 +89,9 @@ class BuyKeysActivity : AppCompatActivity() {
         Thread {
             SupabaseClient.fetchKeyBalance(userId) { success, balance ->
                 runOnUiThread {
-                    if (success) balanceText.text = balance.toString()
+                    if (success) {
+                        balanceText.text = "$balance ${if (balance == 1) "key" else "keys"} left"
+                    }
                 }
             }
         }.start()
