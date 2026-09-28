@@ -81,6 +81,7 @@
                         android:ellipsize="end" />
 
                     <LinearLayout
+                        android:id="@+id/permissionBadge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
@@ -99,6 +100,7 @@
                             android:background="@drawable/badge_dot" />
 
                         <TextView
+                            android:id="@+id/permissionBadgeText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="VERIFIED"
@@ -197,6 +199,51 @@
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:paddingBottom="8dp">
+
+            <!-- Red banner shown only while a required permission is off.
+                 FIX goes straight to the system prompt / settings. -->
+            <LinearLayout
+                android:id="@+id/permissionBanner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="16dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/permission_banner_background"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@drawable/ic_notification_bell"
+                    app:tint="@color/white"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/permissionBannerText"
+                    android:fontFamily="@font/poppins_bold"
+                    android:includeFontPadding="false"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="12dp"
+                    android:textSize="14sp"
+                    android:textColor="@color/white" />
+
+                <TextView
+                    android:fontFamily="@font/poppins_bold"
+                    android:includeFontPadding="false"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="FIX"
+                    android:textSize="14sp"
+                    android:textColor="@color/white" />
+
+            </LinearLayout>
 
             <!-- First-time intro, shown once (dismissed with "Got it") -->
             <LinearLayout

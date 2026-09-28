@@ -67,7 +67,6 @@ class RepostActivity : AppCompatActivity() {
     private lateinit var leaderboardTab: TextView
 
     private lateinit var leaderboardRoot: FrameLayout
-    private lateinit var lbPodiumCard: LinearLayout
     private lateinit var lbList: LinearLayout
     private lateinit var lbEmpty: TextView
     private lateinit var lbLoading: ProgressBar
@@ -200,7 +199,6 @@ class RepostActivity : AppCompatActivity() {
 
     private fun setupLeaderboardViews() {
         leaderboardRoot = findViewById(R.id.repost_leaderboard_root)
-        lbPodiumCard = findViewById(R.id.lb_podium_card)
         lbList = findViewById(R.id.lb_list)
         lbEmpty = findViewById(R.id.lb_empty)
         lbLoading = findViewById(R.id.lb_loading)
@@ -222,6 +220,7 @@ class RepostActivity : AppCompatActivity() {
         if (period == lbPeriod) return
         lbPeriod = period
         styleChips()
+        lbList.removeAllViews()
         loadLeaderboard()
     }
 
@@ -272,7 +271,6 @@ class RepostActivity : AppCompatActivity() {
     }
 
     private fun showLeaderboardMessage(message: String) {
-        lbPodiumCard.visibility = View.GONE
         lbList.removeAllViews()
         lbYouCard.visibility = View.GONE
         lbEmpty.text = message
@@ -281,8 +279,6 @@ class RepostActivity : AppCompatActivity() {
     }
 
     private fun scoreLabel(score: Int): String = if (score == 1) "1 repost" else "$score reposts"
-
-    private fun initials(name: String): String = name.trim().take(2).uppercase()
 
     private fun renderLeaderboard(entries: List<SupabaseClient.LeaderboardEntry>) {
         // The server always appends the caller's own row. When they are
@@ -293,19 +289,14 @@ class RepostActivity : AppCompatActivity() {
         lbList.removeAllViews()
 
         if (visible.isEmpty()) {
-            lbPodiumCard.visibility = View.GONE
             lbEmpty.text = "No verified reposts yet for this period. Repost today to take the top spot."
             lbEmpty.visibility = View.VISIBLE
         } else {
             lbEmpty.visibility = View.GONE
-            renderPodium(visible.take(3))
-            lbPodiumCard.visibility = View.VISIBLE
-
             val inflater = LayoutInflater.from(this)
-            for (entry in visible.drop(3)) {
+            for (entry in visible) {
                 val row = inflater.inflate(R.layout.item_leaderboard_row, lbList, false)
                 row.findViewById<TextView>(R.id.lb_row_rank).text = entry.rank.toString()
-                row.findViewById<TextView>(R.id.lb_row_avatar).text = initials(entry.username)
                 row.findViewById<TextView>(R.id.lb_row_name).text = entry.username
                 row.findViewById<TextView>(R.id.lb_row_score).text = scoreLabel(entry.score)
                 if (entry.isMe) {
@@ -324,42 +315,6 @@ class RepostActivity : AppCompatActivity() {
             lbYouRank.text = "--"
             lbYouScore.text = "Not ranked yet"
         }
-    }
-
-    // Podium slots on screen are [2nd | 1st | 3rd]; entries arrive in rank
-    // order, so index 0 -> centre, 1 -> left, 2 -> right. Missing slots
-    // (fewer than 3 players) stay invisible but keep their space.
-    private fun renderPodium(top: List<SupabaseClient.LeaderboardEntry>) {
-        fun fill(slot: Int, entry: SupabaseClient.LeaderboardEntry?) {
-            val column = findViewById<LinearLayout>(
-                when (slot) { 1 -> R.id.lb_podium_1; 2 -> R.id.lb_podium_2; else -> R.id.lb_podium_3 }
-            )
-            if (entry == null) {
-                column.visibility = View.INVISIBLE
-                return
-            }
-            column.visibility = View.VISIBLE
-            val avatar = findViewById<TextView>(
-                when (slot) { 1 -> R.id.lb_p1_avatar; 2 -> R.id.lb_p2_avatar; else -> R.id.lb_p3_avatar }
-            )
-            val name = findViewById<TextView>(
-                when (slot) { 1 -> R.id.lb_p1_name; 2 -> R.id.lb_p2_name; else -> R.id.lb_p3_name }
-            )
-            val score = findViewById<TextView>(
-                when (slot) { 1 -> R.id.lb_p1_score; 2 -> R.id.lb_p2_score; else -> R.id.lb_p3_score }
-            )
-            val block = findViewById<TextView>(
-                when (slot) { 1 -> R.id.lb_p1_block; 2 -> R.id.lb_p2_block; else -> R.id.lb_p3_block }
-            )
-            avatar.text = initials(entry.username)
-            name.text = if (entry.isMe) "${entry.username} (you)" else entry.username
-            score.text = scoreLabel(entry.score)
-            block.text = entry.rank.toString()
-        }
-
-        fill(1, top.getOrNull(0))
-        fill(2, top.getOrNull(1))
-        fill(3, top.getOrNull(2))
     }
 
     override fun onResume() {
@@ -445,7 +400,8 @@ class RepostActivity : AppCompatActivity() {
                         }
                         "rejected" -> {
                             repostedToday = true
-                            showRepostSent()
+                            showRepostReady()
+                            repostTodayBtn.text = "NOT VERIFIED"
                             showStatusCard(
                                 title = "Couldn't verify",
                                 message = "We couldn't verify today's repost. Try again tomorrow.",
@@ -494,7 +450,7 @@ class RepostActivity : AppCompatActivity() {
         }
 
         repostedToday = true
-        showRepostSent()   // instant visible change: green -> white "YOU POSTED TODAY"
+        showRepostSent()   // instant visible change: red -> yellow "YOU POSTED TODAY"
         showStatusCard(
             title = "Verification pending",
             message = "We'll add your key within 24 hours.",
@@ -526,24 +482,31 @@ class RepostActivity : AppCompatActivity() {
         }
     }
 
-    // Not-yet-posted look: solid green button, no icon.
-    private fun showRepostReady() {
-        repostTodayBtn.isActivated = false
-        repostTodayBtn.text = "REPOST TODAY"
-        repostTodayBtn.icon = null
+    // Paints the repost button one solid colour with white text/icon.
+    private fun paintRepostButton(colorRes: Int) {
+        val color = android.content.res.ColorStateList.valueOf(ContextCompat.getColor(this, colorRes))
+        val white = android.content.res.ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white))
+        repostTodayBtn.backgroundTintList = color
+        repostTodayBtn.strokeColor = color
+        repostTodayBtn.setTextColor(white)
+        repostTodayBtn.iconTint = white
     }
 
-    // Posted look: the button flips from solid green to WHITE with a green
-    // outline, green text and a green check, and says the user posted.
-    // (Colors come from the "activated" state in repost_btn_bg.xml and
-    // repost_btn_text.xml; the button stays tappable.)
+    // Not posted yet: solid RED button, white text, no icon.
+    private fun showRepostReady() {
+        repostTodayBtn.text = "REPOST TODAY"
+        repostTodayBtn.icon = null
+        paintRepostButton(R.color.vg_red)
+    }
+
+    // Posted: YELLOW (amber) while pending, GREEN once verified. White text
+    // and a white check either way; the button stays tappable.
     private fun showRepostSent(verified: Boolean = false) {
-        repostTodayBtn.isActivated = true
         repostTodayBtn.text = if (verified) "POSTED & VERIFIED" else "YOU POSTED TODAY"
         repostTodayBtn.setIconResource(R.drawable.ic_check)
         repostTodayBtn.iconGravity = com.google.android.material.button.MaterialButton.ICON_GRAVITY_TEXT_START
         repostTodayBtn.iconPadding = (8 * resources.displayMetrics.density).toInt()
-        repostTodayBtn.iconTint = repostTodayBtn.textColors
+        paintRepostButton(if (verified) R.color.vg_green else R.color.warning_amber)
     }
 
     // Opens the Buy Keys page (packs + WhatsApp checkout live there).

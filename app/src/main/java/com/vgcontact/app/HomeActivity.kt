@@ -26,6 +26,7 @@ class HomeActivity : AppCompatActivity() {
 
     private lateinit var sessionManager: SessionManager
     private var contactUsFab: android.view.View? = null
+    private var missingPermissions: List<String> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +53,13 @@ class HomeActivity : AppCompatActivity() {
             startActivity(Intent(this, BuyKeysActivity::class.java))
         }
         refreshKeyBalance(keyBalanceText)
+
+        // Header badge + red banner: shown when a required permission is off;
+        // tapping either (or FIX) goes straight to the system prompt / settings.
+        findViewById<LinearLayout>(R.id.permissionBadge).setOnClickListener {
+            if (missingPermissions.isNotEmpty()) fixPermissions()
+        }
+        findViewById<LinearLayout>(R.id.permissionBanner).setOnClickListener { fixPermissions() }
 
         // TODAY banner -> Repost screen
         findViewById<LinearLayout>(R.id.today_repost_banner).setOnClickListener {
@@ -253,6 +261,114 @@ class HomeActivity : AppCompatActivity() {
         // dashboard balance doesn't go stale.
         val keyBalanceText = findViewById<TextView>(R.id.home_key_balance_text)
         refreshKeyBalance(keyBalanceText)
+        updatePermissionBadge()
+    }
+
+    private val NOTIFICATIONS_REQUEST_CODE = 301
+
+    // Live check of the two permissions the app asks for at sign-up
+    // (see PermissionsActivity). Runs every time Home comes back on screen,
+    // so it goes back to normal as soon as the user fixes it.
+    private fun updatePermissionBadge() {
+        val badge = findViewById<LinearLayout>(R.id.permissionBadge)
+        val badgeText = findViewById<TextView>(R.id.permissionBadgeText)
+        val banner = findViewById<LinearLayout>(R.id.permissionBanner)
+        val bannerText = findViewById<TextView>(R.id.permissionBannerText)
+
+        val notificationsOff = !androidx.core.app.NotificationManagerCompat.from(this).areNotificationsEnabled()
+        val pm = getSystemService(android.content.Context.POWER_SERVICE) as android.os.PowerManager
+        val batteryOff = !pm.isIgnoringBatteryOptimizations(packageName)
+
+        val missing = mutableListOf<String>()
+        if (notificationsOff) missing.add("Notifications")
+        if (batteryOff) missing.add("Background activity")
+        missingPermissions = missing
+
+        if (missing.isEmpty()) {
+            badge.setBackgroundResource(R.drawable.group_badge_background)
+            badgeText.text = "VERIFIED"
+            banner.visibility = android.view.View.GONE
+        } else {
+            badge.setBackgroundResource(R.drawable.permission_badge_missing_background)
+            badgeText.text = "UNVERIFIED"
+            bannerText.text = when {
+                notificationsOff && batteryOff -> "Permissions are off - alerts may not reach you"
+                notificationsOff -> "Notifications are off - you won't get repost or key alerts"
+                else -> "Background activity is off - alerts may arrive late"
+            }
+            banner.visibility = android.view.View.VISIBLE
+        }
+        badge.isClickable = missing.isNotEmpty()
+    }
+
+    // FIX: goes straight to the real thing, no custom pop-up in between.
+    //  - Notifications off: the system "Allow / Don't allow" prompt (Android 13+).
+    //    If Android will no longer show it, or on older Android, the app's
+    //    notification settings open instead.
+    //  - Background activity off: the system battery-optimization prompt.
+    // Notifications are handled first; once they are on, tap FIX again for the rest.
+    private fun fixPermissions() {
+        if ("Notifications" in missingPermissions) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU &&
+                androidx.core.content.ContextCompat.checkSelfPermission(
+                    this, android.Manifest.permission.POST_NOTIFICATIONS
+                ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+            ) {
+                androidx.core.app.ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                    NOTIFICATIONS_REQUEST_CODE
+                )
+            } else {
+                openNotificationSettings()
+            }
+        } else if ("Background activity" in missingPermissions) {
+            requestBatteryExemption()
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode != NOTIFICATIONS_REQUEST_CODE) return
+        val granted = grantResults.isNotEmpty() &&
+            grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED
+        // Denied and Android won't ask again: send them to Settings to switch it on.
+        if (!granted && !androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale(
+                this, android.Manifest.permission.POST_NOTIFICATIONS)
+        ) {
+            openNotificationSettings()
+        }
+        updatePermissionBadge()
+    }
+
+    private fun openNotificationSettings() {
+        try {
+            val intent = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                    .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, packageName)
+            } else {
+                Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    .setData(Uri.parse("package:$packageName"))
+            }
+            startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(this, "Couldn't open Settings", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun requestBatteryExemption() {
+        try {
+            startActivity(
+                Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                    .setData(Uri.parse("package:$packageName"))
+            )
+        } catch (e: Exception) {
+            try {
+                startActivity(Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+            } catch (e2: Exception) {
+                Toast.makeText(this, "Couldn't open Settings", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun setupBottomNav() {

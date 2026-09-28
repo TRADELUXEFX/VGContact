@@ -5,6 +5,7 @@
     code (lb_row_me_background) so the user can spot themselves.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/lb_row_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -26,16 +27,15 @@
         android:textSize="14sp"
         android:textColor="@color/text_muted" />
 
-    <TextView
+    <ImageView
         android:id="@+id/lb_row_avatar"
         android:layout_width="34dp"
         android:layout_height="34dp"
-        android:gravity="center"
+        android:padding="6dp"
+        android:src="@drawable/ic_profile_person"
         android:background="@drawable/avatar_circle_tint_background"
-        android:fontFamily="@font/poppins_bold"
-        android:includeFontPadding="false"
-        android:textSize="12sp"
-        android:textColor="@color/vg_green_dark" />
+        android:contentDescription="@null"
+        app:tint="@color/vg_green_dark" />
 
     <TextView
         android:id="@+id/lb_row_name"
