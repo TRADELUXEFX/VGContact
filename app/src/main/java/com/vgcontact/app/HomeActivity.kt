@@ -42,8 +42,8 @@ class HomeActivity : AppCompatActivity() {
             startActivity(Intent(this, RepostActivity::class.java))
         }
 
-        // READY FOR YOU: 3 placeholder rows right away, real groups
-        // replace them once fetched (see refreshReadyGroups in onResume).
+        // READY FOR YOU: 1 placeholder row right away, the real group
+        // replaces it once fetched (see refreshReadyGroups in onResume).
         findViewById<TextView>(R.id.see_all_groups).setOnClickListener {
             startActivity(Intent(this, DownloadsActivity::class.java))
         }
@@ -156,14 +156,13 @@ class HomeActivity : AppCompatActivity() {
         refreshReadyGroups()
     }
 
-    // Always shows exactly 3 rows. Real groups (from Supabase) take the
-    // first slots; any slot without a real group stays a placeholder until
-    // one exists. Placeholder "Group 1" looks unlocked, the rest locked.
+    // Shows exactly 1 row. The first real group (from Supabase) takes the
+    // slot; until one exists it stays a placeholder "Group 1" (unlocked look).
     private fun renderReadyGroups(groups: List<org.json.JSONObject>, unlockedIds: Set<String>) {
         val container = findViewById<LinearLayout>(R.id.ready_groups_container)
         container.removeAllViews()
 
-        for (i in 0 until 3) {
+        for (i in 0 until 1) {
             val group = groups.getOrNull(i)
             val isPlaceholder = group == null
             val groupId = group?.optString("id").orEmpty()

@@ -32,7 +32,7 @@
             android:orientation="vertical"
             android:background="@drawable/header_gradient"
             android:paddingTop="48dp"
-            android:paddingBottom="44dp"
+            android:paddingBottom="18dp"
             android:paddingStart="20dp"
             android:paddingEnd="20dp">
 
@@ -192,19 +192,67 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:paddingTop="20dp"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
             android:paddingBottom="8dp">
 
-            <!-- Keys card, overlapping the header. The spinner lives INSIDE
+            <!-- TODAY: repost banner, first container on Home, above the keys card -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TODAY"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08"
+                android:textColor="@color/text_muted" />
+
+            <LinearLayout
+                android:id="@+id/today_repost_banner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="16dp"
+                android:background="@drawable/today_banner_background"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_repost"
+                    app:tint="@color/warning_amber"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:text="Repost to earn today's key"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/vg_dark" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/text_muted"
+                    android:contentDescription="@null" />
+
+            </LinearLayout>
+
+            <!-- Keys card. The spinner lives INSIDE
                  the card: while the balance loads, the contents stay
                  invisible (they keep their space so the card never
                  resizes) and the spinner is centered in the card. -->
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="-30dp"
-                android:elevation="2dp"
+                android:layout_marginTop="20dp"
                 android:background="@drawable/card_background">
 
                 <ProgressBar
@@ -280,55 +328,6 @@
                 </LinearLayout>
 
             </FrameLayout>
-
-            <!-- TODAY: repost banner, above the groups -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="22dp"
-                android:text="TODAY"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.08"
-                android:textColor="@color/text_muted" />
-
-            <LinearLayout
-                android:id="@+id/today_repost_banner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="16dp"
-                android:background="@drawable/today_banner_background"
-                android:clickable="true"
-                android:focusable="true">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_repost"
-                    app:tint="@color/warning_amber"
-                    android:contentDescription="@null" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="12dp"
-                    android:text="Repost to earn today's key"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/vg_dark" />
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_chevron_right"
-                    app:tint="@color/text_muted"
-                    android:contentDescription="@null" />
-
-            </LinearLayout>
 
             <!-- READY FOR YOU: always 3 rows. Real groups fill in as they
                  exist, placeholders cover the rest (see HomeActivity). -->
