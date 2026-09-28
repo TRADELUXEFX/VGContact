@@ -5,6 +5,11 @@
 // target user's current fcm_token, and sends the push via Firebase's
 // HTTP v1 API. Marks the row is_sent = true on success.
 //
+// Broadcasts: a row with user_id = NULL is a broadcast. It is pushed to
+// EVERY user that has an fcm_token, and marked is_sent = true if at least
+// one push was accepted by FCM. The in-app feed already shows broadcasts
+// once to everyone (see fetch_notifications).
+//
 // ---------------------------------------------------------------------
 // ONE-TIME SETUP
 //
@@ -128,60 +133,88 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ skipped: "already sent" }), { status: 200 });
     }
 
-    // 2. Look up the target user's current FCM token.
-    const { data: user, error: userError } = await supabase
-      .from("users")
-      .select("fcm_token")
-      .eq("id", notif.user_id)
-      .single();
+    // 2. Work out who to send to: one user, or everyone (broadcast).
+    let tokens: string[] = [];
 
-    if (userError || !user?.fcm_token) {
-      // No token on file (never launched app post-login, or push not
-      // supported on this build) - nothing to send. Not an error case;
-      // the in-app notification feed (fetch_notifications) still works
-      // regardless.
-      return new Response(JSON.stringify({ skipped: "no fcm_token for user" }), { status: 200 });
+    if (notif.user_id) {
+      const { data: user, error: userError } = await supabase
+        .from("users")
+        .select("fcm_token")
+        .eq("id", notif.user_id)
+        .single();
+
+      if (userError || !user?.fcm_token) {
+        // No token on file (never launched app post-login, or push not
+        // supported on this build) - nothing to send. Not an error case;
+        // the in-app notification feed (fetch_notifications) still works
+        // regardless.
+        return new Response(JSON.stringify({ skipped: "no fcm_token for user" }), { status: 200 });
+      }
+      tokens = [user.fcm_token];
+    } else {
+      const { data: users, error: usersError } = await supabase
+        .from("users")
+        .select("fcm_token")
+        .not("fcm_token", "is", null);
+
+      if (usersError) {
+        return new Response(JSON.stringify({ error: "failed to load users", detail: usersError }), { status: 500 });
+      }
+      // De-duplicate in case two accounts share a token.
+      tokens = [...new Set((users ?? []).map((u) => u.fcm_token as string).filter(Boolean))];
+
+      if (tokens.length === 0) {
+        return new Response(JSON.stringify({ skipped: "broadcast: no users have an fcm_token" }), { status: 200 });
+      }
     }
 
-    // 3. Send via FCM HTTP v1.
+    // 3. Send via FCM HTTP v1 (one call per token; v1 has no multicast).
     const accessToken = await getAccessToken();
+    const fcmUrl = `https://fcm.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/messages:send`;
 
-    const fcmResponse = await fetch(
-      `https://fcm.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/messages:send`,
-      {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: {
-            token: user.fcm_token,
-            notification: {
-              title: notif.title,
-              body: notif.body,
-            },
+    const results = await Promise.all(tokens.map(async (token) => {
+      try {
+        const res = await fetch(fcmUrl, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
           },
-        }),
-      },
-    );
+          body: JSON.stringify({
+            message: {
+              token,
+              notification: { title: notif.title, body: notif.body },
+            },
+          }),
+        });
+        const detail = res.ok ? null : await res.json().catch(() => null);
+        return { ok: res.ok, detail };
+      } catch (e) {
+        return { ok: false, detail: String(e) };
+      }
+    }));
 
-    const fcmResult = await fcmResponse.json();
+    const sent = results.filter((r) => r.ok).length;
+    const failed = results.length - sent;
 
-    if (!fcmResponse.ok) {
-      // Common cause: fcm_token is stale (app uninstalled, token expired).
-      // Leave is_sent = false so this is visible/retryable rather than
-      // silently swallowed; the in-app notification still shows regardless.
-      return new Response(JSON.stringify({ error: "fcm send failed", detail: fcmResult }), { status: 502 });
+    if (sent === 0) {
+      // Common cause: fcm_token is stale (app uninstalled, token expired)
+      // or bad Firebase credentials. Leave is_sent = false so this is
+      // visible/retryable rather than silently swallowed; the in-app
+      // notification still shows regardless.
+      return new Response(
+        JSON.stringify({ error: "fcm send failed", sent, failed, detail: results[0]?.detail }),
+        { status: 502 },
+      );
     }
 
-    // 4. Mark as sent.
+    // 4. Mark as sent (at least one delivery was accepted).
     await supabase
       .from("notifications")
       .update({ is_sent: true })
       .eq("id", notif.id);
 
-    return new Response(JSON.stringify({ success: true }), { status: 200 });
+    return new Response(JSON.stringify({ success: true, sent, failed }), { status: 200 });
   } catch (err) {
     return new Response(JSON.stringify({ error: String(err) }), { status: 500 });
   }

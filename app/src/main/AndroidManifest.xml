@@ -107,6 +107,19 @@
             android:exported="false"
             android:screenOrientation="portrait" />
 
+        <!-- Status-bar (small) icon for pushes that Firebase draws itself,
+             i.e. when the app is closed or in the background. Without this
+             Android falls back to the launcher logo. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_notification" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/vg_green" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="vgcontact_notifications" />
+
         <!-- Receives pushes sent by the send-push Supabase Edge Function. -->
         <service
             android:name=".VgFirebaseMessagingService"
