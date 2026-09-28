@@ -5,7 +5,6 @@ import android.content.ClipboardManager
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -51,10 +50,10 @@ class ReferralActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.referral_link_text).text =
             if (link.isNotBlank()) link else "Unavailable"
 
-        findViewById<Button>(R.id.referral_copy_code_btn).setOnClickListener {
+        findViewById<View>(R.id.referral_copy_code_btn).setOnClickListener {
             copy("referral_code", code)
         }
-        findViewById<Button>(R.id.referral_copy_link_btn).setOnClickListener {
+        findViewById<View>(R.id.referral_copy_link_btn).setOnClickListener {
             copy("referral_link", link)
         }
         findViewById<View>(R.id.referral_share_btn).setOnClickListener { share(code, link) }
