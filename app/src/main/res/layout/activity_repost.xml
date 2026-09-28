@@ -96,109 +96,83 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- Compact keys readout: label left, balance right -->
+                <!-- Two stat cards side by side: keys + streak -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="@drawable/card_background"
-                    android:paddingStart="20dp"
-                    android:paddingEnd="20dp"
-                    android:paddingTop="16dp"
-                    android:paddingBottom="16dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp">
-
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:src="@drawable/ic_unlock"
-                        app:tint="@color/vg_green_dark"
-                        android:layout_marginEnd="10dp"
-                        android:contentDescription="@null" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Your Keys"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/vg_dark" />
-
-                    <TextView
-                        android:id="@+id/key_balance_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/vg_green_dark" />
-
-                </LinearLayout>
-
-                <!-- Verification status panel: its own card, shown only once -->
-                <!-- the user has reposted today. Sits right under the keys -->
-                <!-- readout (above Today's Task) so the pending/approved -->
-                <!-- feedback is visible immediately after tapping Repost, -->
-                <!-- instead of hiding below the fold under the nav bar. -->
-                <LinearLayout
-                    android:id="@+id/repost_status_card"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="@drawable/card_background"
-                    android:padding="18dp"
-                    android:layout_marginBottom="16dp"
-                    android:visibility="gone">
-
-                    <ImageView
-                        android:id="@+id/repost_status_icon"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:src="@drawable/ic_pending"
-                        app:tint="@color/warning_amber"
-                        android:contentDescription="@null" />
+                    android:layout_marginBottom="12dp">
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="14dp"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:background="@drawable/card_background"
+                        android:padding="16dp"
+                        android:layout_marginEnd="6dp">
 
                         <TextView
-                            android:id="@+id/repost_status_title"
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Verification pending"
-                            android:textSize="15sp"
+                            android:text="YOUR KEYS"
+                            android:textSize="11sp"
                             android:textStyle="bold"
-                            android:textColor="@color/vg_dark" />
+                            android:letterSpacing="0.05"
+                            android:textColor="@color/text_muted" />
 
                         <TextView
-                            android:id="@+id/repost_status"
-                            android:layout_width="match_parent"
+                            android:id="@+id/key_balance_text"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Repost once a day to earn a key. Verified reposts add a key to your balance the next day."
-                            android:textColor="@color/text_muted"
-                            android:textSize="13sp" />
+                            android:text="0"
+                            android:textSize="30sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/vg_green_dark" />
 
                     </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:background="@drawable/card_background"
+                        android:padding="16dp"
+                        android:layout_marginStart="6dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="STREAK"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.05"
+                            android:textColor="@color/text_muted" />
+
+                        <TextView
+                            android:id="@+id/streak_days_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="1 day"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/vg_green_dark" />
+
+                    </LinearLayout>
+
                 </LinearLayout>
 
-                <!-- Today's Task: daily repost flow, matching the streak-card design -->
+                <!-- One action card: status + button + instructions together.
+                     The verification status lives INSIDE this card (same ids
+                     as before) so it is always right next to the button. -->
                 <LinearLayout
-                    android:id="@+id/todays_task_card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:background="@drawable/card_background"
-                    android:padding="20dp"
-                    android:layout_marginBottom="16dp">
+                    android:padding="18dp"
+                    android:layout_marginBottom="12dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -211,51 +185,61 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="TODAY'S TASK"
+                            android:text="TODAY"
                             android:textSize="11sp"
                             android:textStyle="bold"
                             android:letterSpacing="0.05"
                             android:textColor="@color/text_muted" />
 
-                        <ImageView
-                            android:id="@+id/todays_task_close"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_close_small"
-                            app:tint="@color/text_muted"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:background="?android:attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="Dismiss today's task tip" />
+
 
                     </LinearLayout>
 
-                    <TextView
+                    <!-- Verification status (hidden until the user has reposted today) -->
+                    <LinearLayout
+                        android:id="@+id/repost_status_card"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="1. Tap Repost below to open admin's WhatsApp."
-                        android:textColor="@color/vg_dark"
-                        android:textSize="14sp"
-                        android:lineSpacingMultiplier="1.35"
-                        android:layout_marginBottom="8dp" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp"
+                        android:visibility="gone">
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="2. Find admin's status and tap the Repost icon on it."
-                        android:textColor="@color/vg_dark"
-                        android:textSize="14sp"
-                        android:lineSpacingMultiplier="1.35"
-                        android:layout_marginBottom="8dp" />
+                        <ImageView
+                            android:id="@+id/repost_status_icon"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/ic_pending"
+                            app:tint="@color/warning_amber"
+                            android:contentDescription="@null" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="3. Come back here — you'll see a pending badge while it's checked, then your key balance updates once it's approved."
-                        android:textColor="@color/vg_dark"
-                        android:textSize="14sp"
-                        android:lineSpacingMultiplier="1.35"
-                        android:layout_marginBottom="18dp" />
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/repost_status_title"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Verification pending"
+                                android:textSize="15sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/vg_dark" />
+
+                            <TextView
+                                android:id="@+id/repost_status"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="We check reposts each night."
+                                android:textColor="@color/text_muted"
+                                android:textSize="13sp" />
+
+                        </LinearLayout>
+                    </LinearLayout>
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/repost_btn"
@@ -271,39 +255,68 @@
                         app:elevation="0dp"
                         app:rippleColor="@color/vg_green" />
 
+                    <!-- Dismissible how-it-works tip. Only this row hides when the X
+                         is tapped; the status and Repost button above it never do. -->
+                    <LinearLayout
+                        android:id="@+id/todays_task_card"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="top"
+                        android:layout_marginTop="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Tap Repost, repost admin's WhatsApp status, then come back. Your key is added once approved."
+                            android:textColor="@color/text_secondary"
+                            android:textSize="13sp"
+                            android:lineSpacingMultiplier="1.3" />
+
+                        <ImageView
+                            android:id="@+id/todays_task_close"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginStart="10dp"
+                            android:src="@drawable/ic_close_small"
+                            app:tint="@color/text_muted"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="?android:attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Dismiss today's task tip" />
+
+                    </LinearLayout>
+
                 </LinearLayout>
 
                 <TextView
                     android:id="@+id/todays_task_restore"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:background="@drawable/repost_guide_toggle_background"
-                    android:padding="12dp"
-                    android:text="Show today's task again"
-                    android:textAlignment="center"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
+                    android:text="Show how it works"
                     android:textColor="@color/vg_green_dark"
-                    android:visibility="gone"
-                    android:clickable="true"
-                    android:focusable="true" />
+                    android:textSize="13sp"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:layout_marginBottom="12dp"
+                    android:visibility="gone" />
 
-                <!-- Milestones -->
+                <!-- Milestones: same chips as before, tighter card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:background="@drawable/card_background"
-                    android:padding="20dp"
-                    android:layout_marginBottom="16dp">
+                    android:padding="16dp"
+                    android:layout_marginBottom="12dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:layout_marginBottom="14dp">
+                        android:layout_marginBottom="10dp">
 
                         <TextView
                             android:layout_width="0dp"
@@ -330,16 +343,6 @@
                             android:paddingBottom="4dp" />
 
                     </LinearLayout>
-
-                    <ProgressBar
-                        android:id="@+id/milestone_progress"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="6dp"
-                        android:layout_marginBottom="16dp"
-                        android:max="100"
-                        android:progress="35"
-                        android:progressDrawable="@drawable/milestone_progress_bar" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -469,49 +472,23 @@
 
                     </LinearLayout>
 
+
                 </LinearLayout>
 
-                <!-- Buy keys directly -->
-                <LinearLayout
+                <!-- Buy keys: one slim outlined button, no big card -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/buy_keys_btn"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/card_background"
-                    android:padding="20dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Need Keys Faster?"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/vg_dark"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Buy keys directly to unlock files right away."
-                        android:textColor="@color/text_secondary"
-                        android:textSize="14sp"
-                        android:lineSpacingMultiplier="1.3"
-                        android:layout_marginBottom="16dp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/buy_keys_btn"
-                        android:layout_width="match_parent"
-                        android:layout_height="56dp"
-                        android:text="Buy Keys"
-                        android:textAllCaps="false"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        app:strokeColor="@color/vg_green_dark"
-                        android:textColor="@color/vg_green_dark"
-                        app:icon="@drawable/ic_unlock"
-                        app:iconTint="@color/vg_green_dark"
-                        app:iconGravity="textStart"
-                        app:cornerRadius="16dp" />
-
-                </LinearLayout>
+                    android:layout_height="52dp"
+                    android:text="Need keys faster? Buy keys"
+                    android:textAllCaps="false"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    app:strokeColor="@color/vg_green_dark"
+                    android:textColor="@color/vg_green_dark"
+                    app:icon="@drawable/ic_unlock"
+                    app:iconTint="@color/vg_green_dark"
+                    app:iconGravity="textStart"
+                    app:cornerRadius="16dp" />
 
             </LinearLayout>
         </ScrollView>
