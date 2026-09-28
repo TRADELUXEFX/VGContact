@@ -476,12 +476,15 @@ class RepostActivity : AppCompatActivity() {
             return
         }
 
+        // Send the user to the admin's WhatsApp chat (same number used by
+        // Buy Keys / Contact Us) so they can view and repost the admin's status.
         try {
+            val message = Uri.encode("Hi VGContact, I want to repost today's status")
             val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse("https://wa.me/?text=Check%20out%20VGContact")
+            intent.data = Uri.parse("https://wa.me/${BuyKeysActivity.SUPPORT_WHATSAPP}?text=$message")
             startActivity(intent)
         } catch (e: Exception) {
-            Toast.makeText(this, "Error opening WhatsApp", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "WhatsApp not installed", Toast.LENGTH_SHORT).show()
         }
 
         if (repostedToday) {

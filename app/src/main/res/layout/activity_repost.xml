@@ -351,22 +351,54 @@
                 </LinearLayout>
 
                 <!-- 1. Repost button: stands on its own, not inside any card. -->
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="14dp"
+                    android:paddingBottom="4dp"
+                    android:background="@drawable/btn_primary_shadow">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:fontFamily="@font/baloo_2_extrabold"
+                        android:includeFontPadding="false"
+                        android:textSize="18sp"
+                        android:id="@+id/repost_btn"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:text="REPOST TODAY"
+                        android:textAllCaps="true"
+                        android:letterSpacing="0.04"
+                        android:backgroundTint="@color/repost_btn_bg"
+                        android:textColor="@color/repost_btn_text"
+                        app:rippleColor="#33FFFFFF"
+                        app:strokeColor="@color/vg_green_dark"
+                        app:strokeWidth="2dp"
+                        app:cornerRadius="18dp"
+                        app:elevation="0dp" />
+
+                </FrameLayout>
+
+                <!-- Buy keys: one slim outlined button, no big card -->
                 <com.google.android.material.button.MaterialButton
                     android:fontFamily="@font/baloo_2_bold"
                     android:includeFontPadding="false"
                     android:textSize="16sp"
-                    android:id="@+id/repost_btn"
+                    android:id="@+id/buy_keys_btn"
+                    style="@style/Widget.MaterialComponents.Button"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:layout_marginBottom="12dp"
-                    android:text="REPOST TODAY"
-                    android:textAllCaps="true"
-                    android:letterSpacing="0.02"
-                    android:backgroundTint="@color/repost_btn_bg"
-                    android:textColor="@color/repost_btn_text"
+                    android:text="Need New Views? Buy Views"
+                    android:textAllCaps="false"
+                    android:backgroundTint="@color/vg_green_tint"
+                    android:textColor="@color/vg_green_dark"
+                    app:rippleColor="#331FAA59"
                     app:strokeColor="@color/vg_green"
-                    app:strokeWidth="2dp"
-                    app:cornerRadius="16dp"
+                    app:strokeWidth="1.5dp"
+                    app:icon="@drawable/ic_unlock"
+                    app:iconTint="@color/vg_green_dark"
+                    app:iconGravity="textStart"
+                    app:iconPadding="10dp"
+                    app:cornerRadius="18dp"
                     app:elevation="0dp" />
 
                 <!-- Milestones: same chips as before, tighter card -->
@@ -376,6 +408,7 @@
                     android:orientation="vertical"
                     android:background="@drawable/card_background"
                     android:padding="16dp"
+                    android:layout_marginTop="12dp"
                     android:layout_marginBottom="12dp">
 
                     <LinearLayout
@@ -546,24 +579,6 @@
 
                 </LinearLayout>
 
-                <!-- Buy keys: one slim outlined button, no big card -->
-                <com.google.android.material.button.MaterialButton
-                    android:fontFamily="@font/baloo_2_bold"
-                    android:includeFontPadding="false"
-                    android:textSize="16sp"
-                    android:id="@+id/buy_keys_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:text="Need New Views? Buy Views"
-                    android:textAllCaps="false"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    app:strokeColor="@color/vg_green_dark"
-                    android:textColor="@color/vg_green_dark"
-                    app:icon="@drawable/ic_unlock"
-                    app:iconTint="@color/vg_green_dark"
-                    app:iconGravity="textStart"
-                    app:cornerRadius="16dp" />
-
             </LinearLayout>
         </ScrollView>
 
@@ -597,58 +612,64 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="12dp">
+                        android:gravity="center"
+                        android:layout_marginBottom="14dp">
 
                     <TextView
                         android:id="@+id/lb_chip_week"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
                         android:paddingStart="14dp"
                         android:paddingEnd="14dp"
-                        android:paddingTop="7dp"
-                        android:paddingBottom="7dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
                         android:text="This week"
                         android:background="@drawable/filter_chip_default_background"
                         android:fontFamily="@font/baloo_2_bold"
                         android:includeFontPadding="false"
-                        android:textSize="12sp"
+                        android:textSize="13sp"
                         android:textColor="@color/vg_green_dark"
                         android:clickable="true"
                         android:focusable="true" />
 
                     <TextView
                         android:id="@+id/lb_chip_month"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
                         android:paddingStart="14dp"
                         android:paddingEnd="14dp"
-                        android:paddingTop="7dp"
-                        android:paddingBottom="7dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
                         android:text="This month"
                         android:background="@drawable/filter_chip_default_background"
                         android:fontFamily="@font/baloo_2_bold"
                         android:includeFontPadding="false"
-                        android:textSize="12sp"
+                        android:textSize="13sp"
                         android:textColor="@color/vg_green_dark"
                         android:clickable="true"
                         android:focusable="true" />
 
                     <TextView
                         android:id="@+id/lb_chip_all"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
                         android:paddingStart="14dp"
                         android:paddingEnd="14dp"
-                        android:paddingTop="7dp"
-                        android:paddingBottom="7dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
                         android:text="All time"
                         android:background="@drawable/filter_chip_default_background"
                         android:fontFamily="@font/baloo_2_bold"
                         android:includeFontPadding="false"
-                        android:textSize="12sp"
+                        android:textSize="13sp"
                         android:textColor="@color/vg_green_dark"
                         android:clickable="true"
                         android:focusable="true" />

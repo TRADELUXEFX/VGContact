@@ -21,8 +21,8 @@ android {
         applicationId "com.vgcontact.app"
         minSdk 24
         targetSdk 34
-        versionCode 15
-        versionName "1.1.4"
+        versionCode 18
+        versionName "1.1.7"
 
         buildConfigField "String", "SUPABASE_URL", "\"${supabaseUrl}\""
         buildConfigField "String", "SUPABASE_ANON_KEY", "\"${supabaseAnonKey}\""
