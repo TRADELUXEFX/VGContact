@@ -49,10 +49,15 @@ class LoginActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.progressBar)
 
         loginBtn.setOnClickListener {
-            val phone = phoneInput.text.toString().trim()
+            val phone = PhoneUtils.clean(phoneInput.text.toString())
 
             if (phone.isEmpty()) {
                 Toast.makeText(this, "Enter the phone number you registered with", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (!PhoneUtils.isValid(phone)) {
+                Toast.makeText(this, PhoneUtils.ERROR_MESSAGE, Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -88,6 +93,14 @@ class LoginActivity : AppCompatActivity() {
                                 Toast.makeText(
                                     this,
                                     "This number is registered on a different device. Please use the device you originally signed up with.",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                            SupabaseClient.lastError != null -> {
+                                // Server/network problem - NOT "no account".
+                                Toast.makeText(
+                                    this,
+                                    "Couldn't reach the server (${SupabaseClient.lastError}). Try again.",
                                     Toast.LENGTH_LONG
                                 ).show()
                             }

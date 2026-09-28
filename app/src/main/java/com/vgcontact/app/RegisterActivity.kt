@@ -88,11 +88,16 @@ class RegisterActivity : AppCompatActivity() {
 
         registerBtn.setOnClickListener {
             val username = usernameInput.text.toString().trim()
-            val phone = phoneInput.text.toString().trim()
+            val phone = PhoneUtils.clean(phoneInput.text.toString())
             val referral = referralInput.text.toString().trim()
 
             if (username.isEmpty() || phone.isEmpty()) {
                 Toast.makeText(this, "Enter your username and phone number", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (!PhoneUtils.isValid(phone)) {
+                Toast.makeText(this, PhoneUtils.ERROR_MESSAGE, Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -124,15 +129,18 @@ class RegisterActivity : AppCompatActivity() {
                             startActivity(Intent(this, PermissionsActivity::class.java))
                             finish()
                         } else {
-                            // Most likely cause: this username or phone is
-                            // already registered. Send them to Login instead
-                            // of dead-ending on a generic error - same
-                            // "Option A" pattern VGKontact uses.
-                            Toast.makeText(
-                                this,
-                                "That username or phone may already be registered. Try logging in instead.",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            val err = SupabaseClient.lastError.orEmpty()
+                            val msg = when {
+                                err.contains("23505") || err.contains("duplicate", true) ->
+                                    "That username or phone is already registered. Try logging in instead."
+                                err.startsWith("Network error") ->
+                                    "Couldn't reach the server. Check your internet and try again."
+                                err.isNotBlank() ->
+                                    "Couldn't sign up ($err)"
+                                else ->
+                                    "Couldn't sign up. Please try again."
+                            }
+                            Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
                         }
                     }
                 }

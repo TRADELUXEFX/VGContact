@@ -35,8 +35,18 @@ object SupabaseClient {
     // parsed JSON array, or null on any failure. All table access for
     // private data now goes through these functions; the database no longer
     // lets the anon key read or write those tables directly.
+    // Last failure reason from rpc(), so screens can show something more
+    // useful than a guess. Cleared at the start of every call.
+    @Volatile
+    var lastError: String? = null
+        private set
+
     private fun rpc(name: String, params: JSONObject): org.json.JSONArray? {
-        if (!isConfigured()) return null
+        lastError = null
+        if (!isConfigured()) {
+            lastError = "App is missing its server settings (build has no Supabase URL/key)."
+            return null
+        }
         return try {
             val request = Request.Builder()
                 .url("$supabaseUrl/rest/v1/rpc/$name")
@@ -46,9 +56,16 @@ object SupabaseClient {
                 .post(params.toString().toRequestBody("application/json".toMediaType()))
                 .build()
             client.newCall(request).execute().use { response ->
-                if (response.isSuccessful) org.json.JSONArray(response.body?.string() ?: "[]") else null
+                val body = response.body?.string() ?: ""
+                if (response.isSuccessful) {
+                    org.json.JSONArray(if (body.isBlank()) "[]" else body)
+                } else {
+                    lastError = "HTTP ${response.code}: " + body.take(160)
+                    null
+                }
             }
         } catch (e: Exception) {
+            lastError = "Network error: " + (e.message ?: e.javaClass.simpleName)
             null
         }
     }
