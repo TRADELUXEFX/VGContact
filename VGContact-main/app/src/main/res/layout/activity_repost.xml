@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Key-earning screen. Root is a FrameLayout so the bottom nav bar can
+    float over the content as a rounded pill (see bottom_nav_bar.xml).
+    Header is inline (gradient background, centered bold title) matching
+    VGKontact's per-screen header pattern instead of a shared include.
+
+    Keys are the app's unlock currency (see RepostActivity.kt /
+    vgcontact_keys_schema.sql) - this screen shows the current balance,
+    lets the user log today's repost attempt, and offers a way to buy
+    more keys directly.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/header_gradient"
+            android:paddingTop="72dp"
+            android:paddingBottom="28dp"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Repost"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:textAlignment="center" />
+
+            <!-- My streak / Leaderboard tab switch -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:orientation="horizontal"
+                android:background="@drawable/header_tab_track_background"
+                android:padding="4dp">
+
+                <TextView
+                    android:id="@+id/repost_tab_streak"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="My streak"
+                    android:textAlignment="center"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:padding="10dp"
+                    android:background="@drawable/tab_selected_background"
+                    android:textColor="@color/vg_green_dark"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+                <TextView
+                    android:id="@+id/repost_tab_leaderboard"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Leaderboard"
+                    android:textAlignment="center"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:padding="10dp"
+                    android:textColor="@color/white"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <ScrollView
+            android:id="@+id/repost_content_scroll"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingBottom="88dp"
+            android:visibility="gone">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- 3. How it works: its own card, three numbered steps.
+                     The X hides the whole card; "Show how it works"
+                     below brings it back. -->
+                <LinearLayout
+                    android:id="@+id/todays_task_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="top"
+                    android:background="@drawable/card_background"
+                    android:padding="18dp"
+                    android:layout_marginBottom="12dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="10dp">
+
+                            <TextView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:background="@drawable/step_number_background"
+                                android:gravity="center"
+                                android:text="1"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/vg_green_dark" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="12dp"
+                                android:text="Tap the Repost button"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="14sp" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="10dp">
+
+                            <TextView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:background="@drawable/step_number_background"
+                                android:gravity="center"
+                                android:text="2"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/vg_green_dark" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="12dp"
+                                android:text="Repost the admin's WhatsApp status"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="14sp" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="0dp">
+
+                            <TextView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:background="@drawable/step_number_background"
+                                android:gravity="center"
+                                android:text="3"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/vg_green_dark" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="12dp"
+                                android:text="Get 1 key added within 24 hours"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="14sp" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/todays_task_close"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="10dp"
+                        android:src="@drawable/ic_close_small"
+                        app:tint="@color/text_muted"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?android:attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Dismiss how it works" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/todays_task_restore"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Show how it works"
+                    android:textColor="@color/vg_green_dark"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    android:background="@drawable/card_background"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginBottom="12dp"
+                    android:visibility="gone" />
+
+                <!-- Verification status: its own card, shown at the very
+                     top (above Your Keys / Streak) once the user has
+                     reposted today. Icon on the left, text on the right,
+                     the pair centered in the card. -->
+                <LinearLayout
+                    android:id="@+id/repost_status_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:background="@drawable/card_background"
+                    android:padding="18dp"
+                    android:layout_marginBottom="12dp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/repost_status_icon"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_pending"
+                        app:tint="@color/warning_amber"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:id="@+id/repost_status_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:text="Verification pending"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/vg_dark" />
+
+                    <!-- Kept (same id) so existing code that sets it keeps
+                         working, but never shown. -->
+                    <TextView
+                        android:id="@+id/repost_status"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+                <!-- Two stat cards side by side: keys + streak -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:background="@drawable/card_background"
+                        android:padding="16dp"
+                        android:layout_marginEnd="6dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="YOUR KEYS"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.05"
+                            android:textColor="@color/text_muted" />
+
+                        <TextView
+                            android:id="@+id/key_balance_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="30sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/vg_green_dark" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:background="@drawable/card_background"
+                        android:padding="16dp"
+                        android:layout_marginStart="6dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="STREAK"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.05"
+                            android:textColor="@color/text_muted" />
+
+                        <TextView
+                            android:id="@+id/streak_days_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="1 day"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/vg_green_dark" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- 1. Repost button: stands on its own, not inside any card. -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/repost_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginBottom="12dp"
+                    android:text="REPOST TODAY"
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.02"
+                    android:textStyle="bold"
+                    android:backgroundTint="@color/repost_btn_bg"
+                    android:textColor="@color/repost_btn_text"
+                    app:cornerRadius="16dp"
+                    app:elevation="0dp" />
+
+                <!-- Milestones: same chips as before, tighter card -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/card_background"
+                    android:padding="16dp"
+                    android:layout_marginBottom="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="10dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="MILESTONES"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.05"
+                            android:textColor="@color/text_muted" />
+
+                        <TextView
+                            android:id="@+id/milestone_days_to_go"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="2 days to go"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/vg_green_dark"
+                            android:background="@drawable/badge_verified_background"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:paddingTop="4dp"
+                            android:paddingBottom="4dp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="4">
+
+                        <LinearLayout
+                            android:id="@+id/milestone_3day"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="6dp"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:background="@drawable/freq_tile_selected_background"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="3"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/vg_green_dark" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="DAYS"
+                                android:textSize="9sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.03"
+                                android:textColor="@color/vg_green_dark" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="6dp"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:background="@drawable/stats_card_background"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="7"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/text_secondary" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="DAYS"
+                                android:textSize="9sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.03"
+                                android:textColor="@color/text_muted" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="6dp"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:background="@drawable/stats_card_background"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="14"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/text_secondary" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="DAYS"
+                                android:textSize="9sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.03"
+                                android:textColor="@color/text_muted" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:background="@drawable/stats_card_background"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="30"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/text_secondary" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="DAYS"
+                                android:textSize="9sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.03"
+                                android:textColor="@color/text_muted" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+                <!-- Buy keys: one slim outlined button, no big card -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/buy_keys_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:text="Need More Views? Buy Keys"
+                    android:textAllCaps="false"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    app:strokeColor="@color/vg_green_dark"
+                    android:textColor="@color/vg_green_dark"
+                    app:icon="@drawable/ic_unlock"
+                    app:iconTint="@color/vg_green_dark"
+                    app:iconGravity="textStart"
+                    app:cornerRadius="16dp" />
+
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- Same loading pattern as Get Viewers: the green header above
+             stays visible and this spinner fills the body area under it
+             until the screen's data has loaded. -->
+        <LinearLayout
+            android:id="@+id/repost_loading_state"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="visible">
+
+            <ProgressBar
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:indeterminateTint="@color/vg_green" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <include layout="@layout/bottom_nav_bar" />
+</FrameLayout>

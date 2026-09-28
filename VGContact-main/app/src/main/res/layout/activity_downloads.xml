@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Root is a FrameLayout so the bottom nav bar can float over the
+    content as a rounded pill (see bottom_nav_bar.xml). Header is
+    inline (gradient background, centered bold title) matching
+    VGKontact's per-screen header pattern instead of a shared include.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/header_gradient"
+            android:paddingTop="48dp"
+            android:paddingBottom="28dp"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Get Viewers"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:textAlignment="center" />
+
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingTop="16dp"
+            android:paddingBottom="88dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+                <LinearLayout
+                    android:id="@+id/file_list_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <!-- Shown immediately on open (and on retry) while the
+                     Supabase fetch is in flight, before results or the
+                     empty state are ready to display. -->
+                <LinearLayout
+                    android:id="@+id/loading_state_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingTop="48dp"
+                    android:paddingBottom="48dp"
+                    android:visibility="visible">
+
+                    <ProgressBar
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:indeterminateTint="@color/vg_green" />
+
+                </LinearLayout>
+
+                <!-- Shown instead of an unexplained blank screen whenever
+                     the fetch fails or returns no published groups. Tap
+                     to retry. -->
+                <LinearLayout
+                    android:id="@+id/empty_state_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingTop="48dp"
+                    android:visibility="gone"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="140dp"
+                        android:layout_height="128dp"
+                        android:src="@drawable/illus_empty_contacts"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:id="@+id/empty_state_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="No contact lists available right now"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary"
+                        android:textAlignment="center" />
+
+                    <TextView
+                        android:id="@+id/empty_state_retry"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Tap to retry"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/vg_green" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+    <include layout="@layout/bottom_nav_bar" />
+</FrameLayout>

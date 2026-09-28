@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Single splash background: solid dark color plus the round launcher
+    icon centered on top, painted as the theme's windowBackground. Set
+    directly on the theme (Theme.VGContact.Splash) so the system draws
+    this as the very first frame, before SplashActivity's onCreate/
+    setContentView ever runs - meaning there is only ever one splash
+    image, not a plain background frame followed by a second layout
+    popping the icon in on top of it.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/vg_dark" />
+    <item
+        android:width="96dp"
+        android:height="96dp"
+        android:gravity="center"
+        android:drawable="@mipmap/ic_launcher_round" />
+</layer-list>

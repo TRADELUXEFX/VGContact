@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Repost button background: solid green when it can be tapped, light
+     green (the "sent" look) once the repost has been logged today (button
+     stays enabled, just looks "sent"). -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_activated="true" android:color="@color/vg_green_tint" />
+    <item android:color="@color/vg_green" />
+</selector>

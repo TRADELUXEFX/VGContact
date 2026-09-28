@@ -1,0 +1,3 @@
+-keep class com.vgcontact.app.** { *; }
+-keep class org.json.** { *; }
+-keepattributes SourceFile,LineNumberTable
