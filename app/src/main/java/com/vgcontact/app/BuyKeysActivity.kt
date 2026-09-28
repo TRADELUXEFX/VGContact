@@ -28,6 +28,8 @@ class BuyKeysActivity : AppCompatActivity() {
         const val SUPPORT_WHATSAPP = "2349110321143"
         // Pack size -> price in naira (10 keys is discounted).
         private val PACK_PRICES = mapOf(1 to 1000, 5 to 5000, 10 to 8000)
+        // Each key unlocks this many status viewers; a pack is keys * this.
+        private const val VIEWERS_PER_KEY = 250
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,9 +54,22 @@ class BuyKeysActivity : AppCompatActivity() {
         for ((keys, view) in packViews) {
             view.setOnClickListener { selectPack(keys) }
         }
+        bindViewerCounts()
         selectPack(selectedKeys)
 
         buyBtn.setOnClickListener { openWhatsApp() }
+    }
+
+    private fun bindViewerCounts() {
+        val labels = mapOf(
+            1 to R.id.buy_pack_1_viewers,
+            5 to R.id.buy_pack_5_viewers,
+            10 to R.id.buy_pack_10_viewers
+        )
+        for ((keys, id) in labels) {
+            val viewers = String.format(java.util.Locale.US, "%,d", keys * VIEWERS_PER_KEY)
+            findViewById<TextView>(id).text = "$viewers status viewers"
+        }
     }
 
     private fun selectPack(keys: Int) {

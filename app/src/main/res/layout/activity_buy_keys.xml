@@ -5,6 +5,7 @@
      earning keys by reposting lives on the Repost tab. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/vg_green_dark">
@@ -118,14 +119,30 @@
                     android:clickable="true"
                     android:focusable="true">
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="1 key"
-                        android:textSize="17sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/vg_dark" />
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="1 key"
+                            android:textSize="17sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/vg_dark" />
+
+                        <TextView
+                            android:id="@+id/buy_pack_1_viewers"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_secondary"
+                            tools:text="250 status viewers" />
+
+                    </LinearLayout>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -155,14 +172,30 @@
                     android:clickable="true"
                     android:focusable="true">
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="5 keys"
-                        android:textSize="17sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/vg_dark" />
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="5 keys"
+                            android:textSize="17sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/vg_dark" />
+
+                        <TextView
+                            android:id="@+id/buy_pack_5_viewers"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_secondary"
+                            tools:text="1,250 status viewers" />
+
+                    </LinearLayout>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -202,14 +235,30 @@
                     android:clickable="true"
                     android:focusable="true">
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="10 keys"
-                        android:textSize="17sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/vg_dark" />
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="10 keys"
+                            android:textSize="17sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/vg_dark" />
+
+                        <TextView
+                            android:id="@+id/buy_pack_10_viewers"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_secondary"
+                            tools:text="2,500 status viewers" />
+
+                    </LinearLayout>
 
                     <TextView
                         android:layout_width="wrap_content"
