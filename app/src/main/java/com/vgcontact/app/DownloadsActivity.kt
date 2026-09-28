@@ -11,7 +11,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.io.File
 import kotlin.concurrent.thread
 
@@ -257,8 +256,9 @@ class DownloadsActivity : AppCompatActivity() {
     private fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()
 
     // Tap on UNLOCK: the button spins while we check the key balance.
-    //  - Has a key -> spend it and open the import screen straight away.
-    //  - No keys   -> stop spinning and show the out-of-keys pop-up.
+    //  - Has keys  -> "Unlock this file?" pop-up (4 -> 3 keys left). Unlock
+    //                 spends the key and opens the save-contact screen.
+    //  - No keys   -> "You're out of keys" pop-up (repost free / buy a key).
     // If the balance can't be read we still try the unlock; the server
     // answers NO_KEYS when there are none.
     private fun startUnlock(row: RowViews, groupId: String) {
@@ -272,29 +272,91 @@ class DownloadsActivity : AppCompatActivity() {
         thread {
             SupabaseClient.fetchKeyBalance(userId) { ok, balance ->
                 runOnUiThread {
-                    if (ok && balance <= 0) {
-                        setRowLoading(row, false, groupId)
-                        showOutOfKeysDialog()
-                    } else {
-                        unlockWithKey(row, groupId)
+                    when {
+                        !ok -> unlockWithKey(row, groupId)
+                        balance <= 0 -> {
+                            setRowLoading(row, false, groupId)
+                            showOutOfKeysDialog()
+                        }
+                        else -> showConfirmUnlockDialog(
+                            balance,
+                            onUnlock = { unlockWithKey(row, groupId) },
+                            onCancel = { setRowLoading(row, false, groupId) }
+                        )
                     }
                 }
             }
         }
     }
 
-    // Rounded pop-up: ways to get a key.
+    // Rounded pop-up: green header with the icon beside the title.
+    private fun showVgPopup(
+        iconRes: Int,
+        title: String,
+        message: String,
+        balanceFrom: Int?,
+        balanceTo: Int?,
+        positiveLabel: String,
+        negativeLabel: String,
+        onPositive: () -> Unit,
+        onNegative: () -> Unit,
+        onOutside: () -> Unit = {}
+    ) {
+        val view = layoutInflater.inflate(R.layout.dialog_vg_popup, null)
+        view.findViewById<ImageView>(R.id.popup_icon).setImageResource(iconRes)
+        view.findViewById<TextView>(R.id.popup_title).text = title
+        view.findViewById<TextView>(R.id.popup_message).text = message
+        if (balanceFrom != null && balanceTo != null) {
+            view.findViewById<android.view.View>(R.id.popup_balance_row).visibility = android.view.View.VISIBLE
+            view.findViewById<TextView>(R.id.popup_balance_from).text = balanceFrom.toString()
+            view.findViewById<TextView>(R.id.popup_balance_to).text = balanceTo.toString()
+        }
+        val positive = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.popup_positive)
+        val negative = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.popup_negative)
+        positive.text = positiveLabel
+        negative.text = negativeLabel
+
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(this).setView(view).create()
+        var handled = false
+        positive.setOnClickListener { handled = true; dialog.dismiss(); onPositive() }
+        negative.setOnClickListener { handled = true; dialog.dismiss(); onNegative() }
+        // Tapping outside or pressing Back just closes it.
+        dialog.setOnCancelListener { if (!handled) onOutside() }
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.show()
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.88f).toInt(),
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+    }
+
+    private fun showConfirmUnlockDialog(balance: Int, onUnlock: () -> Unit, onCancel: () -> Unit) {
+        showVgPopup(
+            iconRes = R.drawable.ic_unlock,
+            title = "Unlock this file?",
+            message = "This uses 1 key from your balance.",
+            balanceFrom = balance,
+            balanceTo = balance - 1,
+            positiveLabel = "Unlock",
+            negativeLabel = "Cancel",
+            onPositive = onUnlock,
+            onNegative = onCancel,
+            onOutside = onCancel
+        )
+    }
+
     private fun showOutOfKeysDialog() {
-        MaterialAlertDialogBuilder(this, R.style.VGRoundedAlertDialog)
-            .setTitle("You're out of keys")
-            .setMessage("Repost today for a free key, or buy one for \u20A61,000. Keys are added within 24 hours.")
-            .setPositiveButton("Repost free") { _, _ ->
-                startActivity(Intent(this, RepostActivity::class.java))
-            }
-            .setNegativeButton("Buy a key") { _, _ ->
-                startActivity(Intent(this, BuyKeysActivity::class.java))
-            }
-            .show()
+        showVgPopup(
+            iconRes = R.drawable.ic_key,
+            title = "You're out of keys",
+            message = "Repost today for a free key, or buy one for \u20A61,000. Keys are added within 24 hours.",
+            balanceFrom = null,
+            balanceTo = null,
+            positiveLabel = "Repost free",
+            negativeLabel = "Buy a key",
+            onPositive = { startActivity(Intent(this, RepostActivity::class.java)) },
+            onNegative = { startActivity(Intent(this, BuyKeysActivity::class.java)) }
+        )
     }
 
     // Spends one key (via the spend_key_unlock_group RPC, atomic on the
