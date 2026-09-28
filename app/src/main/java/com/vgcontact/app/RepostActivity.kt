@@ -45,7 +45,7 @@ class RepostActivity : AppCompatActivity() {
 
     private lateinit var keyBalanceText: TextView
     private lateinit var repostStatusText: TextView
-    private lateinit var repostTodayBtn: Button
+    private lateinit var repostTodayBtn: com.google.android.material.button.MaterialButton
     private lateinit var buyKeysBtn: Button
 
     private lateinit var statusCard: LinearLayout
@@ -197,11 +197,12 @@ class RepostActivity : AppCompatActivity() {
                         null -> {
                             repostTodayBtn.isEnabled = true
                             repostTodayBtn.text = "REPOST TODAY"
+                            repostTodayBtn.icon = null
                             statusCard.visibility = android.view.View.GONE
                         }
                         "pending" -> {
                             repostTodayBtn.isEnabled = false
-                            repostTodayBtn.text = "REPOST SENT"
+                            showRepostSent()
                             showStatusCard(
                                 title = "Verification pending",
                                 message = "We check WhatsApp status views each night. Your key will appear here once confirmed.",
@@ -211,7 +212,7 @@ class RepostActivity : AppCompatActivity() {
                         }
                         "verified" -> {
                             repostTodayBtn.isEnabled = false
-                            repostTodayBtn.text = "REPOST SENT"
+                            showRepostSent()
                             showStatusCard(
                                 title = "Repost verified",
                                 message = "Today's repost was verified and your key has been added.",
@@ -221,7 +222,7 @@ class RepostActivity : AppCompatActivity() {
                         }
                         "rejected" -> {
                             repostTodayBtn.isEnabled = false
-                            repostTodayBtn.text = "REPOST SENT"
+                            showRepostSent()
                             showStatusCard(
                                 title = "Couldn't verify",
                                 message = "We couldn't verify today's repost. Try again tomorrow.",
@@ -272,7 +273,7 @@ class RepostActivity : AppCompatActivity() {
             SupabaseClient.submitDailyRepost(userId) { success, message ->
                 runOnUiThread {
                     if (success) {
-                        repostTodayBtn.text = "REPOST SENT"
+                        showRepostSent()
                         showStatusCard(
                             title = "Verification pending",
                             message = "We check WhatsApp status views each night. Your key will appear here once confirmed.",
@@ -291,10 +292,18 @@ class RepostActivity : AppCompatActivity() {
         }
     }
 
+    // Sent state: repost icon + "REPOST" (button is disabled by the callers).
+    private fun showRepostSent() {
+        repostTodayBtn.text = "REPOST"
+        repostTodayBtn.setIconResource(R.drawable.ic_repost)
+        repostTodayBtn.iconGravity = com.google.android.material.button.MaterialButton.ICON_GRAVITY_TEXT_START
+        repostTodayBtn.iconTint = repostTodayBtn.textColors
+    }
+
     private fun openBuyKeysChat() {
         try {
             val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse("https://wa.me/?text=Hi%2C%20I%27d%20like%20to%20buy%20more%20VGContact%20keys")
+            intent.data = Uri.parse("https://wa.me/${BuyKeysActivity.SUPPORT_WHATSAPP}?text=Hi%2C%20I%27d%20like%20to%20buy%20more%20VGContact%20keys")
             startActivity(intent)
         } catch (e: Exception) {
             Toast.makeText(this, "WhatsApp not installed", Toast.LENGTH_SHORT).show()
