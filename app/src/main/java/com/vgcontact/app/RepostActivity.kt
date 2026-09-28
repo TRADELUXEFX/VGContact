@@ -111,7 +111,7 @@ class RepostActivity : AppCompatActivity() {
         applyTodaysTaskVisibility()
 
         repostTodayBtn.setOnClickListener { onRepostTodayClicked() }
-        buyKeysBtn.setOnClickListener { openBuyKeysChat() }
+        buyKeysBtn.setOnClickListener { openBuyKeysPage() }
 
         refreshKeyBalance()
         refreshTodayStatus()
@@ -313,14 +313,9 @@ class RepostActivity : AppCompatActivity() {
         repostTodayBtn.iconTint = repostTodayBtn.textColors
     }
 
-    private fun openBuyKeysChat() {
-        try {
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse("https://wa.me/${BuyKeysActivity.SUPPORT_WHATSAPP}?text=Hi%2C%20I%27d%20like%20to%20buy%20more%20VGContact%20keys")
-            startActivity(intent)
-        } catch (e: Exception) {
-            Toast.makeText(this, "WhatsApp not installed", Toast.LENGTH_SHORT).show()
-        }
+    // Opens the Buy Keys page (packs + WhatsApp checkout live there).
+    private fun openBuyKeysPage() {
+        startActivity(Intent(this, BuyKeysActivity::class.java))
     }
 
     private fun setupBottomNav() {

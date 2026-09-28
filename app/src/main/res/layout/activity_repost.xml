@@ -534,7 +534,7 @@
                     android:id="@+id/buy_keys_btn"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
-                    android:text="Need More Views? Buy Keys"
+                    android:text="Need New Views? Buy Views"
                     android:textAllCaps="false"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     app:strokeColor="@color/vg_green_dark"

@@ -26,7 +26,8 @@ class BuyKeysActivity : AppCompatActivity() {
     companion object {
         // 09110321143 in international format (Nigeria +234, no leading 0).
         const val SUPPORT_WHATSAPP = "2349110321143"
-        private const val PRICE_PER_KEY = 1000
+        // Pack size -> price in naira (10 keys is discounted).
+        private val PACK_PRICES = mapOf(1 to 1000, 5 to 5000, 10 to 8000)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,7 +71,7 @@ class BuyKeysActivity : AppCompatActivity() {
         try {
             val intent = Intent(Intent.ACTION_VIEW)
             val username = sessionManager.getUsername()
-            val total = String.format(java.util.Locale.US, "%,d", selectedKeys * PRICE_PER_KEY)
+            val total = String.format(java.util.Locale.US, "%,d", (PACK_PRICES[selectedKeys] ?: (selectedKeys * 1000)))
             val message = "Hi, I'd like to buy $selectedKeys VGContact " +
                 (if (selectedKeys == 1) "key" else "keys") + " (₦$total)." +
                 if (username.isNullOrBlank()) "" else " My username is $username."

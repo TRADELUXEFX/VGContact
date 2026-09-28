@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+
+    <!-- White rounded tile -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M26,2 H74 A24,24 0 0 1 98,26 V74 A24,24 0 0 1 74,98 H26 A24,24 0 0 1 2,74 V26 A24,24 0 0 1 26,2 Z" />
+
+    <!-- Green rounded triangle -->
+    <path
+        android:fillColor="#158548"
+        android:strokeColor="#158548"
+        android:strokeWidth="3"
+        android:strokeLineJoin="round"
+        android:pathData="M24,16 L86,46 Q92,50 86,54 L24,84 Q17,87 17,79 V21 Q17,13 24,16 Z" />
+
+    <!-- White people glyph, scaled .6 and centered at (45,50) -->
+    <group
+        android:translateX="15"
+        android:translateY="19.4"
+        android:scaleX="0.6"
+        android:scaleY="0.6">
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M42.5,38 a7.5,7.5 0 1 0 15,0 a7.5,7.5 0 1 0 -15,0 Z" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M28.5,43 a5.5,5.5 0 1 0 11,0 a5.5,5.5 0 1 0 -11,0 Z" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M60.5,43 a5.5,5.5 0 1 0 11,0 a5.5,5.5 0 1 0 -11,0 Z" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M36,68 a14,14 0 0 1 28,0 v2 a2,2 0 0 1 -2,2 h-24 a2,2 0 0 1 -2,-2 z" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M21,68 a10,10 0 0 1 9,-10 a17,17 0 0 0 -2,10 v4 h-5 a2,2 0 0 1 -2,-2 z" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M79,68 a10,10 0 0 0 -9,-10 a17,17 0 0 1 2,10 v4 h5 a2,2 0 0 0 2,-2 z" />
+    </group>
+</vector>

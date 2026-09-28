@@ -38,12 +38,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="start|center_vertical"
+                        android:background="@drawable/buy_header_pill"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
                         android:text="Back"
                         android:textSize="14sp"
                         android:textColor="@color/vg_green_tint"
-                        android:paddingTop="8dp"
-                        android:paddingBottom="8dp"
-                        android:paddingEnd="16dp"
                         android:clickable="true"
                         android:focusable="true" />
 
@@ -52,6 +54,11 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="end|center_vertical"
+                        android:background="@drawable/buy_header_pill"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
                         android:text=""
                         android:textSize="14sp"
                         android:textColor="@color/vg_green_tint" />
@@ -70,7 +77,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Get more keys.\nUnlock more."
+                    android:text="Get more status viewers with keys"
                     android:textSize="32sp"
                     android:textStyle="bold"
                     android:textColor="@color/white" />
@@ -79,7 +86,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:text="₦1,000 per key. 1 key opens 1 contact file."
+                    android:text="1 VGCONTACT KEY UNLOCKS 250 STATUS VIEWERS"
                     android:textSize="14sp"
                     android:textColor="@color/vg_green_tint" />
 
@@ -166,7 +173,7 @@
                             android:paddingEnd="10dp"
                             android:paddingTop="2dp"
                             android:paddingBottom="2dp"
-                            android:text="BEST VALUE"
+                            android:text="MOST POPULAR"
                             android:textSize="11sp"
                             android:textStyle="bold"
                             android:textColor="@color/vg_dark" />
@@ -196,7 +203,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="₦10,000"
+                        android:text="₦8,000"
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:textColor="@color/vg_green_dark" />
