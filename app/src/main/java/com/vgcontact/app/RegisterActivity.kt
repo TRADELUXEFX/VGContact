@@ -66,7 +66,7 @@ class RegisterActivity : AppCompatActivity() {
                     }
             }
 
-            startActivity(Intent(this, HomeActivity::class.java))
+            startActivity(NotificationRouter.forward(intent, Intent(this, HomeActivity::class.java)))
             finish()
             return
         }

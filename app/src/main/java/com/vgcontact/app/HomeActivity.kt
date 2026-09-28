@@ -15,6 +15,15 @@ import androidx.core.widget.NestedScrollView
 
 class HomeActivity : AppCompatActivity() {
 
+    // Home is already open and a push was tapped (FLAG_ACTIVITY_CLEAR_TOP on a
+    // non-singleTop activity normally recreates it, but this covers the case
+    // where the system delivers it to the existing instance).
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        NotificationRouter.handle(this, intent)
+    }
+
     private lateinit var sessionManager: SessionManager
     private var contactUsFab: android.view.View? = null
 
@@ -30,6 +39,11 @@ class HomeActivity : AppCompatActivity() {
             finish()
             return
         }
+
+        // Opened by tapping a push? Do what the notification says (e.g. jump
+        // straight to the admin's WhatsApp). Home is still underneath, so
+        // Back returns here.
+        if (savedInstanceState == null) NotificationRouter.handle(this, intent)
 
         // Keys card: "Get more" opens the buy-keys page only. Earning keys
         // by reposting is the Repost tab / today banner below.

@@ -69,10 +69,15 @@ class VgFirebaseMessagingService : FirebaseMessagingService() {
             ?: message.data["body"]
             ?: ""
 
-        showNotification(title, body)
+        showNotification(
+            title,
+            body,
+            message.data[NotificationRouter.EXTRA_ACTION],
+            message.data[NotificationRouter.EXTRA_TARGET]
+        )
     }
 
-    private fun showNotification(title: String, body: String) {
+    private fun showNotification(title: String, body: String, action: String?, target: String?) {
         val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -89,9 +94,14 @@ class VgFirebaseMessagingService : FirebaseMessagingService() {
         val openIntent = Intent(this, HomeActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
+        NotificationRouter.putExtras(openIntent, action, target)
+        val notificationId = System.currentTimeMillis().toInt()
+        // Unique requestCode per notification: with a shared code,
+        // FLAG_UPDATE_CURRENT would overwrite the extras of earlier
+        // notifications still sitting in the tray.
         val pendingIntent = PendingIntent.getActivity(
             this,
-            0,
+            notificationId,
             openIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -105,7 +115,6 @@ class VgFirebaseMessagingService : FirebaseMessagingService() {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .build()
 
-        val notificationId = System.currentTimeMillis().toInt()
         manager.notify(notificationId, notification)
     }
 }

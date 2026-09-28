@@ -121,7 +121,7 @@ Deno.serve(async (req) => {
     // 1. Load the notification row.
     const { data: notif, error: notifError } = await supabase
       .from("notifications")
-      .select("id, user_id, title, body, is_sent")
+      .select("id, user_id, title, body, is_sent, action, target")
       .eq("id", notification_id)
       .single();
 
@@ -184,6 +184,15 @@ Deno.serve(async (req) => {
             message: {
               token,
               notification: { title: notif.title, body: notif.body },
+              // Tap routing. FCM data values must all be strings. The app
+              // reads these in VgFirebaseMessagingService (foreground) and
+              // HomeActivity (background/killed - Firebase puts them in the
+              // launch intent extras) and routes via NotificationRouter.
+              data: {
+                notification_id: String(notif.id),
+                action: notif.action ?? "open_home",
+                target: notif.target ?? "",
+              },
             },
           }),
         });

@@ -84,6 +84,11 @@ class NotificationsActivity : AppCompatActivity() {
             row.findViewById<TextView>(R.id.notification_time).text = formatRelativeTime(notification.createdAt)
             row.findViewById<View>(R.id.notification_unread_dot).visibility =
                 if (notification.isRead) View.GONE else View.VISIBLE
+            if (!notification.action.isNullOrBlank() && notification.action != NotificationRouter.ACTION_HOME) {
+                row.setOnClickListener {
+                    NotificationRouter.run(this, notification.action, notification.target)
+                }
+            }
             container.addView(row)
         }
     }

@@ -48,7 +48,7 @@ class SplashActivity : AppCompatActivity() {
 
         Handler(Looper.getMainLooper()).postDelayed({
             val destination = if (isLoggedIn) HomeActivity::class.java else RegisterActivity::class.java
-            startActivity(Intent(this, destination))
+            startActivity(NotificationRouter.forward(intent, Intent(this, destination)))
             finish()
         }, MIN_SPLASH_MS)
     }

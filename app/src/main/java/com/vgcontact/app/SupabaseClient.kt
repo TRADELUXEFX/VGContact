@@ -326,7 +326,9 @@ object SupabaseClient {
         val title: String,
         val body: String,
         val createdAt: String,
-        val isRead: Boolean
+        val isRead: Boolean,
+        val action: String? = null,
+        val target: String? = null
     )
 
     // Up to the 50 most recent notifications visible to this user, via the
@@ -364,7 +366,9 @@ object SupabaseClient {
                                 title = row.optString("title"),
                                 body = row.optString("body"),
                                 createdAt = row.optString("created_at"),
-                                isRead = row.optBoolean("is_read", false)
+                                isRead = row.optBoolean("is_read", false),
+                                action = row.optString("action", "").ifBlank { null },
+                                target = row.optString("target", "").ifBlank { null }
                             )
                         )
                     }
