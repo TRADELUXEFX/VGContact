@@ -7,8 +7,13 @@ import android.os.Build
 
 /** Application entry point. Registers app-wide UI that lives above every screen. */
 class VGApp : Application() {
+    companion object {
+        @Volatile var instance: VGApp? = null
+    }
+
     override fun onCreate() {
         super.onCreate()
+        instance = this
         FloatingContactHelper.register(this)
         createNotificationChannel()
     }
