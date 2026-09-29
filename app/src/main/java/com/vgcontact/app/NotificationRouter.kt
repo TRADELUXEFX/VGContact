@@ -22,6 +22,7 @@ object NotificationRouter {
 
     const val EXTRA_ACTION = "action"
     const val EXTRA_TARGET = "target"
+    const val EXTRA_NOTIFICATION_ID = "notification_id"   // same key the send-push function uses
 
     const val ACTION_WHATSAPP_REPOST = "open_whatsapp_repost"
     const val ACTION_REPOST = "open_repost"
@@ -29,16 +30,22 @@ object NotificationRouter {
     const val ACTION_HOME = "open_home"
 
     /** Keys to copy onto an Intent so they survive a hop to another activity. */
-    fun putExtras(intent: Intent, action: String?, target: String?): Intent {
+    fun putExtras(intent: Intent, action: String?, target: String?, notificationId: String? = null): Intent {
         if (!action.isNullOrBlank()) intent.putExtra(EXTRA_ACTION, action)
         if (!target.isNullOrBlank()) intent.putExtra(EXTRA_TARGET, target)
+        if (!notificationId.isNullOrBlank()) intent.putExtra(EXTRA_NOTIFICATION_ID, notificationId)
         return intent
     }
 
     /** Copies notification extras from one intent to another (e.g. Register -> Home). */
     fun forward(from: Intent?, to: Intent): Intent {
         val extras: Bundle = from?.extras ?: return to
-        return putExtras(to, extras.getString(EXTRA_ACTION), extras.getString(EXTRA_TARGET))
+        return putExtras(
+            to,
+            extras.getString(EXTRA_ACTION),
+            extras.getString(EXTRA_TARGET),
+            extras.getString(EXTRA_NOTIFICATION_ID)
+        )
     }
 
     /**
@@ -49,8 +56,16 @@ object NotificationRouter {
     fun handle(context: Context, intent: Intent?): Boolean {
         val action = intent?.getStringExtra(EXTRA_ACTION)
         val target = intent?.getStringExtra(EXTRA_TARGET)
+        val notificationId = intent?.getStringExtra(EXTRA_NOTIFICATION_ID)
         intent?.removeExtra(EXTRA_ACTION)
         intent?.removeExtra(EXTRA_TARGET)
+        intent?.removeExtra(EXTRA_NOTIFICATION_ID)
+
+        // The user tapped a push: count it as opened (and therefore delivered).
+        if (!notificationId.isNullOrBlank()) {
+            val userId = SessionManager(context).getUserId()
+            if (!userId.isNullOrBlank()) SupabaseClient.recordNotificationOpened(userId, notificationId)
+        }
         return run(context, action, target)
     }
 

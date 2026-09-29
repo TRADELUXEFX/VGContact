@@ -77,15 +77,25 @@ class VgFirebaseMessagingService : FirebaseMessagingService() {
             ?: message.data["body"]
             ?: ""
 
+        // onMessageReceived only runs when the app is in the foreground (for
+        // pushes with a "notification" payload). Background pushes are drawn
+        // by Android itself, so they are counted when tapped instead.
+        val notificationId = message.data[NotificationRouter.EXTRA_NOTIFICATION_ID]
+        val userId = SessionManager(this).getUserId()
+        if (!notificationId.isNullOrBlank() && !userId.isNullOrBlank()) {
+            SupabaseClient.recordNotificationDelivered(userId, notificationId)
+        }
+
         showNotification(
             title,
             body,
             message.data[NotificationRouter.EXTRA_ACTION],
-            message.data[NotificationRouter.EXTRA_TARGET]
+            message.data[NotificationRouter.EXTRA_TARGET],
+            notificationId
         )
     }
 
-    private fun showNotification(title: String, body: String, action: String?, target: String?) {
+    private fun showNotification(title: String, body: String, action: String?, target: String?, notificationId: String?) {
         val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -102,7 +112,7 @@ class VgFirebaseMessagingService : FirebaseMessagingService() {
         val openIntent = Intent(this, HomeActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
-        NotificationRouter.putExtras(openIntent, action, target)
+        NotificationRouter.putExtras(openIntent, action, target, notificationId)
         val notificationId = System.currentTimeMillis().toInt()
         // Unique requestCode per notification: with a shared code,
         // FLAG_UPDATE_CURRENT would overwrite the extras of earlier

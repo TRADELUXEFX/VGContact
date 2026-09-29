@@ -335,6 +335,39 @@ object SupabaseClient {
         }
     }
 
+    // ---- Delivery tracking (see add_notification_tracking.sql) ----------
+    // All three are fire-and-forget: a failed receipt must never affect the app.
+
+    private fun fireAndForget(name: String, params: JSONObject) {
+        kotlin.concurrent.thread { rpc(name, params) }
+    }
+
+    // A push arrived while the app was in the foreground.
+    fun recordNotificationDelivered(userId: String, notificationId: String) {
+        fireAndForget("record_notification_delivered", JSONObject().apply {
+            put("p_user_id", userId)
+            put("p_notification_id", notificationId)
+        })
+    }
+
+    // The user tapped a push (this also proves it was delivered).
+    fun recordNotificationOpened(userId: String, notificationId: String) {
+        fireAndForget("record_notification_opened", JSONObject().apply {
+            put("p_user_id", userId)
+            put("p_notification_id", notificationId)
+        })
+    }
+
+    // Whether Android currently lets this app show notifications.
+    fun reportNotificationsEnabled(userId: String, enabled: Boolean, callback: (Boolean) -> Unit) {
+        kotlin.concurrent.thread {
+            callback(rpc("report_notifications_enabled", JSONObject().apply {
+                put("p_user_id", userId)
+                put("p_enabled", enabled)
+            }) != null)
+        }
+    }
+
     // Marks every notification currently visible to this user as read
     // (called when they open the Notifications screen), via the
     // mark_notifications_read RPC.

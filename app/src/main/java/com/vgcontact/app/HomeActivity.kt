@@ -272,6 +272,20 @@ class HomeActivity : AppCompatActivity() {
 
     private val NOTIFICATIONS_REQUEST_CODE = 301
 
+    // Tells the server whether this phone currently allows notifications, so
+    // the reach numbers are real. Only sends when the answer changed since
+    // the last report, so it costs nothing on normal resumes.
+    private fun reportNotificationsEnabledIfChanged(enabled: Boolean) {
+        val userId = sessionManager.getUserId() ?: return
+        val prefs = getSharedPreferences("vgkontact_session", MODE_PRIVATE)
+        val value = if (enabled) 1 else 0
+        if (prefs.getInt("reported_notif_enabled", -1) == value) return
+        // Remember the answer only once the server has it, so a failed call retries next time.
+        SupabaseClient.reportNotificationsEnabled(userId, enabled) { ok ->
+            if (ok) prefs.edit().putInt("reported_notif_enabled", value).apply()
+        }
+    }
+
     // Live check of the permission the app asks for at sign-up
     // (see PermissionsActivity). Runs every time Home comes back on screen,
     // so it goes back to normal as soon as the user fixes it.
@@ -282,6 +296,7 @@ class HomeActivity : AppCompatActivity() {
         val bannerText = findViewById<TextView>(R.id.permissionBannerText)
 
         val notificationsOff = !androidx.core.app.NotificationManagerCompat.from(this).areNotificationsEnabled()
+        reportNotificationsEnabledIfChanged(!notificationsOff)
 
         val missing = mutableListOf<String>()
         if (notificationsOff) missing.add("Notifications")

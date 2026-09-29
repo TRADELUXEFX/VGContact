@@ -200,14 +200,38 @@ Deno.serve(async (req) => {
           }),
         });
         const detail = res.ok ? null : await res.json().catch(() => null);
-        return { ok: res.ok, detail };
+        // FCM says the token is dead (app uninstalled / data cleared / token
+        // expired). Only these two codes mean that; other errors (quota,
+        // bad payload, FCM outage) must NOT wipe a good token.
+        const dead = !res.ok && (
+          detail?.error?.status === "NOT_FOUND" ||
+          (detail?.error?.details ?? []).some(
+            (d: { errorCode?: string }) => d?.errorCode === "UNREGISTERED",
+          )
+        );
+        return { ok: res.ok, detail, dead, token };
       } catch (e) {
-        return { ok: false, detail: String(e) };
+        return { ok: false, detail: String(e), dead: false, token };
       }
     }));
 
     const sent = results.filter((r) => r.ok).length;
     const failed = results.length - sent;
+
+    // Record how this push went, so notification_stats has real numbers.
+    await supabase
+      .from("notifications")
+      .update({ fcm_sent: sent, fcm_failed: failed })
+      .eq("id", notif.id);
+
+    // Clear dead tokens so the next push (and the reach numbers) ignore them.
+    const deadTokens = results.filter((r) => r.dead).map((r) => r.token);
+    if (deadTokens.length > 0) {
+      await supabase
+        .from("users")
+        .update({ fcm_token: null })
+        .in("fcm_token", deadTokens);
+    }
 
     if (sent === 0) {
       // Common cause: fcm_token is stale (app uninstalled, token expired)
