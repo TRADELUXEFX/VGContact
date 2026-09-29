@@ -34,23 +34,53 @@
                     android:fontFamily="@font/poppins_bold"
                     android:includeFontPadding="false"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
+                    android:gravity="center"
+                    android:paddingStart="92dp"
+                    android:paddingEnd="92dp"
+                    android:maxLines="1"
                     android:text="Get Viewers"
                     android:textSize="24sp"
                     android:textColor="@color/white"
-                    android:textAlignment="center" />
+                    app:autoSizeTextType="uniform"
+                    app:autoSizeMinTextSize="16sp"
+                    app:autoSizeMaxTextSize="24sp" />
 
-                <!-- Turns select mode on/off (says Cancel while it's on). -->
+                <!-- Left pill: only while select mode is on. -->
+                <TextView
+                    android:id="@+id/select_all_toggle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_gravity="start|center_vertical"
+                    android:background="@drawable/buy_header_pill"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:text="Select all"
+                    android:fontFamily="@font/poppins_bold"
+                    android:includeFontPadding="false"
+                    android:textSize="13sp"
+                    android:textColor="@color/white"
+                    android:visibility="gone" />
+
+                <!-- Right pill: turns select mode on/off (says Cancel while it's on). -->
                 <TextView
                     android:id="@+id/select_toggle"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
                     android:layout_gravity="end|center_vertical"
-                    android:padding="6dp"
+                    android:background="@drawable/buy_header_pill"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
                     android:text="Select"
                     android:fontFamily="@font/poppins_bold"
                     android:includeFontPadding="false"
-                    android:textSize="14sp"
+                    android:textSize="13sp"
                     android:textColor="@color/white" />
 
             </FrameLayout>

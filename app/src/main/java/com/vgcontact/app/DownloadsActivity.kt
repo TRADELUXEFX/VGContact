@@ -521,6 +521,13 @@ class DownloadsActivity : AppCompatActivity() {
             if (selectMode) exitSelectMode() else enterSelectMode()
         }
         findViewById<android.view.View>(R.id.selection_action).setOnClickListener { startBatch() }
+        // Select all / Clear all (left pill, only visible in select mode).
+        findViewById<TextView>(R.id.select_all_toggle).setOnClickListener {
+            if (batchBusy || spinners.isNotEmpty()) return@setOnClickListener
+            val ids = allGroups.map { it.optString("id") }.filter { it.isNotEmpty() }
+            if (ids.isNotEmpty() && selectedIds.containsAll(ids)) selectedIds.clear() else selectedIds.addAll(ids)
+            refreshSelectionUi()
+        }
     }
 
     private fun enterSelectMode() {
@@ -546,6 +553,11 @@ class DownloadsActivity : AppCompatActivity() {
 
     private fun refreshSelectionUi() {
         findViewById<TextView>(R.id.select_toggle).text = if (selectMode) "Cancel" else "Select"
+        findViewById<TextView>(R.id.select_all_toggle).apply {
+            visibility = if (selectMode) android.view.View.VISIBLE else android.view.View.GONE
+            val ids = allGroups.map { it.optString("id") }.filter { it.isNotEmpty() }
+            text = if (ids.isNotEmpty() && selectedIds.containsAll(ids)) "Clear all" else "Select all"
+        }
         rowsById.forEach { (id, row) ->
             row.check.visibility = if (selectMode) android.view.View.VISIBLE else android.view.View.GONE
             row.check.setImageResource(

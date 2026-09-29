@@ -297,20 +297,144 @@
                     android:textSize="18sp"
                     android:textColor="@color/vg_dark" />
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:lineSpacingExtra="6dp"
-                    android:text="1   Get a key. Repost for free, or buy one for ₦1,000.\n2   Unlock a contact file. 1 key unlocks 1 file.\n3   Download it and save the contacts."
-                    android:textSize="14sp"
-                    android:textColor="@color/text_secondary" />
+                    android:orientation="horizontal"
+                    android:layout_marginTop="14dp">
+
+                    <TextView
+                        android:fontFamily="@font/poppins_bold"
+                        android:includeFontPadding="false"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:background="@drawable/step_number_background"
+                        android:gravity="center"
+                        android:text="1"
+                        android:textSize="14sp"
+                        android:textColor="@color/vg_green_dark" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:fontFamily="@font/poppins_bold"
+                            android:includeFontPadding="false"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Get a key"
+                            android:textSize="15sp"
+                            android:textColor="@color/vg_dark" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:lineSpacingExtra="2dp"
+                            android:text="Repost the admin's status on WhatsApp once a day for a free key, or buy keys for ₦1,000 each."
+                            android:textSize="13sp"
+                            android:textColor="@color/text_secondary" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="14dp">
+
+                    <TextView
+                        android:fontFamily="@font/poppins_bold"
+                        android:includeFontPadding="false"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:background="@drawable/step_number_background"
+                        android:gravity="center"
+                        android:text="2"
+                        android:textSize="14sp"
+                        android:textColor="@color/vg_green_dark" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:fontFamily="@font/poppins_bold"
+                            android:includeFontPadding="false"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Unlock a contact list"
+                            android:textSize="15sp"
+                            android:textColor="@color/vg_dark" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:lineSpacingExtra="2dp"
+                            android:text="1 key unlocks 1 contact list of up to 250 people who can then see your status."
+                            android:textSize="13sp"
+                            android:textColor="@color/text_secondary" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="14dp">
+
+                    <TextView
+                        android:fontFamily="@font/poppins_bold"
+                        android:includeFontPadding="false"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:background="@drawable/step_number_background"
+                        android:gravity="center"
+                        android:text="3"
+                        android:textSize="14sp"
+                        android:textColor="@color/vg_green_dark" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:fontFamily="@font/poppins_bold"
+                            android:includeFontPadding="false"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Save the contacts"
+                            android:textSize="15sp"
+                            android:textColor="@color/vg_dark" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:lineSpacingExtra="2dp"
+                            android:text="Tap Unlock and save. The contacts go into your phone, then post your WhatsApp status to get viewers."
+                            android:textSize="13sp"
+                            android:textColor="@color/text_secondary" />
+                    </LinearLayout>
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Keys are added within 24 hours."
+                    android:layout_marginTop="14dp"
+                    android:lineSpacingExtra="2dp"
+                    android:text="Keys from reposts and purchases are added within 24 hours. Every 10 friends you refer earns you 1 extra key."
                     android:textSize="12sp"
                     android:textColor="@color/text_muted" />
 
