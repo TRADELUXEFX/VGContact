@@ -27,14 +27,9 @@ class CommunityActivity : AppCompatActivity() {
         // Join WhatsApp button
         val joinBtn = findViewById<Button>(R.id.join_whatsapp_btn)
         joinBtn.setOnClickListener {
-            try {
-                val intent = Intent(Intent.ACTION_VIEW)
-                intent.data = Uri.parse("https://chat.whatsapp.com/your-group-link")
-                startActivity(intent)
-            } catch (e: Exception) {
-                Toast.makeText(this, "WhatsApp not installed", Toast.LENGTH_SHORT).show()
-            }
+            CommunityLink.open(this)
         }
+        CommunityLink.refresh(this)
 
         // Chat support button
         val chatBtn = findViewById<Button>(R.id.chat_support_btn)

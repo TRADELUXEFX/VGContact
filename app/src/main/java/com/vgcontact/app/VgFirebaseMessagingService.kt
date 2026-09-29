@@ -35,13 +35,21 @@ class VgFirebaseMessagingService : FirebaseMessagingService() {
          */
         fun flushPendingTokenIfAny(context: Context) {
             val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            val pending = prefs.getString(KEY_PENDING_TOKEN, null) ?: return
             val userId = SessionManager(context).getUserId() ?: return
-            SupabaseClient.saveFcmToken(userId, pending) { success ->
-                if (success) {
-                    prefs.edit().remove(KEY_PENDING_TOKEN).apply()
+            val pending = prefs.getString(KEY_PENDING_TOKEN, null)
+            if (pending != null) {
+                SupabaseClient.saveFcmToken(userId, pending) { success ->
+                    if (success) {
+                        prefs.edit().remove(KEY_PENDING_TOKEN).apply()
+                    }
                 }
+                return
             }
+            // No stashed token (onNewToken hasn't fired): ask FCM for the
+            // current one so a fresh sign-up isn't left without push until
+            // the next cold start.
+            com.google.firebase.messaging.FirebaseMessaging.getInstance().token
+                .addOnSuccessListener { token -> SupabaseClient.saveFcmToken(userId, token) { _ -> } }
         }
     }
 

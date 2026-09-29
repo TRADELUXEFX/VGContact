@@ -316,16 +316,27 @@ class DownloadsActivity : AppCompatActivity() {
 
         val builder = StringBuilder()
         contacts.forEach { (username, phone) ->
+            val name = vcardEscape("$username VGC")
             builder.append("BEGIN:VCARD\r\n")
             builder.append("VERSION:3.0\r\n")
-            builder.append("FN:$username VGC\r\n")
-            builder.append("TEL:$phone\r\n")
+            builder.append("N:;$name;;;\r\n")
+            builder.append("FN:$name\r\n")
+            builder.append("TEL:${phone.filter { it.isDigit() || it == '+' }}\r\n")
             builder.append("END:VCARD\r\n")
         }
 
         vcfFile.writeText(builder.toString())
         return vcfFile
     }
+
+    // Strips control characters (incl. CR/LF, which would let a username
+    // inject extra vCard fields or cards) and escapes vCard 3.0 specials.
+    private fun vcardEscape(value: String): String =
+        value.replace(Regex("[\\p{Cntrl}\\u2028\\u2029]"), " ")
+            .replace("\\", "\\\\")
+            .replace(";", "\\;")
+            .replace(",", "\\,")
+            .trim()
 
     private fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()
 
@@ -449,8 +460,8 @@ class DownloadsActivity : AppCompatActivity() {
     private fun showOutOfKeysDialog() {
         showVgPopup(
             iconRes = R.drawable.ic_unlock,
-            title = "Unlock this file?",
-            message = "You need 1 key to unlock. Repost today for a free key, or buy one for \u20A61,000.",
+            title = "You're out of keys",
+            message = "You need 1 key to unlock. Repost today for a free key, or buy one for \u20A6${BuyKeysActivity.KEY_PRICE_NAIRA}.",
             balanceFrom = null,
             balanceTo = null,
             balanceOnly = 0,

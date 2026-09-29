@@ -91,7 +91,7 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         registerBtn.setOnClickListener {
-            val username = usernameInput.text.toString().trim()
+            val username = usernameInput.text.toString().replace(Regex("[\\p{Cntrl}\\u2028\\u2029]"), " ").trim()
             val phone = PhoneUtils.clean(phoneInput.text.toString())
             val referral = referralInput.text.toString().trim()
 

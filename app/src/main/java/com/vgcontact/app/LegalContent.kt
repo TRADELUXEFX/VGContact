@@ -10,8 +10,8 @@ package com.vgcontact.app
  */
 object LegalContent {
 
-    const val LAST_UPDATED = "Last updated: [DATE]"
-    const val OPERATOR = "[YOUR COMPANY / OWNER NAME]"
+    const val LAST_UPDATED = "Last updated: 29 September 2026"
+    const val OPERATOR = "VGCONTACT"
     const val SUPPORT_CONTACT = "WhatsApp +234 911 032 1143"
 
     val TERMS = """

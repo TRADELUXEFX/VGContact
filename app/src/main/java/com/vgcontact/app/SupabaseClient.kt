@@ -179,42 +179,20 @@ object SupabaseClient {
     // itself (SECURITY DEFINER), so this fails with NOT_UNLOCKED if called
     // for a group this user hasn't paid for.
     fun getGroupContacts(userId: String, groupId: String, callback: (Boolean, List<Pair<String, String>>) -> Unit) {
-        if (!isConfigured()) {
+        val arr = rpc("get_group_contacts", JSONObject().apply {
+            put("p_user_id", userId)
+            put("p_group_id", groupId)
+        })
+        if (arr == null) {
             callback(false, emptyList())
             return
         }
-
-        try {
-            val url = "$supabaseUrl/rest/v1/rpc/get_group_contacts"
-            val body = JSONObject().apply {
-                put("p_user_id", userId)
-                put("p_group_id", groupId)
-            }
-
-            val request = Request.Builder()
-                .url(url)
-                .addHeader("apikey", anonKey)
-                .addHeader("Authorization", "Bearer $anonKey")
-                .addHeader("Content-Type", "application/json")
-                .post(body.toString().toRequestBody("application/json".toMediaType()))
-                .build()
-
-            client.newCall(request).execute().use { response ->
-                if (response.isSuccessful) {
-                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
-                    val contacts = mutableListOf<Pair<String, String>>()
-                    for (i in 0 until arr.length()) {
-                        val row = arr.getJSONObject(i)
-                        contacts.add(row.optString("username") to row.optString("phone"))
-                    }
-                    callback(true, contacts)
-                } else {
-                    callback(false, emptyList())
-                }
-            }
-        } catch (e: Exception) {
-            callback(false, emptyList())
+        val contacts = mutableListOf<Pair<String, String>>()
+        for (i in 0 until arr.length()) {
+            val row = arr.getJSONObject(i)
+            contacts.add(row.optString("username") to row.optString("phone"))
         }
+        callback(true, contacts)
     }
 
     // Current key balance. New users start with 3 (set server-side); this
@@ -238,40 +216,14 @@ object SupabaseClient {
     //
     // message is one of: "OK", "ALREADY_REPOSTED_TODAY", or a raw error.
     fun submitDailyRepost(userId: String, callback: (Boolean, String) -> Unit) {
-        if (!isConfigured()) {
-            callback(false, "NOT_CONFIGURED")
-            return
-        }
-
-        try {
-            val url = "$supabaseUrl/rest/v1/rpc/submit_daily_repost"
-            val body = JSONObject().apply {
-                put("p_user_id", userId)
+        val arr = rpc("submit_daily_repost", JSONObject().apply { put("p_user_id", userId) })
+        when {
+            arr == null -> callback(false, if (!isConfigured()) "NOT_CONFIGURED" else "REQUEST_FAILED")
+            arr.length() == 0 -> callback(false, "EMPTY_RESPONSE")
+            else -> {
+                val row = arr.getJSONObject(0)
+                callback(row.optBoolean("success", false), row.optString("message", "OK"))
             }
-
-            val request = Request.Builder()
-                .url(url)
-                .addHeader("apikey", anonKey)
-                .addHeader("Authorization", "Bearer $anonKey")
-                .addHeader("Content-Type", "application/json")
-                .post(body.toString().toRequestBody("application/json".toMediaType()))
-                .build()
-
-            client.newCall(request).execute().use { response ->
-                if (response.isSuccessful) {
-                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
-                    if (arr.length() > 0) {
-                        val row = arr.getJSONObject(0)
-                        callback(row.optBoolean("success", false), row.optString("message", "OK"))
-                    } else {
-                        callback(false, "EMPTY_RESPONSE")
-                    }
-                } else {
-                    callback(false, "REQUEST_FAILED")
-                }
-            }
-        } catch (e: Exception) {
-            callback(false, "EXCEPTION")
         }
     }
 
@@ -282,46 +234,11 @@ object SupabaseClient {
     // message is one of: "OK", "NO_KEYS", "ALREADY_UNLOCKED",
     // "GROUP_NOT_FULL", "GROUP_NOT_FOUND", "USER_NOT_FOUND", or a raw error.
     fun spendKeyToUnlockGroup(userId: String, groupId: String, callback: (Boolean, String, Int) -> Unit) {
-        if (!isConfigured()) {
-            callback(false, "NOT_CONFIGURED", 0)
-            return
-        }
-
-        try {
-            val url = "$supabaseUrl/rest/v1/rpc/spend_key_unlock_group"
-            val body = JSONObject().apply {
-                put("p_user_id", userId)
-                put("p_group_id", groupId)
-            }
-
-            val request = Request.Builder()
-                .url(url)
-                .addHeader("apikey", anonKey)
-                .addHeader("Authorization", "Bearer $anonKey")
-                .addHeader("Content-Type", "application/json")
-                .post(body.toString().toRequestBody("application/json".toMediaType()))
-                .build()
-
-            client.newCall(request).execute().use { response ->
-                if (response.isSuccessful) {
-                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
-                    if (arr.length() > 0) {
-                        val row = arr.getJSONObject(0)
-                        callback(
-                            row.optBoolean("success", false),
-                            row.optString("message", "OK"),
-                            row.optInt("remaining_keys", 0)
-                        )
-                    } else {
-                        callback(false, "EMPTY_RESPONSE", 0)
-                    }
-                } else {
-                    callback(false, "REQUEST_FAILED", 0)
-                }
-            }
-        } catch (e: Exception) {
-            callback(false, "EXCEPTION", 0)
-        }
+        val arr = rpc("spend_key_unlock_group", JSONObject().apply {
+            put("p_user_id", userId)
+            put("p_group_id", groupId)
+        })
+        deliverSpendResult(arr, callback)
     }
 
     // Unlocks several groups at once, all or nothing, via the
@@ -330,45 +247,25 @@ object SupabaseClient {
     // "GROUP_NOT_FULL", "USER_NOT_FOUND", or "REQUEST_FAILED" / "EXCEPTION"
     // (e.g. the SQL hasn't been added to Supabase yet).
     fun spendKeysToUnlockGroups(userId: String, groupIds: List<String>, callback: (Boolean, String, Int) -> Unit) {
-        if (!isConfigured()) {
-            callback(false, "NOT_CONFIGURED", 0)
-            return
-        }
+        val arr = rpc("spend_keys_unlock_groups", JSONObject().apply {
+            put("p_user_id", userId)
+            put("p_group_ids", org.json.JSONArray(groupIds))
+        })
+        deliverSpendResult(arr, callback)
+    }
 
-        try {
-            val url = "$supabaseUrl/rest/v1/rpc/spend_keys_unlock_groups"
-            val body = JSONObject().apply {
-                put("p_user_id", userId)
-                put("p_group_ids", org.json.JSONArray(groupIds))
+    private fun deliverSpendResult(arr: org.json.JSONArray?, callback: (Boolean, String, Int) -> Unit) {
+        when {
+            arr == null -> callback(false, if (!isConfigured()) "NOT_CONFIGURED" else "REQUEST_FAILED", 0)
+            arr.length() == 0 -> callback(false, "EMPTY_RESPONSE", 0)
+            else -> {
+                val row = arr.getJSONObject(0)
+                callback(
+                    row.optBoolean("success", false),
+                    row.optString("message", "OK"),
+                    row.optInt("remaining_keys", 0)
+                )
             }
-
-            val request = Request.Builder()
-                .url(url)
-                .addHeader("apikey", anonKey)
-                .addHeader("Authorization", "Bearer $anonKey")
-                .addHeader("Content-Type", "application/json")
-                .post(body.toString().toRequestBody("application/json".toMediaType()))
-                .build()
-
-            client.newCall(request).execute().use { response ->
-                if (response.isSuccessful) {
-                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
-                    if (arr.length() > 0) {
-                        val row = arr.getJSONObject(0)
-                        callback(
-                            row.optBoolean("success", false),
-                            row.optString("message", "OK"),
-                            row.optInt("remaining_keys", 0)
-                        )
-                    } else {
-                        callback(false, "EMPTY_RESPONSE", 0)
-                    }
-                } else {
-                    callback(false, "REQUEST_FAILED", 0)
-                }
-            }
-        } catch (e: Exception) {
-            callback(false, "EXCEPTION", 0)
         }
     }
 
@@ -400,51 +297,27 @@ object SupabaseClient {
     // fetch_notifications RPC (SECURITY DEFINER - direct table reads are
     // blocked by RLS, see notifications_schema.sql).
     fun fetchNotifications(userId: String, callback: (Boolean, List<AppNotification>) -> Unit) {
-        if (!isConfigured()) {
+        val arr = rpc("fetch_notifications", JSONObject().apply { put("p_user_id", userId) })
+        if (arr == null) {
             callback(false, emptyList())
             return
         }
-
-        try {
-            val url = "$supabaseUrl/rest/v1/rpc/fetch_notifications"
-            val body = JSONObject().apply {
-                put("p_user_id", userId)
-            }
-
-            val request = Request.Builder()
-                .url(url)
-                .addHeader("apikey", anonKey)
-                .addHeader("Authorization", "Bearer $anonKey")
-                .addHeader("Content-Type", "application/json")
-                .post(body.toString().toRequestBody("application/json".toMediaType()))
-                .build()
-
-            client.newCall(request).execute().use { response ->
-                if (response.isSuccessful) {
-                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
-                    val notifications = mutableListOf<AppNotification>()
-                    for (i in 0 until arr.length()) {
-                        val row = arr.getJSONObject(i)
-                        notifications.add(
-                            AppNotification(
-                                id = row.optString("id"),
-                                title = row.optString("title"),
-                                body = row.optString("body"),
-                                createdAt = row.optString("created_at"),
-                                isRead = row.optBoolean("is_read", false),
-                                action = row.optString("action", "").ifBlank { null },
-                                target = row.optString("target", "").ifBlank { null }
-                            )
-                        )
-                    }
-                    callback(true, notifications)
-                } else {
-                    callback(false, emptyList())
-                }
-            }
-        } catch (e: Exception) {
-            callback(false, emptyList())
+        val notifications = mutableListOf<AppNotification>()
+        for (i in 0 until arr.length()) {
+            val row = arr.getJSONObject(i)
+            notifications.add(
+                AppNotification(
+                    id = row.optString("id"),
+                    title = row.optString("title"),
+                    body = row.optString("body"),
+                    createdAt = row.optString("created_at"),
+                    isRead = row.optBoolean("is_read", false),
+                    action = row.optString("action", "").ifBlank { null },
+                    target = row.optString("target", "").ifBlank { null }
+                )
+            )
         }
+        callback(true, notifications)
     }
 
     // Saves this device's current FCM token onto the user's row so the
@@ -466,31 +339,7 @@ object SupabaseClient {
     // (called when they open the Notifications screen), via the
     // mark_notifications_read RPC.
     fun markNotificationsRead(userId: String, callback: (Boolean) -> Unit) {
-        if (!isConfigured()) {
-            callback(false)
-            return
-        }
-
-        try {
-            val url = "$supabaseUrl/rest/v1/rpc/mark_notifications_read"
-            val body = JSONObject().apply {
-                put("p_user_id", userId)
-            }
-
-            val request = Request.Builder()
-                .url(url)
-                .addHeader("apikey", anonKey)
-                .addHeader("Authorization", "Bearer $anonKey")
-                .addHeader("Content-Type", "application/json")
-                .post(body.toString().toRequestBody("application/json".toMediaType()))
-                .build()
-
-            client.newCall(request).execute().use { response ->
-                callback(response.isSuccessful)
-            }
-        } catch (e: Exception) {
-            callback(false)
-        }
+        callback(rpc("mark_notifications_read", JSONObject().apply { put("p_user_id", userId) }) != null)
     }
 
     // One row of the leaderboard. rank is shared on ties (1, 2, 2, 4).
@@ -515,52 +364,30 @@ object SupabaseClient {
         limit: Int,
         callback: (Boolean, List<LeaderboardEntry>) -> Unit
     ) {
-        if (!isConfigured()) {
+        val arr = rpc("get_leaderboard", JSONObject().apply {
+            put("p_user_id", userId)
+            put("p_metric", metric)
+            put("p_period", period)
+            put("p_limit", limit)
+        })
+        if (arr == null) {
             callback(false, emptyList())
             return
         }
-
-        try {
-            val url = "$supabaseUrl/rest/v1/rpc/get_leaderboard"
-            val body = JSONObject().apply {
-                put("p_user_id", userId)
-                put("p_metric", metric)
-                put("p_period", period)
-                put("p_limit", limit)
-            }
-
-            val request = Request.Builder()
-                .url(url)
-                .addHeader("apikey", anonKey)
-                .addHeader("Authorization", "Bearer $anonKey")
-                .addHeader("Content-Type", "application/json")
-                .post(body.toString().toRequestBody("application/json".toMediaType()))
-                .build()
-
-            client.newCall(request).execute().use { response ->
-                if (response.isSuccessful) {
-                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
-                    val entries = mutableListOf<LeaderboardEntry>()
-                    for (i in 0 until arr.length()) {
-                        val row = arr.getJSONObject(i)
-                        entries.add(
-                            LeaderboardEntry(
-                                rank = row.optInt("rank", 0),
-                                userId = row.optString("user_id"),
-                                username = row.optString("username"),
-                                score = row.optInt("score", 0),
-                                isMe = row.optBoolean("is_me", false)
-                            )
-                        )
-                    }
-                    callback(true, entries)
-                } else {
-                    callback(false, emptyList())
-                }
-            }
-        } catch (e: Exception) {
-            callback(false, emptyList())
+        val entries = mutableListOf<LeaderboardEntry>()
+        for (i in 0 until arr.length()) {
+            val row = arr.getJSONObject(i)
+            entries.add(
+                LeaderboardEntry(
+                    rank = row.optInt("rank", 0),
+                    userId = row.optString("user_id"),
+                    username = row.optString("username"),
+                    score = row.optInt("score", 0),
+                    isMe = row.optBoolean("is_me", false)
+                )
+            )
         }
+        callback(true, entries)
     }
 
     // Referral milestones: every 10 referrals = 1 key. The claim_referral_keys
@@ -568,38 +395,23 @@ object SupabaseClient {
     // paid (safe to call repeatedly - it never pays the same key twice) and
     // returns (referrals, keys_earned, keys_added). Run off the UI thread.
     fun claimReferralKeys(userId: String, callback: (Boolean, Int, Int) -> Unit) {
-        if (!isConfigured() || userId.isBlank()) {
+        if (userId.isBlank()) {
             callback(false, 0, 0)
             return
         }
-
-        try {
-            val url = "$supabaseUrl/rest/v1/rpc/claim_referral_keys"
-            val body = JSONObject().apply { put("p_user_id", userId) }
-            val request = Request.Builder()
-                .url(url)
-                .addHeader("apikey", anonKey)
-                .addHeader("Authorization", "Bearer $anonKey")
-                .addHeader("Content-Type", "application/json")
-                .post(body.toString().toRequestBody("application/json".toMediaType()))
-                .build()
-
-            client.newCall(request).execute().use { response ->
-                if (response.isSuccessful) {
-                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
-                    if (arr.length() > 0) {
-                        val row = arr.getJSONObject(0)
-                        callback(true, row.optInt("referrals", 0), row.optInt("keys_added", 0))
-                    } else {
-                        callback(false, 0, 0)
-                    }
-                } else {
-                    callback(false, 0, 0)
-                }
-            }
-        } catch (e: Exception) {
+        val arr = rpc("claim_referral_keys", JSONObject().apply { put("p_user_id", userId) })
+        if (arr == null || arr.length() == 0) {
             callback(false, 0, 0)
+            return
         }
+        val row = arr.getJSONObject(0)
+        callback(true, row.optInt("referrals", 0), row.optInt("keys_added", 0))
+    }
+
+    // One value from the app_settings table (null if missing / offline).
+    fun fetchSetting(key: String, callback: (String?) -> Unit) {
+        val arr = rpc("get_app_setting", JSONObject().apply { put("p_key", key) })
+        callback(if (arr != null && arr.length() > 0) arr.getJSONObject(0).optString("value").ifBlank { null } else null)
     }
 
     // Date registered + referred by for accounts that logged in before

@@ -85,15 +85,9 @@ class HomeActivity : AppCompatActivity() {
         // Community button
         val joinBtn = findViewById<Button>(R.id.join_community_btn)
         joinBtn.setOnClickListener {
-            // Open WhatsApp group link
-            try {
-                val intent = Intent(Intent.ACTION_VIEW)
-                intent.data = Uri.parse("https://chat.whatsapp.com/your-group-link")
-                startActivity(intent)
-            } catch (e: Exception) {
-                Toast.makeText(this, "WhatsApp not installed", Toast.LENGTH_SHORT).show()
-            }
+            CommunityLink.open(this)
         }
+        CommunityLink.refresh(this)
 
         // First-time intro card: shown once, then never again.
         val tips = getSharedPreferences("vg_tips", MODE_PRIVATE)

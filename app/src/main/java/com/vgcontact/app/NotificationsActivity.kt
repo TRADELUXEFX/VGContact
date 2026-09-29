@@ -98,18 +98,20 @@ class NotificationsActivity : AppCompatActivity() {
     // string if parsing fails rather than crashing the screen over it.
     private fun formatRelativeTime(isoTimestamp: String): String {
         return try {
-            val instant = java.time.Instant.parse(
-                if (isoTimestamp.contains("+") || isoTimestamp.endsWith("Z")) isoTimestamp
-                else "${isoTimestamp}Z"
-            )
-            val minutes = java.time.Duration.between(instant, java.time.Instant.now()).toMinutes()
+            // Normalise to "yyyy-MM-ddTHH:mm:ss+00:00": drop fractional
+            // seconds, turn Z into +00:00, assume UTC if no offset.
+            var ts = isoTimestamp.replace(Regex("\\.\\d+"), "").replace("Z", "+00:00")
+            if (!Regex("[+-]\\d{2}:\\d{2}$").containsMatchIn(ts)) ts += "+00:00"
+            val parsed = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", java.util.Locale.US).parse(ts)
+                ?: return isoTimestamp
+            val minutes = (System.currentTimeMillis() - parsed.time) / 60000
             when {
                 minutes < 1 -> "Just now"
                 minutes < 60 -> "$minutes min ago"
                 minutes < 1440 -> "${minutes / 60}h ago"
                 else -> "${minutes / 1440}d ago"
             }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             isoTimestamp
         }
     }

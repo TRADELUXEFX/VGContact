@@ -35,7 +35,8 @@ class BuyKeysActivity : AppCompatActivity() {
         // 09110321143 in international format (Nigeria +234, no leading 0).
         const val SUPPORT_WHATSAPP = "2349110321143"
         // Pack size -> price in naira (10 keys is discounted).
-        private val PACK_PRICES = mapOf(1 to 1000, 5 to 5000, 10 to 8000)
+        const val KEY_PRICE_NAIRA = 1000
+        private val PACK_PRICES = mapOf(1 to KEY_PRICE_NAIRA, 5 to 5000, 10 to 8000)
         // Each key unlocks this many status viewers; a pack is keys * this.
         private const val VIEWERS_PER_KEY = 250
         // Never leave the user on a spinner if the network stalls.
@@ -109,7 +110,7 @@ class BuyKeysActivity : AppCompatActivity() {
         try {
             val intent = Intent(Intent.ACTION_VIEW)
             val username = sessionManager.getUsername()
-            val total = String.format(java.util.Locale.US, "%,d", (PACK_PRICES[selectedKeys] ?: (selectedKeys * 1000)))
+            val total = String.format(java.util.Locale.US, "%,d", (PACK_PRICES[selectedKeys] ?: (selectedKeys * KEY_PRICE_NAIRA)))
             val message = "Hi, I'd like to buy $selectedKeys VGContact " +
                 (if (selectedKeys == 1) "key" else "keys") + " (₦$total)." +
                 if (username.isNullOrBlank()) "" else " My username is $username."
