@@ -47,11 +47,6 @@ class RegisterActivity : AppCompatActivity() {
         // the splash color.
         setTheme(R.style.Theme_VGContact)
         super.onCreate(savedInstanceState)
-        if (BanPrefs.isBanned(this)) {
-            BannedHandler.launch(this)
-            finish()
-            return
-        }
         setContentView(R.layout.activity_register)
 
         sessionManager = SessionManager(this)

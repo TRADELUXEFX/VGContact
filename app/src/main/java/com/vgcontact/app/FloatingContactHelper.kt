@@ -46,7 +46,8 @@ object FloatingContactHelper {
         ChatSupportActivity::class.java,
         BuyKeysActivity::class.java,
         ReferralActivity::class.java,
-        NotificationsActivity::class.java
+        NotificationsActivity::class.java,
+        BannedActivity::class.java
     )
 
     /**
