@@ -60,6 +60,7 @@ object SupabaseClient {
                 if (response.isSuccessful) {
                     org.json.JSONArray(if (body.isBlank()) "[]" else body)
                 } else {
+                    if (body.contains("ACCOUNT_BANNED")) BannedHandler.trigger()
                     lastError = "HTTP ${response.code}: " + body.take(160)
                     null
                 }
