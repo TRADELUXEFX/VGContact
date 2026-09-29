@@ -30,6 +30,10 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (BanPrefs.isBanned(this)) {
+            BannedHandler.showFrom(this)
+            return
+        }
         setContentView(R.layout.activity_home)
 
         sessionManager = SessionManager(this)
@@ -257,14 +261,19 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        // Known ban: straight to the banned screen before anything else is drawn.
+        if (BanPrefs.isBanned(this)) {
+            BannedHandler.showFrom(this)
+            return
+        }
         // Covers coming back from the Keys screen (a repost just got
         // verified, or a key was just spent unlocking a file) so the
         // dashboard balance doesn't go stale.
         val keyBalanceText = findViewById<TextView>(R.id.home_key_balance_text)
         refreshKeyBalance(keyBalanceText)
         updatePermissionBadge()
-        // Ask the server if this account is banned; if so, show the banned screen.
-        BannedHandler.checkFromHome(this)
+        // Ask the server too, so a new ban (or a lifted one) is noticed.
+        BannedHandler.checkWithServer(this)
     }
 
     private val NOTIFICATIONS_REQUEST_CODE = 301

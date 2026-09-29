@@ -27,6 +27,10 @@ class SplashActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (BanPrefs.isBanned(this)) {
+            BannedHandler.showFrom(this)
+            return
+        }
         setContentView(R.layout.activity_splash)
 
         val sessionManager = SessionManager(this)

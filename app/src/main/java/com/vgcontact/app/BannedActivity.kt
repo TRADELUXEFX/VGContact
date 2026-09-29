@@ -1,6 +1,7 @@
 package com.vgcontact.app
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -13,32 +14,55 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 
 /**
- * The server is the only source of truth: it refuses banned users, and
- * get_ban_status tells the app who is banned. Nothing is saved on the phone.
+ * Remembers "this account is banned" on the phone so the banned screen shows
+ * instantly (also offline). Kept separate from the session, so signing out
+ * does not erase it. Only a definite "not banned" answer from the server
+ * clears it.
  */
+object BanPrefs {
+    private fun p(c: Context) = c.applicationContext.getSharedPreferences("vg_ban", Context.MODE_PRIVATE)
+    fun isBanned(c: Context) = p(c).getBoolean("banned", false)
+    fun phone(c: Context): String? = p(c).getString("phone", null)?.ifBlank { null }
+    fun reason(c: Context): String? = p(c).getString("reason", null)?.ifBlank { null }
+    fun set(c: Context, phone: String?, reason: String?) {
+        p(c).edit().putBoolean("banned", true)
+            .putString("phone", phone ?: phone(c) ?: "")
+            .putString("reason", reason ?: reason(c) ?: "").apply()
+    }
+    fun clear(c: Context) = p(c).edit().clear().apply()
+}
+
 object BannedHandler {
     @Volatile private var showing = false
 
-    private fun intentFor(ctx: android.content.Context, phone: String?, reason: String?) =
-        Intent(ctx, BannedActivity::class.java)
-            .putExtra(BannedActivity.EXTRA_PHONE, phone)
-            .putExtra(BannedActivity.EXTRA_REASON, reason)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+    private fun intentFor(ctx: Context) = Intent(ctx, BannedActivity::class.java)
+        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
 
-    /** A server call was refused with ACCOUNT_BANNED (login, sign-up, keys...). Any thread. */
-    fun trigger(phone: String?) {
-        val app = VGApp.instance ?: return
-        if (showing) return
+    /** Replace the screen the user is on with the banned screen (fade, no back-stack). */
+    fun showFrom(a: Activity) {
+        if (showing || a is BannedActivity) return
         showing = true
         try {
-            app.startActivity(intentFor(app, phone ?: SessionManager(app).getPhone(), null))
+            a.startActivity(intentFor(a))
+            @Suppress("DEPRECATION")
+            a.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+            a.finish()
         } catch (e: Exception) {
             showing = false
         }
     }
 
-    /** Home asks the server; if banned, replace Home with the banned screen. */
-    fun checkFromHome(a: Activity) {
+    /** A server call was refused with ACCOUNT_BANNED (login, sign-up, keys...). Any thread. */
+    fun trigger(phone: String?) {
+        val app = VGApp.instance ?: return
+        BanPrefs.set(app, phone ?: SessionManager(app).getPhone(), null)
+        if (showing) return
+        showing = true
+        try { app.startActivity(intentFor(app)) } catch (e: Exception) { showing = false }
+    }
+
+    /** Ask the server (in the background) whether this signed-in account is banned. */
+    fun checkWithServer(a: Activity) {
         val app = a.applicationContext
         val sm = SessionManager(app)
         val userId = sm.getUserId() ?: return
@@ -46,15 +70,8 @@ object BannedHandler {
             try {
                 SupabaseClient.getBanStatus(userId, sm.getPhone(), androidId(app)) { banned, reason ->
                     if (banned == true) {
-                        a.runOnUiThread {
-                            if (!a.isFinishing && !showing) {
-                                showing = true
-                                a.startActivity(intentFor(a, sm.getPhone(), reason))
-                                @Suppress("DEPRECATION")
-                                a.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-                                a.finish()
-                            }
-                        }
+                        BanPrefs.set(app, sm.getPhone(), reason)
+                        a.runOnUiThread { if (!a.isFinishing) showFrom(a) }
                     }
                 }
             } catch (t: Throwable) { /* a failed check must never crash the app */ }
@@ -63,17 +80,12 @@ object BannedHandler {
 
     fun closed() { showing = false }
 
-    fun androidId(c: android.content.Context): String =
+    fun androidId(c: Context): String =
         Settings.Secure.getString(c.contentResolver, Settings.Secure.ANDROID_ID) ?: ""
 }
 
 /** Full-screen "Banned" page: account number, reason, what it means, WhatsApp appeal. */
 class BannedActivity : AppCompatActivity() {
-
-    companion object {
-        const val EXTRA_PHONE = "phone"
-        const val EXTRA_REASON = "reason"
-    }
 
     private var accountNumber: String? = null
 
@@ -82,12 +94,12 @@ class BannedActivity : AppCompatActivity() {
         setContentView(R.layout.activity_banned)
         window.statusBarColor = ContextCompat.getColor(this, R.color.vg_red)
 
-        accountNumber = intent.getStringExtra(EXTRA_PHONE)?.ifBlank { null } ?: SessionManager(this).getPhone()
+        accountNumber = BanPrefs.phone(this) ?: SessionManager(this).getPhone()
         accountNumber?.takeIf { it.isNotBlank() }?.let {
             findViewById<TextView>(R.id.bannedNumberText).text = it
             findViewById<View>(R.id.bannedAccountSection).visibility = View.VISIBLE
         }
-        showReason(intent.getStringExtra(EXTRA_REASON))
+        showReason(BanPrefs.reason(this))
         findViewById<Button>(R.id.contactCareButton).setOnClickListener { openWhatsApp() }
     }
 
@@ -100,8 +112,8 @@ class BannedActivity : AppCompatActivity() {
         }
     }
 
-    // Every time this screen comes back into view: refresh the reason, and if
-    // the ban was lifted, go back into the app.
+    // Every time this screen comes into view: refresh the reason, and if the
+    // ban was lifted, clear the saved flag and go back into the app.
     override fun onResume() {
         super.onResume()
         val app = applicationContext
@@ -109,17 +121,19 @@ class BannedActivity : AppCompatActivity() {
         Thread {
             try {
                 SupabaseClient.getBanStatus(sm.getUserId(), accountNumber, BannedHandler.androidId(app)) { banned, reason ->
-                    runOnUiThread {
-                        if (isFinishing) return@runOnUiThread
-                        if (banned == false) {
+                    if (banned == false) {
+                        BanPrefs.clear(app)
+                        runOnUiThread {
+                            if (isFinishing) return@runOnUiThread
                             val dest = if (sm.isLoggedIn()) HomeActivity::class.java else RegisterActivity::class.java
                             startActivity(Intent(this, dest).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK))
                             @Suppress("DEPRECATION")
                             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
                             finish()
-                        } else if (banned == true && reason != null) {
-                            showReason(reason)
                         }
+                    } else if (banned == true && reason != null) {
+                        BanPrefs.set(app, accountNumber, reason)
+                        runOnUiThread { if (!isFinishing) showReason(reason) }
                     }
                 }
             } catch (t: Throwable) { /* keep the screen as it is */ }
