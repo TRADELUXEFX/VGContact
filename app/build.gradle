@@ -10,6 +10,8 @@ if (localPropsFile.exists()) {
     localProps.load(new FileInputStream(localPropsFile))
 }
 
+def releaseKsPath = System.getenv('KEYSTORE_FILE')
+def hasReleaseKs = releaseKsPath && new File(releaseKsPath).exists()
 def supabaseUrl = localProps.getProperty('SUPABASE_URL') ?: System.getenv('SUPABASE_URL') ?: ''
 def supabaseAnonKey = localProps.getProperty('SUPABASE_ANON_KEY') ?: System.getenv('SUPABASE_ANON_KEY') ?: ''
 
@@ -21,7 +23,7 @@ android {
         applicationId "com.vgcontact.app"
         minSdk 24
         targetSdk 34
-        versionCode 32
+        versionCode 33
         versionName "1.0.${System.getenv('GITHUB_RUN_NUMBER') ?: '0'}"
 
         buildConfigField "String", "SUPABASE_URL", "\"${supabaseUrl}\""
@@ -35,6 +37,14 @@ android {
             keyAlias "vgkontactdebugkey"
             keyPassword "vgkontactdebug"
         }
+        release {
+            if (hasReleaseKs) {
+                storeFile new File(releaseKsPath)
+                storePassword System.getenv('KEYSTORE_PASSWORD')
+                keyAlias System.getenv('KEY_ALIAS')
+                keyPassword System.getenv('KEY_PASSWORD')
+            }
+        }
     }
 
     buildTypes {
@@ -42,6 +52,9 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
+            // Falls back to the debug key if the release secrets aren't set,
+            // so the build never breaks.
+            signingConfig hasReleaseKs ? signingConfigs.release : signingConfigs.debug
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
