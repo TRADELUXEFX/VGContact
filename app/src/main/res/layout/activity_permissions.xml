@@ -35,7 +35,7 @@
                 android:letterSpacing="0.08"
                 android:textColor="@color/white"
                 android:alpha="0.85"
-                tools:text="STEP 1 OF 2" />
+                tools:text="STEP 1 OF 1" />
 
             <TextView
                 android:fontFamily="@font/poppins_bold"

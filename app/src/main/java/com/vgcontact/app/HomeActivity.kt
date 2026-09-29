@@ -272,7 +272,7 @@ class HomeActivity : AppCompatActivity() {
 
     private val NOTIFICATIONS_REQUEST_CODE = 301
 
-    // Live check of the two permissions the app asks for at sign-up
+    // Live check of the permission the app asks for at sign-up
     // (see PermissionsActivity). Runs every time Home comes back on screen,
     // so it goes back to normal as soon as the user fixes it.
     private fun updatePermissionBadge() {
@@ -282,12 +282,9 @@ class HomeActivity : AppCompatActivity() {
         val bannerText = findViewById<TextView>(R.id.permissionBannerText)
 
         val notificationsOff = !androidx.core.app.NotificationManagerCompat.from(this).areNotificationsEnabled()
-        val pm = getSystemService(android.content.Context.POWER_SERVICE) as android.os.PowerManager
-        val batteryOff = !pm.isIgnoringBatteryOptimizations(packageName)
 
         val missing = mutableListOf<String>()
         if (notificationsOff) missing.add("Notifications")
-        if (batteryOff) missing.add("Background activity")
         missingPermissions = missing
 
         if (missing.isEmpty()) {
@@ -297,11 +294,7 @@ class HomeActivity : AppCompatActivity() {
         } else {
             badge.setBackgroundResource(R.drawable.permission_badge_missing_background)
             badgeText.text = "UNVERIFIED"
-            bannerText.text = when {
-                notificationsOff && batteryOff -> "Permissions are off - alerts may not reach you"
-                notificationsOff -> "Notifications are off - you won't get repost or key alerts"
-                else -> "Background activity is off - alerts may arrive late"
-            }
+            bannerText.text = "Notifications are off - you won't get repost or key alerts"
             banner.visibility = android.view.View.VISIBLE
         }
         badge.isClickable = missing.isNotEmpty()
@@ -311,8 +304,6 @@ class HomeActivity : AppCompatActivity() {
     //  - Notifications off: the system "Allow / Don't allow" prompt (Android 13+).
     //    If Android will no longer show it, or on older Android, the app's
     //    notification settings open instead.
-    //  - Background activity off: the system battery-optimization prompt.
-    // Notifications are handled first; once they are on, tap FIX again for the rest.
     private fun fixPermissions() {
         if ("Notifications" in missingPermissions) {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU &&
@@ -328,8 +319,6 @@ class HomeActivity : AppCompatActivity() {
             } else {
                 openNotificationSettings()
             }
-        } else if ("Background activity" in missingPermissions) {
-            requestBatteryExemption()
         }
     }
 
@@ -359,21 +348,6 @@ class HomeActivity : AppCompatActivity() {
             startActivity(intent)
         } catch (e: Exception) {
             Toast.makeText(this, "Couldn't open Settings", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun requestBatteryExemption() {
-        try {
-            startActivity(
-                Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
-                    .setData(Uri.parse("package:$packageName"))
-            )
-        } catch (e: Exception) {
-            try {
-                startActivity(Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
-            } catch (e2: Exception) {
-                Toast.makeText(this, "Couldn't open Settings", Toast.LENGTH_SHORT).show()
-            }
         }
     }
 

@@ -184,6 +184,9 @@ Deno.serve(async (req) => {
             message: {
               token,
               notification: { title: notif.title, body: notif.body },
+              // Explicit high priority so Android delivers immediately,
+              // including while the phone is in Doze mode.
+              android: { priority: "HIGH" },
               // Tap routing. FCM data values must all be strings. The app
               // reads these in VgFirebaseMessagingService (foreground) and
               // HomeActivity (background/killed - Firebase puts them in the
