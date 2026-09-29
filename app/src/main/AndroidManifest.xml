@@ -35,6 +35,12 @@
             </intent-filter>
         </activity>
 
+        <!-- Shown when the server says the account is banned. -->
+        <activity
+            android:name=".BannedActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
         <!-- Login: only reached via the "Already have an account?" link -->
         <activity
             android:name=".LoginActivity"
