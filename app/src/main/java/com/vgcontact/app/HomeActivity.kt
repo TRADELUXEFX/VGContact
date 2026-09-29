@@ -34,6 +34,12 @@ class HomeActivity : AppCompatActivity() {
 
         sessionManager = SessionManager(this)
 
+        if (BanPrefs.isBanned(this)) {
+            BannedHandler.launch(this)
+            finish()
+            return
+        }
+
         // Check login
         if (!sessionManager.isLoggedIn()) {
             startActivity(Intent(this, RegisterActivity::class.java))
@@ -263,6 +269,8 @@ class HomeActivity : AppCompatActivity() {
         val keyBalanceText = findViewById<TextView>(R.id.home_key_balance_text)
         refreshKeyBalance(keyBalanceText)
         updatePermissionBadge()
+        // Ask the server if this account was banned since the last visit.
+        BannedHandler.verifyInBackground(this)
     }
 
     private val NOTIFICATIONS_REQUEST_CODE = 301

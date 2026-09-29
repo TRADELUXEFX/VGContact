@@ -60,7 +60,9 @@ object SupabaseClient {
                 if (response.isSuccessful) {
                     org.json.JSONArray(if (body.isBlank()) "[]" else body)
                 } else {
-                    if (body.contains("ACCOUNT_BANNED")) BannedHandler.trigger()
+                    if (body.contains("ACCOUNT_BANNED")) {
+                        BannedHandler.trigger(if (params.isNull("p_phone")) null else params.optString("p_phone").ifBlank { null })
+                    }
                     lastError = "HTTP ${response.code}: " + body.take(160)
                     null
                 }
@@ -115,6 +117,20 @@ object SupabaseClient {
         val exists = row.optBoolean("account_exists", false)
         val matches = row.optBoolean("device_matches", false)
         callback(exists, matches, if (exists && matches) row else null)
+    }
+
+    // Is this account / phone / device banned? Never errors on a ban itself:
+    // callback(null, null) means "couldn't tell" (offline / server error).
+    fun getBanStatus(userId: String?, phone: String?, androidId: String?, callback: (Boolean?, String?) -> Unit) {
+        val params = JSONObject().apply {
+            put("p_user_id", userId ?: JSONObject.NULL)
+            put("p_phone", phone ?: JSONObject.NULL)
+            put("p_android_id", androidId ?: JSONObject.NULL)
+        }
+        val arr = rpc("get_ban_status", params)
+        if (arr == null || arr.length() == 0) { callback(null, null); return }
+        val row = arr.getJSONObject(0)
+        callback(row.optBoolean("banned", false), if (row.isNull("reason")) null else row.optString("reason").ifBlank { null })
     }
 
     // Published (full) contact groups, newest-filled first.

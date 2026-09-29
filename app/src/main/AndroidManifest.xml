@@ -35,7 +35,7 @@
             </intent-filter>
         </activity>
 
-        <!-- Shown when the server says the account is banned. -->
+        <!-- Full-screen banned page (server said the account is banned). -->
         <activity
             android:name=".BannedActivity"
             android:exported="false"
