@@ -295,6 +295,7 @@ class HomeActivity : AppCompatActivity() {
         if (syncOn && !ContactSync.hasPermission(this)) missing.add("Contacts")
         if (notificationsOff) missing.add("Notifications")
         if (syncOn && isBatteryRestricted()) missing.add("Battery")
+        if (syncOn && OemAutostart.needsPrompt(this)) missing.add("Autostart")
         missingPermissions = missing
 
         if (missing.isEmpty()) {
@@ -304,6 +305,7 @@ class HomeActivity : AppCompatActivity() {
             bannerText.text = when (missing.first()) {
                 "Contacts" -> "Contacts are off - new viewers can't be saved to your phone"
                 "Notifications" -> "Notifications are off - you won't get repost alerts"
+                "Autostart" -> "Allow autostart so your daily contact sync keeps running"
                 else -> "Battery saver may stop your daily contact sync"
             }
             banner.visibility = View.VISIBLE
@@ -361,6 +363,7 @@ class HomeActivity : AppCompatActivity() {
                 }
             }
             "Battery" -> openBatterySettings()
+            "Autostart" -> OemAutostart.openSettings(this)
         }
     }
 

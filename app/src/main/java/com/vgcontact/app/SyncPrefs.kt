@@ -35,6 +35,18 @@ object SyncPrefs {
             .edit().putInt(KEY_INTERVAL, hours).apply()
     }
 
+    // Set once we have sent the user to their phone brand's autostart screen.
+    // Deliberately NOT cleared by clear(): it describes the phone, not the account.
+    private const val KEY_OEM_SEEN = "oem_autostart_prompted"
+
+    fun hasSeenOemAutostartPrompt(context: Context): Boolean =
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE).getBoolean(KEY_OEM_SEEN, false)
+
+    fun setSeenOemAutostartPrompt(context: Context, seen: Boolean) {
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .edit().putBoolean(KEY_OEM_SEEN, seen).apply()
+    }
+
     // Running total of contacts added today (resets by itself on a new day).
     private const val KEY_DAY = "added_day"
     private const val KEY_DAY_COUNT = "added_day_count"
