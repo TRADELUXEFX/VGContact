@@ -269,6 +269,47 @@ class HomeActivity : AppCompatActivity() {
         BannedHandler.checkWithServer(this)
     }
 
+    // ---------------- "your sync stopped" help ----------------
+
+    /** Opened by the server's stalled-sync push (action fix_sync). */
+    fun showSyncHelp() {
+        if (isFinishing) return
+        val builder = androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Your contact sync stopped")
+            .setNegativeButton("Close", null)
+
+        when {
+            SyncPrefs.isPaused(this) -> builder
+                .setMessage("Syncing is paused, so new viewers are not being saved to your phone. Open Profile and tap Resume Syncing.")
+                .setPositiveButton("Open Profile") { _, _ ->
+                    startActivity(Intent(this, ProfileActivity::class.java))
+                }
+            !ContactSync.hasPermission(this) -> builder
+                .setMessage("Contacts permission is off, so nothing can be saved to your phone.")
+                .setPositiveButton("Turn on") { _, _ ->
+                    androidx.core.app.ActivityCompat.requestPermissions(
+                        this,
+                        arrayOf(
+                            android.Manifest.permission.READ_CONTACTS,
+                            android.Manifest.permission.WRITE_CONTACTS
+                        ),
+                        CONTACTS_REQUEST_CODE
+                    )
+                }
+            else -> builder
+                .setMessage("Your phone may be stopping VGContact in the background. Allow it to keep running, then sync once to check.")
+                .setPositiveButton("Fix now") { _, _ ->
+                    when {
+                        OemAutostart.isKnownOem() -> OemAutostart.openSettings(this)
+                        isBatteryRestricted() -> openBatterySettings()
+                        else -> openAppSettings()
+                    }
+                }
+                .setNeutralButton("Sync now") { _, _ -> startSync() }
+        }
+        builder.show()
+    }
+
     // ---------------- notification permission banner ----------------
 
     private fun reportNotificationsEnabledIfChanged(enabled: Boolean) {
@@ -305,7 +346,7 @@ class HomeActivity : AppCompatActivity() {
             bannerText.text = when (missing.first()) {
                 "Contacts" -> "Contacts are off - new viewers can't be saved to your phone"
                 "Notifications" -> "Notifications are off - you won't get repost alerts"
-                "Autostart" -> "Allow autostart so your daily contact sync keeps running"
+                "Autostart" -> "Your contact sync looks stalled - allow autostart so it keeps running"
                 else -> "Battery saver may stop your daily contact sync"
             }
             banner.visibility = View.VISIBLE

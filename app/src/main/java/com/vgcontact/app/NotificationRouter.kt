@@ -28,6 +28,7 @@ object NotificationRouter {
     const val ACTION_REPOST = "open_repost"
     const val ACTION_DOWNLOADS = "open_downloads"
     const val ACTION_HOME = "open_home"
+    const val ACTION_FIX_SYNC = "fix_sync"   // "your sync stopped" nudge from the server
 
     /** Keys to copy onto an Intent so they survive a hop to another activity. */
     fun putExtras(intent: Intent, action: String?, target: String?, notificationId: String? = null): Intent {
@@ -79,6 +80,19 @@ object NotificationRouter {
             }
             ACTION_REPOST -> {
                 context.startActivity(Intent(context, RepostActivity::class.java))
+                true
+            }
+            ACTION_FIX_SYNC -> {
+                if (context is HomeActivity) {
+                    context.showSyncHelp()
+                } else {
+                    // From another screen (e.g. the Notifications feed): go to Home
+                    // and let Home run the same action.
+                    val home = Intent(context, HomeActivity::class.java)
+                    putExtras(home, ACTION_FIX_SYNC, null)
+                    if (context !is android.app.Activity) home.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(home)
+                }
                 true
             }
             ACTION_DOWNLOADS -> {
