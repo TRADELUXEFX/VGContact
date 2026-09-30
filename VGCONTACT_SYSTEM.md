@@ -21,7 +21,7 @@ Three parts:
 1. **Signup.** The new user goes into the lowest-numbered group that is not full. If every group is full, a new group is created. A group fills at `group_size` signups (default 3). When it fills it becomes `is_full` and `is_published`.
 2. **Free viewers** = signups in your own default group, shown as current / group_size (for example 1/3).
 3. **Repost.** A user may submit one repost per UTC day. It starts `pending`. Blocked once the user has `free_repost_cap` verified reposts (default 3).
-4. **Verify.** The admin verifies a pending repost. The user is then added (`joined_via = 'added'`) to the lowest-numbered full group they are not already in. If no full group exists, they get nothing, and the verified repost still counts toward the cap. **Catch-up:** every 10 minutes `_catch_up_group_grants` gives users any group they are owed (verified reposts, capped by `free_repost_cap`, minus their `added` groups) once a full group exists.
+4. **Verify.** The admin verifies a pending repost. The user is then added (`joined_via = 'added'`) to the lowest-numbered full group they are not already in. If no full group exists, they get nothing, and the verified repost still counts toward the cap. **Catch-up:** once a day `_catch_up_group_grants` gives users any group they are owed (verified reposts, capped by `free_repost_cap`, minus their `added` groups) once a full group exists.
 5. **Extra viewers** = everyone in every other group the user belongs to, shown as current / max (max is the larger of group_size and the actual count, per group).
 6. **Referred viewers** = users whose `referred_by` matches this user's username (case-insensitive), or is all digits and matches the last 10 digits of this user's phone.
 7. **Verified badge.** A user is VERIFIED once they have at least one verified repost, otherwise PENDING.
@@ -67,7 +67,7 @@ All are `SECURITY DEFINER` and read-only unless noted.
 ## 7. Automatic things
 - **Triggers:** `a_block_signup_when_closed` (BEFORE INSERT on users, honours `registrations_open`); `on_repost_status_change` (AFTER UPDATE on daily_reposts, creates "Repost verified" or "Repost rejected" notifications); `on_notification_created` (AFTER INSERT on notifications, calls the `send-push` edge function).
 - **Push:** needs the secret `service_role_key` in Supabase Vault (confirmed present 2026-09-30). If it is missing, pushes silently do nothing.
-- **Cron:** `daily-repost-reminder` runs at `0 8 * * *` (08:00 UTC, 09:00 Nigeria time). `catch-up-group-grants` runs every 10 minutes (`*/10 * * * *`).
+- **Cron:** `daily-repost-reminder` runs at `0 8 * * *` (08:00 UTC, 09:00 Nigeria time). `catch-up-group-grants` runs once a day at `0 6 * * *` (06:00 UTC, 07:00 Nigeria time).
 
 ## 8. Permissions gotcha (important)
 The app connects as the `anon` role and can only run functions it has `EXECUTE` on. A new or recreated function may lack it. Symptom: the call fails silently and the screen shows placeholders. Fix:
@@ -110,7 +110,7 @@ Single-file page. Tabs cover users, pending reposts (verify/reject), settings, n
 - 2026-09-30: Contact naming and cleanup ported from VGKontact, tag `VGC`. Contacts saved as `<name> VGC<N>`; sync now removes VGC contacts that left the server list (with empty-list safety); Profile got Delete My Contacts / Resume Syncing with a local pause flag honoured by the background worker. No database change.
 - 2026-09-30: Banned screen now removes every VGC contact from the phone; `ContactSync.run` refuses to sync while `BanPrefs.isBanned` (resumes on its own if the ban is lifted). Background worker upgraded: retry on reconnect, permission-off reminder, new-contacts notification. No database change.
 - 2026-09-30: `get_sync_contacts` now also returns users referred by the caller (rule 6 matching, banned excluded). SQL in `get_sync_contacts_with_referrals.sql`. No app change.
-- 2026-09-30: Added `_catch_up_group_grants` and cron `catch-up-group-grants` (every 10 min) so reposts verified before any group was full get their groups later. SQL in `catch_up_group_grants.sql`. No app change.
+- 2026-09-30: Added `_catch_up_group_grants` and cron `catch-up-group-grants` (once a day, 06:00 UTC) so reposts verified before any group was full get their groups later. SQL in `catch_up_group_grants.sql`. No app change.
 - 2026-09-30: Background sync notification now reads "N contacts synced today at HH:mm". No Home-screen line, no sync history screen.
 - 2026-09-30: Sync Contacts button message on Home now reads "N contacts added today". Problem messages (no internet, banned, paused) unchanged.
 - 2026-09-30: "N contacts added/synced today" (Sync button message and background notification) is now the running total for the day, kept in `SyncPrefs`; it resets on a new day and when Delete My Contacts is used.

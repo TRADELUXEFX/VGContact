@@ -66,7 +66,7 @@ class ProfileActivity : AppCompatActivity() {
         FloatingContactHelper.attach(this)
     }
 
-    private lateinit var deleteContactsBtn: Button
+    private lateinit var deleteContactsBtn: com.google.android.material.button.MaterialButton
 
     // One button, two states: normal = Delete My Contacts (red outline),
     // paused = Resume Syncing (green).
