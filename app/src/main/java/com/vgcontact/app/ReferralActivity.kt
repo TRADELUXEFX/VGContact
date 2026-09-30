@@ -506,23 +506,31 @@ class ReferralActivity : AppCompatActivity() {
         }
         scroll.visibility = View.VISIBLE
         box.removeAllViews()
-        for (i in 0 until pages) {
-            val selected = i == current
+        // Max 5 numbered circles at a time; arrows on the sides move to the
+        // previous / next page (the window of 5 slides with the current page).
+        val maxBtns = 5
+        val winStart = if (pages <= maxBtns) 0 else (current - 2).coerceIn(0, pages - maxBtns)
+        val winEnd = minOf(winStart + maxBtns, pages)
+        fun addBtn(label: String, enabled: Boolean, selected: Boolean, target: Int) {
             box.addView(TextView(this).apply {
-                text = (i + 1).toString()
+                text = label
                 textSize = 13f
                 gravity = Gravity.CENTER
+                alpha = if (enabled) 1f else 0.35f
                 setBackgroundResource(
                     if (selected) R.drawable.page_button_selected_background
                     else R.drawable.page_button_default_background
                 )
                 setTextColor(ContextCompat.getColor(this@ReferralActivity, if (selected) R.color.white else R.color.vg_dark))
                 layoutParams = LinearLayout.LayoutParams(dp(34), dp(34)).apply {
-                    marginStart = if (i == 0) 0 else dp(8)
+                    marginStart = if (box.childCount == 0) 0 else dp(8)
                 }
-                setOnClickListener { if (!selected) onPage(i) }
+                setOnClickListener { if (enabled && !selected) onPage(target) }
             })
         }
+        if (pages > maxBtns) addBtn("\u2039", current > 0, false, current - 1)
+        for (i in winStart until winEnd) addBtn((i + 1).toString(), true, i == current, i)
+        if (pages > maxBtns) addBtn("\u203A", current < pages - 1, false, current + 1)
     }
 
     // --------------------------------------------------------------- helpers

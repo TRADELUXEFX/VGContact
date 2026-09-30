@@ -536,23 +536,31 @@ class RepostActivity : AppCompatActivity() {
         }
         boardPagerScroll.visibility = View.VISIBLE
         boardPager.removeAllViews()
-        for (i in 0 until pages) {
-            val selected = i == boardPage
+        // Max 5 numbered circles at a time; arrows on the sides move to the
+        // previous / next page (the window of 5 slides with the current page).
+        val maxBtns = 5
+        val winStart = if (pages <= maxBtns) 0 else (boardPage - 2).coerceIn(0, pages - maxBtns)
+        val winEnd = minOf(winStart + maxBtns, pages)
+        fun addBtn(label: String, enabled: Boolean, selected: Boolean, target: Int) {
             boardPager.addView(TextView(this).apply {
-                text = (i + 1).toString()
+                text = label
                 textSize = 13f
                 gravity = Gravity.CENTER
+                alpha = if (enabled) 1f else 0.35f
                 setBackgroundResource(
                     if (selected) R.drawable.page_button_selected_background
                     else R.drawable.page_button_default_background
                 )
                 setTextColor(ContextCompat.getColor(this@RepostActivity, if (selected) R.color.white else R.color.vg_dark))
                 layoutParams = LinearLayout.LayoutParams(dp(34), dp(34)).apply {
-                    marginStart = if (i == 0) 0 else dp(8)
+                    marginStart = if (boardPager.childCount == 0) 0 else dp(8)
                 }
-                setOnClickListener { if (!selected) { boardPage = i; renderBoard() } }
+                setOnClickListener { if (enabled && !selected) { boardPage = target; renderBoard() } }
             })
         }
+        if (pages > maxBtns) addBtn("\u2039", boardPage > 0, false, boardPage - 1)
+        for (i in winStart until winEnd) addBtn((i + 1).toString(), true, i == boardPage, i)
+        if (pages > maxBtns) addBtn("\u203A", boardPage < pages - 1, false, boardPage + 1)
     }
 
     private fun setupBottomNav() {
