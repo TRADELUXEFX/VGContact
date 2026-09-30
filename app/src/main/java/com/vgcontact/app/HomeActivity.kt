@@ -8,7 +8,6 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -168,8 +167,6 @@ class HomeActivity : AppCompatActivity() {
 
         findViewById<TextView>(R.id.freeViewersCurrentText).text = h.freeCurrent.toString()
         findViewById<TextView>(R.id.freeViewersMaxText).text = "/${h.freeMax}"
-        val meter = findViewById<ProgressBar>(R.id.freeViewersMeter)
-        meter.progress = if (h.freeMax > 0) (h.freeCurrent * 100 / h.freeMax).coerceIn(0, 100) else 0
 
         findViewById<TextView>(R.id.extraViewersCurrentText).text = h.extraCurrent.toString()
         findViewById<TextView>(R.id.extraViewersMaxText).text = "/${h.extraMax}"

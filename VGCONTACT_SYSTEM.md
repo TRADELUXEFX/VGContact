@@ -26,7 +26,7 @@ Three parts:
 6. **Referred viewers** = users whose `referred_by` matches this user's username (case-insensitive), or is all digits and matches the last 10 digits of this user's phone.
 7. **Verified badge.** A user is VERIFIED once they have at least one verified repost, otherwise PENDING.
 8. **Sync** (what the phone saves): the admin number (`admin_phone`, named `admin_contact_name` or "VGContact Admin"), the optional `anon_phone` (named `anon_contact_name` or "VGContact Status"), plus other members of your groups. Group members are included only if they are not banned and have at least one verified repost themselves. A group counts only if it is full, or if you were added to it.
-   **Referred users** (rule 6) are also in the sync list (from `get_sync_contacts`), named by username; banned ones are excluded, and no verified repost is required from them.
+   **Referred users** (rule 6 matching) are also in the sync list (from `get_sync_contacts`), named by username, **3 levels deep** (people you referred, who they referred, who those referred), nearest first, capped at 200. Banned users are not saved but the chain continues past them; no verified repost is required. The Home "Referred viewers" number still counts direct (level 1) referrals only.
    **On the phone:** each saved contact is named `<name> VGC<N>` (e.g. `Chidera VGC3`, N = lowest free number). The `VGC<N>` ending is how the app recognises its own contacts, read from the phone itself, so it survives clearing app data. Each sync also removes VGC contacts whose number is no longer in the server list (banned or removed member); contacts without the tag are never touched, and an empty server list never deletes anything.
 9. **Bans** block by user, phone and device (`banned_identities`). Banned users get `ACCOUNT_BANNED`.
 10. **Support.** "Buy Status Viewers" opens a WhatsApp chat with support (number in `SupportContact.kt`).
@@ -48,7 +48,7 @@ Three parts:
 ## 6. Database functions
 All are `SECURITY DEFINER` and read-only unless noted.
 
-**Helpers (internal, not callable by the app):** `_group_size`, `_repost_cap`, `_setting_int`, `_android_id_required`, `_is_admin`, `_is_banned`, `_is_verified`, `_count_referrals`.
+**Helpers (internal, not callable by the app):** `_ref_match`, `_group_size`, `_repost_cap`, `_setting_int`, `_android_id_required`, `_is_admin`, `_is_banned`, `_is_verified`, `_count_referrals`.
 
 **Writes:**
 - `_place_user_in_group(user)`: signup placement (advisory lock `vgcontact_group_placement`).
@@ -60,7 +60,7 @@ All are `SECURITY DEFINER` and read-only unless noted.
 - `save_fcm_token`, `report_notifications_enabled`, `mark_notifications_read`, `record_notification_delivered/opened`.
 - `send_daily_repost_reminder`: inserts reminder notifications (run by cron).
 
-**Reads used by the app:** `login_by_phone`, `get_home`, `get_sync_contacts`, `get_my_profile`, `get_leaderboard` (no longer called by the app), `get_today_repost_status`, `get_ban_status`, `get_app_setting`, `fetch_notifications`.
+**Reads used by the app:** `login_by_phone`, `get_home`, `get_sync_contacts`, `get_my_profile`, `get_leaderboard` (no longer called by the app), `get_my_referrals`, `get_referral_leaderboard`, `get_today_repost_status`, `get_ban_status`, `get_app_setting`, `fetch_notifications`.
 
 **Admin only (checked by `_is_admin()`):** `admin_find_users`, `admin_pending_reposts`, `admin_set_repost` (verify or reject), `admin_set_banned`, `admin_get_settings`, `admin_set_setting`, `admin_send_notification`, `admin_notification_history`, `admin_notification_stats`, `admin_notification_reach`. Also defined but not used by the admin page: `admin_verify_reposts` (bulk verify by username, with preview) and `admin_add_user_to_group`.
 
@@ -85,8 +85,8 @@ Check with `has_function_privilege('anon', p.oid, 'execute')`. Internal helpers 
 
 ## 10. Android app map (`app/src/main/java/com/vgcontact/app`)
 - `SupabaseClient.kt`: every server call (`rpc("name", params)`); reads `SUPABASE_URL` and `SUPABASE_ANON_KEY` from BuildConfig.
-- `HomeActivity`: Free/Extra/Referred viewers (from `get_home`), Sync Contacts, Buy Status Viewers. Starts at 0 and /0; shows a toast if loading fails.
-- `RepostActivity` (no leaderboard; header title only), `ReferralActivity` (built like Repost: centered title, no Back arrow), `ProfileActivity`, `NotificationsActivity`, `LoginActivity`, `RegisterActivity`, `SessionManager` (stores `user_id`), `ContactSync` (writes contacts to the phone), `SupportContact.kt`, `LegalContent.kt` (Terms and Privacy, rewritten for groups and reposts).
+- `HomeActivity`: Free/Extra/Referred viewers (from `get_home`), Sync Contacts, Buy Status Viewers. Starts at 0 and /0; shows a toast if loading fails. The free-viewers progress bar was removed (numbers only).
+- `RepostActivity` (no leaderboard; header title only), `ReferralActivity` (laid out like VGKontact's Referrals page: header with a My referrals / Leaderboard switcher and search; My referrals = code card + referral list with tap-to-drill-in to levels 2 and 3, rows with invites open, level 3 is the last; Leaderboard = top 50 by direct referrals, usernames only; banned users hidden; 10 per page; no Back arrow, but phone Back goes up one level while drilled in), `ProfileActivity`, `NotificationsActivity`, `LoginActivity`, `RegisterActivity`, `SessionManager` (stores `user_id`), `ContactSync` (writes contacts to the phone), `SupportContact.kt`, `LegalContent.kt` (Terms and Privacy, rewritten for groups and reposts).
 - `DailySyncWorker.kt`: background contact sync every ~24 hours (WorkManager), scheduled from `VGApp`. Same `ContactSync` as the Sync button. Skips when logged out, banned or paused. Contacts permission off gives one reminder notification. Offline or server failure queues a one-time retry that fires when the network returns. New contacts added gives a notification like "3 contacts synced today at 10:30" (nothing is shown on Home). With data off, the sync waits and runs, with the notification, as soon as data is back.
 - `SyncPrefs.kt`: local paused flag (`vgc_sync` prefs). Profile > **Delete My Contacts** removes every `VGC<N>` contact and pauses all syncing (button, first-run, background); the same button becomes **Resume Syncing**, which unpauses and syncs at once. Pause is local only, not reported to the database.
 - `BuyKeysActivity.kt` and `DownloadsActivity.kt` are empty stubs and can be deleted from the repo.
@@ -114,3 +114,5 @@ Single-file page. Tabs cover users, pending reposts (verify/reject), settings, n
 - 2026-09-30: Background sync notification now reads "N contacts synced today at HH:mm". No Home-screen line, no sync history screen.
 - 2026-09-30: Sync Contacts button message on Home now reads "N contacts added today". Problem messages (no internet, banned, paused) unchanged.
 - 2026-09-30: "N contacts added/synced today" (Sync button message and background notification) is now the running total for the day, kept in `SyncPrefs`; it resets on a new day and when Delete My Contacts is used.
+- 2026-09-30: `get_sync_contacts` referrals extended from level 1 to 3 levels (recursive, cap 200, chain continues past banned users). SQL in `get_sync_contacts_referral_levels.sql`. No app change.
+- 2026-09-30: Referral page rebuilt in the VGKontact Referrals style with a 3-level drill-in list and a leaderboard. New functions `get_my_referrals` (you and your own 2 levels only) and `get_referral_leaderboard` (top 50, direct referrals, usernames only, banned hidden) plus internal helper `_ref_match`. SQL in `referral_page_functions.sql`. Home free-viewers progress bar removed.

@@ -244,6 +244,55 @@ object SupabaseClient {
         return out
     }
 
+    // One person in a referral list (see get_my_referrals). invitedCount =
+    // how many people that person referred themselves.
+    data class MyReferral(
+        val userId: String,
+        val username: String,
+        val phone: String,
+        val createdAt: String,
+        val invitedCount: Int
+    )
+
+    // The people one user referred. targetUserId = null gives the caller's own
+    // list; a downline member's id gives that person's list (the server only
+    // answers for people inside the caller's own levels). Blocking - call from
+    // a background thread. Null = failed.
+    fun fetchMyReferrals(userId: String, targetUserId: String?): List<MyReferral>? {
+        val params = JSONObject().apply {
+            put("p_user_id", userId)
+            put("p_target_user_id", if (targetUserId.isNullOrBlank()) JSONObject.NULL else targetUserId)
+        }
+        val arr = rpc("get_my_referrals", params) ?: return null
+        val out = mutableListOf<MyReferral>()
+        for (i in 0 until arr.length()) {
+            val r = arr.getJSONObject(i)
+            out.add(
+                MyReferral(
+                    userId = r.optString("user_id"),
+                    username = r.optString("username"),
+                    phone = r.optString("phone"),
+                    createdAt = r.optString("created_at"),
+                    invitedCount = r.optInt("invited_count", 0)
+                )
+            )
+        }
+        return out
+    }
+
+    data class LeaderboardEntry(val username: String, val referralCount: Int, val isMe: Boolean)
+
+    // Top 50 referrers by direct referrals. Usernames only. Null = failed.
+    fun fetchReferralLeaderboard(userId: String): List<LeaderboardEntry>? {
+        val arr = rpc("get_referral_leaderboard", JSONObject().apply { put("p_user_id", userId) }) ?: return null
+        val out = mutableListOf<LeaderboardEntry>()
+        for (i in 0 until arr.length()) {
+            val r = arr.getJSONObject(i)
+            out.add(LeaderboardEntry(r.optString("username"), r.optInt("referral_count", 0), r.optBoolean("is_me", false)))
+        }
+        return out
+    }
+
     // A notification the user can see: their own targeted rows (a group
     // they're in became full) plus every broadcast row (any group filled).
     data class AppNotification(

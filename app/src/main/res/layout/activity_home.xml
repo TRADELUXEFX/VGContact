@@ -246,16 +246,6 @@
                             android:text="/0" />
                     </LinearLayout>
 
-                        <ProgressBar
-                            android:id="@+id/freeViewersMeter"
-                            style="?android:attr/progressBarStyleHorizontal"
-                            android:layout_width="match_parent"
-                            android:layout_height="8dp"
-                            android:layout_marginBottom="12dp"
-                            android:max="100"
-                            android:progress="0"
-                            android:progressDrawable="@drawable/limit_meter_progress" />
-
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
