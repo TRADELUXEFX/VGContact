@@ -18,22 +18,11 @@ import androidx.core.content.ContextCompat
 import kotlin.concurrent.thread
 
 /**
- * Key-earning screen. Keys are the only currency used to unlock contact
- * groups now - see DownloadsActivity, which spends a key via
- * SupabaseClient.spendKeyToUnlockGroup().
- *
- * New users start with 3 free keys (users.key_balance default, set at
- * signup). More keys are earned by:
- *   1. Reposting once per day - tapping the button here sends the user
- *      to WhatsApp and logs a 'pending' row in daily_reposts. This does
- *      NOT grant a key immediately: reposts are checked manually against
- *      WhatsApp status viewers that night, and only once marked
- *      'verified' server-side does key_balance go up by 1. So after
- *      tapping, this screen shows "Verifying..." rather than an instant
- *      unlock - the balance only changes the next time the app fetches
- *      it (e.g. next open, or pull-to-refresh here).
- *   2. Buying keys directly (no in-app payment yet - the button below
- *      just opens a WhatsApp chat to arrange it manually).
+ * Repost screen. Tapping the repost button sends the user to WhatsApp and
+ * logs a 'pending' row in daily_reposts. Reposts are checked manually
+ * against the admin's WhatsApp status viewers; once the admin marks the
+ * repost 'verified' the user gets the "Repost verified" push and the
+ * streak / leaderboard count it. This screen never touches keys.
  */
 class RepostActivity : AppCompatActivity() {
 
@@ -54,10 +43,9 @@ class RepostActivity : AppCompatActivity() {
     private lateinit var contentScroll: android.widget.ScrollView
     private lateinit var loadingState: LinearLayout
 
-    private lateinit var keyBalanceText: TextView
     private lateinit var repostStatusText: TextView
     private lateinit var repostTodayBtn: com.google.android.material.button.MaterialButton
-    private lateinit var buyKeysBtn: Button
+    private lateinit var buyViewersBtn: Button
 
     private lateinit var statusCard: LinearLayout
     private lateinit var statusIcon: ImageView
@@ -89,7 +77,6 @@ class RepostActivity : AppCompatActivity() {
     // load (the green header stays visible the whole time, same as Get
     // Viewers). Later refreshes (e.g. onResume) update the visible
     // content in place instead of hiding it again.
-    private var keyBalanceLoaded = false
     private var todayStatusLoaded = false
     private var initialContentRevealed = false
 
@@ -113,10 +100,9 @@ class RepostActivity : AppCompatActivity() {
         contentScroll = findViewById(R.id.repost_content_scroll)
         loadingState = findViewById(R.id.repost_loading_state)
 
-        keyBalanceText = findViewById(R.id.key_balance_text)
         repostStatusText = findViewById(R.id.repost_status)
         repostTodayBtn = findViewById(R.id.repost_btn)
-        buyKeysBtn = findViewById(R.id.buy_keys_btn)
+        buyViewersBtn = findViewById(R.id.buy_viewers_btn)
 
         statusCard = findViewById(R.id.repost_status_card)
         statusIcon = findViewById(R.id.repost_status_icon)
@@ -136,9 +122,8 @@ class RepostActivity : AppCompatActivity() {
         applyTodaysTaskVisibility()
 
         repostTodayBtn.setOnClickListener { onRepostTodayClicked() }
-        buyKeysBtn.setOnClickListener { openBuyKeysPage() }
+        buyViewersBtn.setOnClickListener { openBuyViewers() }
 
-        refreshKeyBalance()
         refreshTodayStatus()
 
         setupBottomNav()
@@ -321,35 +306,13 @@ class RepostActivity : AppCompatActivity() {
         super.onResume()
         // Covers the case where verification landed while the user was
         // away from this screen (e.g. reopening the app the next day).
-        refreshKeyBalance()
         refreshTodayStatus()
         if (showingLeaderboard) loadLeaderboard()
     }
 
-    private fun refreshKeyBalance() {
-        val userId = sessionManager.getUserId()
-        if (userId.isNullOrBlank()) {
-            keyBalanceLoaded = true
-            revealContentIfReady()
-            return
-        }
-
-        thread {
-            SupabaseClient.fetchKeyBalance(userId) { success, balance ->
-                runOnUiThread {
-                    if (success) {
-                        keyBalanceText.text = balance.toString()
-                    }
-                    keyBalanceLoaded = true
-                    revealContentIfReady()
-                }
-            }
-        }
-    }
-
     private fun revealContentIfReady() {
         if (initialContentRevealed) return
-        if (keyBalanceLoaded && todayStatusLoaded) {
+        if (todayStatusLoaded) {
             initialContentRevealed = true
             loadingState.visibility = android.view.View.GONE
             if (!showingLeaderboard) contentScroll.visibility = android.view.View.VISIBLE
@@ -383,7 +346,7 @@ class RepostActivity : AppCompatActivity() {
                             showRepostSent()
                             showStatusCard(
                                 title = "Verification pending",
-                                message = "We check your repost and add your key within 24 hours.",
+                                message = "We check your repost within 24 hours.",
                                 icon = R.drawable.ic_pending,
                                 tint = R.color.warning_amber
                             )
@@ -393,7 +356,7 @@ class RepostActivity : AppCompatActivity() {
                             showRepostSent(verified = true)
                             showStatusCard(
                                 title = "Repost verified",
-                                message = "Today's repost was verified and your key has been added.",
+                                message = "Today's repost was verified.",
                                 icon = R.drawable.ic_check,
                                 tint = R.color.vg_green
                             )
@@ -433,11 +396,11 @@ class RepostActivity : AppCompatActivity() {
         }
 
         // Send the user to the admin's WhatsApp chat (same number used by
-        // Buy Keys / Contact Us) so they can view and repost the admin's status.
+        // Contact Us) so they can view and repost the admin's status.
         try {
             val message = Uri.encode("Hi VGContact, I want to repost today's status")
             val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse("https://wa.me/${BuyKeysActivity.SUPPORT_WHATSAPP}?text=$message")
+            intent.data = Uri.parse("https://wa.me/${SupportContact.WHATSAPP}?text=$message")
             startActivity(intent)
         } catch (e: Exception) {
             Toast.makeText(this, "WhatsApp not installed", Toast.LENGTH_SHORT).show()
@@ -453,7 +416,7 @@ class RepostActivity : AppCompatActivity() {
         showRepostSent()   // instant visible change: red -> yellow "YOU POSTED TODAY"
         showStatusCard(
             title = "Verification pending",
-            message = "We'll add your key within 24 hours.",
+            message = "We'll check your repost within 24 hours.",
             icon = R.drawable.ic_pending,
             tint = R.color.warning_amber
         )
@@ -465,7 +428,7 @@ class RepostActivity : AppCompatActivity() {
                         showRepostSent()
                         showStatusCard(
                             title = "Verification pending",
-                            message = "We check your repost and add your key within 24 hours.",
+                            message = "We check your repost within 24 hours.",
                             icon = R.drawable.ic_pending,
                             tint = R.color.warning_amber
                         )
@@ -509,9 +472,9 @@ class RepostActivity : AppCompatActivity() {
         paintRepostButton(if (verified) R.color.vg_green else R.color.warning_amber)
     }
 
-    // Opens the Buy Keys page (packs + WhatsApp checkout live there).
-    private fun openBuyKeysPage() {
-        startActivity(Intent(this, BuyKeysActivity::class.java))
+    // Opens a WhatsApp chat with support to buy status viewers.
+    private fun openBuyViewers() {
+        SupportContact.openBuyViewers(this)
     }
 
     private fun setupBottomNav() {

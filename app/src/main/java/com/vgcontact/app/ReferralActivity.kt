@@ -5,15 +5,15 @@ import android.content.ClipboardManager
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.LinearLayout
-import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 
 /**
- * Refer & Earn page, opened from the "Refer & Earn" button on Home.
+ * Referral page: the Referral tab of the floating bottom nav (also opened
+ * from the referral button on Home). Shows the user's code + the total
+ * number of people who registered under them.
  * The referral code is the user's phone number (same value shown in the
  * Home header and the same value new users type into the "Referral
  * Username" box at sign-up; users.referred_by stores it).
@@ -22,10 +22,9 @@ class ReferralActivity : AppCompatActivity() {
 
     private lateinit var sessionManager: SessionManager
 
-    // The body stays hidden (spinner under the green header) until both
-    // fetches finish. Later refreshes (onResume) update in place.
-    private var keysLoaded = false
-    private var milestonesLoaded = false
+    // The body stays hidden (spinner under the green header) until the
+    // referral count loads. Later refreshes (onResume) update in place.
+    private var countLoaded = false
     private var contentRevealed = false
 
     companion object {
@@ -50,6 +49,7 @@ class ReferralActivity : AppCompatActivity() {
 
         BackHeader.bind(this, "Refer and earn")
         window.statusBarColor = ContextCompat.getColor(this, R.color.vg_green)
+        BottomNavHelper.setup(this, BottomNavHelper.Tab.REFERRAL)
 
         val codeText = findViewById<TextView>(R.id.referral_code_text)
         val tabNumber = findViewById<TextView>(R.id.referral_tab_number)
@@ -100,55 +100,27 @@ class ReferralActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        loadKeyBalance()
-        loadMilestones()
+        loadReferralCount()
     }
 
-    // Header "Total keys" card: the user's current key balance.
-    private fun loadKeyBalance() {
+    // Referred viewers = total people who registered under this user.
+    // Counted server-side by get_home (same number as the Home screen).
+    private fun loadReferralCount() {
         val userId = sessionManager.getUserId().orEmpty()
         if (userId.isBlank()) {
-            keysLoaded = true
+            countLoaded = true
             revealIfReady()
             return
         }
         Thread {
-            SupabaseClient.fetchKeyBalance(userId) { ok, balance ->
+            SupabaseClient.fetchHome(userId) { ok, home ->
                 runOnUiThread {
                     if (isFinishing) return@runOnUiThread
-                    if (ok) {
-                        findViewById<TextView>(R.id.referral_keys_text).text = balance.toString()
+                    if (ok && home != null) {
+                        findViewById<TextView>(R.id.referral_earnings_text).text =
+                            home.referralCount.toString()
                     }
-                    keysLoaded = true
-                    revealIfReady()
-                }
-            }
-        }.start()
-    }
-
-    // Asks the server to pay any milestone keys now due (every 10 referrals
-    // = 1 key; never pays the same key twice) and returns the live count.
-    private fun loadMilestones() {
-        val userId = sessionManager.getUserId().orEmpty()
-        if (userId.isBlank()) {
-            milestonesLoaded = true
-            revealIfReady()
-            return
-        }
-        Thread {
-            SupabaseClient.claimReferralKeys(userId) { ok, referrals, keysAdded ->
-                runOnUiThread {
-                    if (isFinishing) return@runOnUiThread
-                    if (ok) {
-                        showMilestones(referrals)
-                        if (keysAdded > 0) {
-                            loadKeyBalance()
-                            val word = if (keysAdded == 1) "key" else "keys"
-                            Toast.makeText(this, "You earned $keysAdded $word!", Toast.LENGTH_LONG).show()
-                        }
-                    }
-                    // Reveal only after the milestones are filled in (or failed).
-                    milestonesLoaded = true
+                    countLoaded = true
                     revealIfReady()
                 }
             }
@@ -156,34 +128,10 @@ class ReferralActivity : AppCompatActivity() {
     }
 
     private fun revealIfReady() {
-        if (contentRevealed || !keysLoaded || !milestonesLoaded) return
+        if (contentRevealed || !countLoaded) return
         contentRevealed = true
         findViewById<View>(R.id.referral_loading_state).visibility = View.GONE
         findViewById<View>(R.id.referral_content_scroll).visibility = View.VISIBLE
-    }
-
-    private fun showMilestones(count: Int) {
-        findViewById<TextView>(R.id.referral_earnings_text).text = count.toString()
-        findViewById<TextView>(R.id.referral_to_go).text = "${10 - (count % 10)} to go"
-        findViewById<ProgressBar>(R.id.referral_progress).progress = count % 10
-        styleChip(R.id.referral_chip_10, count >= 10)
-        styleChip(R.id.referral_chip_20, count >= 20)
-        styleChip(R.id.referral_chip_30, count >= 30)
-        styleChip(R.id.referral_chip_50, count >= 50)
-    }
-
-    private fun styleChip(chipId: Int, reached: Boolean) {
-        val chip = findViewById<LinearLayout>(chipId)
-        chip.background = ContextCompat.getDrawable(
-            this,
-            if (reached) R.drawable.freq_tile_selected_background else R.drawable.stats_card_background
-        )
-        (chip.getChildAt(0) as TextView).setTextColor(
-            ContextCompat.getColor(this, if (reached) R.color.vg_green_dark else R.color.text_secondary)
-        )
-        (chip.getChildAt(1) as TextView).setTextColor(
-            ContextCompat.getColor(this, if (reached) R.color.vg_green_dark else R.color.text_muted)
-        )
     }
 
     private fun copy(label: String, value: String) {

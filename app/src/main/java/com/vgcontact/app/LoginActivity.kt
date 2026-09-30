@@ -86,7 +86,8 @@ class LoginActivity : AppCompatActivity() {
                                 sessionManager.saveUserId(user.optString("id", ""))
                                 sessionManager.saveRegistrationFrom(user)
                                 VgFirebaseMessagingService.flushPendingTokenIfAny(this)
-                                startActivity(Intent(this, PermissionsActivity::class.java))
+                                // Clear the whole back stack so Back from Home can never return to Register/Login.
+                                startActivity(Intent(this, PermissionsActivity::class.java).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK) })
                                 finish()
                             }
                             found && !deviceMatches -> {

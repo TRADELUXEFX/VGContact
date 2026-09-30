@@ -52,7 +52,7 @@ class ProfileActivity : AppCompatActivity() {
         val logoutBtn = findViewById<Button>(R.id.logout_btn)
         logoutBtn.setOnClickListener {
             sessionManager.logout()
-            startActivity(Intent(this, RegisterActivity::class.java))
+            startActivity(Intent(this, RegisterActivity::class.java).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK) })
             finish()
         }
 

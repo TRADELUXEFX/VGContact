@@ -66,17 +66,7 @@
             android:exported="false"
             android:screenOrientation="portrait" />
 
-        <!-- Downloads Screen -->
-        <activity
-            android:name=".DownloadsActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
 
-        <!-- Buy Keys Screen: reached from "Get more" on Home -->
-        <activity
-            android:name=".BuyKeysActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
 
         <!-- Referral Screen: reached from "Refer & Earn" on Home -->
         <activity
@@ -136,7 +126,7 @@
             </intent-filter>
         </service>
 
-        <!-- Serves generated .vcf files (see DownloadsActivity) out to the
+        <!-- Serves generated .vcf files (see ContactSync) out to the
              device's contacts app via a content:// URI, since Android 7+
              blocks passing raw file:// paths between apps. -->
         <provider

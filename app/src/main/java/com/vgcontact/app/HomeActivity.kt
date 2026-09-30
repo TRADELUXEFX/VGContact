@@ -73,7 +73,7 @@ class HomeActivity : AppCompatActivity() {
         syncBtn.setOnClickListener { startSync() }
 
         findViewById<Button>(R.id.buyViewersBtn).setOnClickListener {
-            startActivity(Intent(this, BuyKeysActivity::class.java))
+            SupportContact.openBuyViewers(this)
         }
 
         findViewById<Button>(R.id.join_community_btn).setOnClickListener {

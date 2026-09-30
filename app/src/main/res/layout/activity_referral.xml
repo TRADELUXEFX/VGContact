@@ -2,8 +2,9 @@
 <!-- Refer and earn page. Reached from the "Refer & Earn" button on Home.
      Same look as the other screens: green gradient header (back + centered
      title + two stat cards), light background, white bordered cards.
-     Body: key reward note, code card (Number / Username switch + Share code),
-     and milestones. -->
+     Body: code card (Number / Username switch + Share code).
+     Header shows one card: Referred viewers = everyone who registered
+     under this user. Floating bottom nav (Referral tab) like Home / Repost / Profile. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -66,39 +67,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="0dp"
-                android:layout_marginEnd="5dp"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp"
-                android:background="@drawable/header_stat_background">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Total keys"
-                    android:fontFamily="@font/poppins"
-                    android:includeFontPadding="false"
-                    android:textSize="12sp"
-                    android:textColor="@color/white" />
-
-                <TextView
-                    android:id="@+id/referral_keys_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="-"
-                    android:fontFamily="@font/poppins_bold"
-                    android:includeFontPadding="false"
-                    android:textSize="26sp"
-                    android:textColor="@color/white" />
-
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="5dp"
                 android:layout_marginEnd="0dp"
                 android:orientation="vertical"
                 android:gravity="center"
@@ -109,7 +77,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Total referrals"
+                    android:text="Referred viewers"
                     android:fontFamily="@font/poppins"
                     android:includeFontPadding="false"
                     android:textSize="12sp"
@@ -144,40 +112,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
-
-                <!-- Reward note -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="16dp"
-                    android:background="@drawable/referral_tip_background">
-
-                    <ImageView
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:padding="8dp"
-                        android:src="@drawable/ic_key"
-                        android:background="@drawable/avatar_circle_tint_background"
-                        app:tint="@color/vg_green_dark"
-                        android:contentDescription="@null" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="12dp"
-                        android:text="Every 10 referrals, you get a key"
-                        android:fontFamily="@font/poppins_medium"
-                        android:includeFontPadding="false"
-                        android:lineSpacingExtra="4dp"
-                        android:textSize="13sp"
-                        android:textColor="@color/vg_green_dark" />
-
-                </LinearLayout>
+                android:paddingStart="16dp"
+                android:paddingTop="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="140dp">
 
                 <!-- Code card -->
                 <LinearLayout
@@ -290,209 +228,13 @@
 
                 </LinearLayout>
 
-                <!-- Milestones: every 10 referrals = 1 key -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:orientation="vertical"
-                    android:padding="16dp"
-                    android:background="@drawable/card_background">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="10dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="MILESTONES"
-                            android:fontFamily="@font/poppins_semibold"
-                            android:includeFontPadding="false"
-                            android:textSize="11sp"
-                            android:letterSpacing="0.05"
-                            android:textColor="@color/text_muted" />
-
-                        <TextView
-                            android:id="@+id/referral_to_go"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="10 to go"
-                            android:fontFamily="@font/poppins_semibold"
-                            android:includeFontPadding="false"
-                            android:textSize="12sp"
-                            android:textColor="@color/vg_green_dark"
-                            android:background="@drawable/badge_verified_background"
-                            android:paddingStart="10dp"
-                            android:paddingEnd="10dp"
-                            android:paddingTop="4dp"
-                            android:paddingBottom="4dp" />
-
-                    </LinearLayout>
-
-                    <ProgressBar
-                        android:id="@+id/referral_progress"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="8dp"
-                        android:max="10"
-                        android:progress="0"
-                        android:progressDrawable="@drawable/referral_progress" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:orientation="horizontal"
-                        android:weightSum="4">
-
-                        <LinearLayout
-                            android:id="@+id/referral_chip_10"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="6dp"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:background="@drawable/stats_card_background"
-                            android:paddingTop="10dp"
-                            android:paddingBottom="10dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/poppins_bold"
-                                android:includeFontPadding="false"
-                                android:text="10"
-                                android:textSize="18sp"
-                                android:textColor="@color/text_secondary" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="1 KEY"
-                                android:fontFamily="@font/poppins_semibold"
-                                android:includeFontPadding="false"
-                                android:textSize="10sp"
-                                android:letterSpacing="0.03"
-                                android:textColor="@color/text_muted" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/referral_chip_20"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="6dp"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:background="@drawable/stats_card_background"
-                            android:paddingTop="10dp"
-                            android:paddingBottom="10dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/poppins_bold"
-                                android:includeFontPadding="false"
-                                android:text="20"
-                                android:textSize="18sp"
-                                android:textColor="@color/text_secondary" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="2 KEYS"
-                                android:fontFamily="@font/poppins_semibold"
-                                android:includeFontPadding="false"
-                                android:textSize="10sp"
-                                android:letterSpacing="0.03"
-                                android:textColor="@color/text_muted" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/referral_chip_30"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="6dp"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:background="@drawable/stats_card_background"
-                            android:paddingTop="10dp"
-                            android:paddingBottom="10dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/poppins_bold"
-                                android:includeFontPadding="false"
-                                android:text="30"
-                                android:textSize="18sp"
-                                android:textColor="@color/text_secondary" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="3 KEYS"
-                                android:fontFamily="@font/poppins_semibold"
-                                android:includeFontPadding="false"
-                                android:textSize="10sp"
-                                android:letterSpacing="0.03"
-                                android:textColor="@color/text_muted" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/referral_chip_50"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="0dp"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:background="@drawable/stats_card_background"
-                            android:paddingTop="10dp"
-                            android:paddingBottom="10dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/poppins_bold"
-                                android:includeFontPadding="false"
-                                android:text="50"
-                                android:textSize="18sp"
-                                android:textColor="@color/text_secondary" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="5 KEYS"
-                                android:fontFamily="@font/poppins_semibold"
-                                android:includeFontPadding="false"
-                                android:textSize="10sp"
-                                android:letterSpacing="0.03"
-                                android:textColor="@color/text_muted" />
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
             </LinearLayout>
 
         </ScrollView>
 
         <!-- Same loading pattern as Repost / Get Viewers: the green header
-             stays visible and this spinner fills the body until the key
-             balance and milestones have loaded. -->
+             stays visible and this spinner fills the body until the referral
+             count has loaded. -->
         <LinearLayout
             android:id="@+id/referral_loading_state"
             android:layout_width="match_parent"
@@ -510,5 +252,7 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <include layout="@layout/bottom_nav_bar" />
 
 </FrameLayout>

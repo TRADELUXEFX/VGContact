@@ -82,7 +82,7 @@ object NotificationRouter {
                 true
             }
             ACTION_DOWNLOADS -> {
-                context.startActivity(Intent(context, DownloadsActivity::class.java))
+                context.startActivity(Intent(context, HomeActivity::class.java))
                 true
             }
             else -> false   // open_home / null / unknown: just stay on Home
@@ -93,7 +93,7 @@ object NotificationRouter {
         try {
             val message = Uri.encode("Hi VGContact, I want to repost today's status")
             val intent = Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse("https://wa.me/${BuyKeysActivity.SUPPORT_WHATSAPP}?text=$message")
+                data = Uri.parse("https://wa.me/${SupportContact.WHATSAPP}?text=$message")
                 if (context !is android.app.Activity) addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             context.startActivity(intent)

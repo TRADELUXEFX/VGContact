@@ -156,7 +156,7 @@ class BannedActivity : AppCompatActivity() {
         else "Hi VG Kontact, my account has been banned. I'd like to appeal this."
         try {
             startActivity(Intent(Intent.ACTION_VIEW,
-                Uri.parse("https://wa.me/${BuyKeysActivity.SUPPORT_WHATSAPP}?text=${Uri.encode(text)}")))
+                Uri.parse("https://wa.me/${SupportContact.WHATSAPP}?text=${Uri.encode(text)}")))
         } catch (e: Exception) {
             Toast.makeText(this, "WhatsApp is not installed", Toast.LENGTH_SHORT).show()
         }

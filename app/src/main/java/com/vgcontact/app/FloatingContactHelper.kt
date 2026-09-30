@@ -24,8 +24,8 @@ import androidx.core.content.ContextCompat
  * everything else already on screen, including scrolling content and
  * the bottom nav pill.
  *
- * Uses the same WhatsApp support number as the Buy Keys screen
- * (BuyKeysActivity.SUPPORT_WHATSAPP), so every contact-us entry point in
+ * Uses the same WhatsApp support number as everything else
+ * (SupportContact.WHATSAPP), so every contact-us entry point in
  * the app goes to the same place.
  */
 object FloatingContactHelper {
@@ -34,8 +34,8 @@ object FloatingContactHelper {
 
     /**
      * Screens that must NOT show the floating button (auth / onboarding /
-     * splash / permissions / legal, the chat-support screen itself, Referral,
-     * Notifications, and Buy Keys, which has its own WhatsApp checkout button).
+     * splash / permissions / legal, the chat-support screen itself,
+     * Notifications, and Banned).
      */
     private val EXCLUDED: Set<Class<out Activity>> = setOf(
         SplashActivity::class.java,
@@ -44,8 +44,6 @@ object FloatingContactHelper {
         PermissionsActivity::class.java,
         LegalActivity::class.java,
         ChatSupportActivity::class.java,
-        BuyKeysActivity::class.java,
-        ReferralActivity::class.java,
         NotificationsActivity::class.java,
         BannedActivity::class.java
     )
@@ -125,7 +123,7 @@ object FloatingContactHelper {
 
     private fun openWhatsAppContactUs(activity: Activity) {
         val message = Uri.encode("Hi VGContact, I need help with...")
-        val uri = Uri.parse("https://wa.me/${BuyKeysActivity.SUPPORT_WHATSAPP}?text=$message")
+        val uri = Uri.parse("https://wa.me/${SupportContact.WHATSAPP}?text=$message")
         try {
             activity.startActivity(Intent(Intent.ACTION_VIEW, uri))
         } catch (e: Exception) {

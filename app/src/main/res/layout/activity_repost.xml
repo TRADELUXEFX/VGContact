@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Key-earning screen. Root is a FrameLayout so the bottom nav bar can
+    Repost screen. Root is a FrameLayout so the bottom nav bar can
     float over the content as a rounded pill (see bottom_nav_bar.xml).
     Header is inline (gradient background, centered bold title) matching
     VGKontact's per-screen header pattern instead of a shared include.
 
-    Keys are the app's unlock currency (see RepostActivity.kt /
-    vgcontact_keys_schema.sql) - this screen shows the current balance,
-    lets the user log today's repost attempt, and offers a way to buy
-    more keys directly.
+    This screen shows the streak, lets the user log today's repost
+    attempt, and has the leaderboard tab.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -199,7 +197,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:layout_marginStart="12dp"
-                                android:text="Get 1 key added within 24 hours"
+                                android:text="Get verified within 24 hours"
                                 android:textColor="@color/text_secondary"
                                 android:textSize="14sp" />
 
@@ -238,7 +236,7 @@
                     android:visibility="gone" />
 
                 <!-- Verification status: its own card, shown at the very
-                     top (above Your Keys / Streak) once the user has
+                     top (above the Streak card) once the user has
                      reposted today. Icon on the left, text on the right,
                      the pair centered in the card. -->
                 <LinearLayout
@@ -281,7 +279,7 @@
 
                 </LinearLayout>
 
-                <!-- Two stat cards side by side: keys + streak -->
+                <!-- Streak card -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -294,38 +292,7 @@
                         android:layout_weight="1"
                         android:orientation="vertical"
                         android:background="@drawable/card_background"
-                        android:padding="16dp"
-                        android:layout_marginEnd="6dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="YOUR KEYS"
-                            android:textSize="11sp"
-                            android:textStyle="bold"
-                            android:letterSpacing="0.05"
-                            android:textColor="@color/text_muted" />
-
-                        <TextView
-                            android:fontFamily="@font/poppins_bold"
-                            android:includeFontPadding="false"
-                            android:id="@+id/key_balance_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0"
-                            android:textSize="32sp"
-                            android:textColor="@color/vg_green_dark" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:background="@drawable/card_background"
-                        android:padding="16dp"
-                        android:layout_marginStart="6dp">
+                        android:padding="16dp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -369,12 +336,12 @@
                     app:cornerRadius="16dp"
                     app:elevation="0dp" />
 
-                <!-- Buy keys: one slim outlined button, no big card -->
+                <!-- Buy status viewers: one slim outlined button, no big card -->
                 <com.google.android.material.button.MaterialButton
                     android:fontFamily="@font/poppins_bold"
                     android:includeFontPadding="false"
                     android:textSize="16sp"
-                    android:id="@+id/buy_keys_btn"
+                    android:id="@+id/buy_viewers_btn"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
                     android:text="Buy Status Viewers"

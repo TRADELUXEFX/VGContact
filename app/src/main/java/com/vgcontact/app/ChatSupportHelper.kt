@@ -53,7 +53,7 @@ object ChatSupportHelper {
     fun openWhatsApp(activity: Activity) {
         try {
             val message = Uri.encode("Hi VGContact, I need help with...")
-            val uri = Uri.parse("https://wa.me/${BuyKeysActivity.SUPPORT_WHATSAPP}?text=$message")
+            val uri = Uri.parse("https://wa.me/${SupportContact.WHATSAPP}?text=$message")
             activity.startActivity(Intent(Intent.ACTION_VIEW, uri))
         } catch (e: Exception) {
             Toast.makeText(activity, "WhatsApp not installed", Toast.LENGTH_SHORT).show()
