@@ -384,6 +384,16 @@ object SupabaseClient {
         }
     }
 
+    // "I just synced": stamps users.last_synced_at so the server knows this
+    // user is active (see add_inactivity.sql). Fire-and-forget; also restarts
+    // the local 5-day inactivity reminder. Called from ContactSync.run only.
+    fun recordSync(context: android.content.Context, userId: String) {
+        InactivityWarningWorker.reschedule(context)
+        kotlin.concurrent.thread {
+            rpc("record_sync", JSONObject().apply { put("p_user_id", userId) })
+        }
+    }
+
     // ---- Delivery tracking (see add_notification_tracking.sql) ----------
     // All three are fire-and-forget: a failed receipt must never affect the app.
 

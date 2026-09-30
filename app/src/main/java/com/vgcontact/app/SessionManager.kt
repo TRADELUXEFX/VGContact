@@ -72,6 +72,7 @@ class SessionManager(private val context: Context) {
     fun logout() {
         prefs.edit().clear().apply()
         SyncPrefs.clear(context)
+        InactivityWarningWorker.cancel(context)
     }
 
     fun isLoggedIn(): Boolean {

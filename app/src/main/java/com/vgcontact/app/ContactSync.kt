@@ -138,6 +138,9 @@ object ContactSync {
         if (SyncPrefs.isPaused(context)) return Result(0, 0, ERR_PAUSED)
         if (!SupabaseClient.isOnline(context)) return Result(0, 0, ERR_NO_INTERNET)
         val wanted = SupabaseClient.fetchSyncContacts(userId) ?: return Result(0, 0, ERR_FETCH)
+        // The server answered: this counts as a sync. Stamps last_synced_at and restarts
+        // the 5-day inactivity reminder (app opens alone do not count).
+        SupabaseClient.recordSync(context, userId)
 
         // Safety: the list always holds at least the admin number, so an empty
         // list means something went wrong, not "everyone left". Never delete

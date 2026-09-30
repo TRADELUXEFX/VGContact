@@ -32,7 +32,7 @@ Three parts:
 10. **Support.** "Buy Status Viewers" opens a WhatsApp chat with support (number in `SupportContact.kt`).
 
 ## 4. Tables (public schema)
-- `users`: id, android_id, username, phone, referred_by, created_at, total_downloads, total_reposts, subscription_status, key_balance (unused), fcm_token, is_banned, ban_reason, fcm_token_updated_at, notifications_enabled, notifications_enabled_at
+- `users`: id, android_id, username, phone, referred_by, created_at, total_downloads, total_reposts, last_synced_at, subscription_status, key_balance (unused), fcm_token, is_banned, ban_reason, fcm_token_updated_at, notifications_enabled, notifications_enabled_at
 - `contact_groups`: id, group_number, member_count, is_full, is_published, created_at, filled_at
 - `contact_group_members`: id, group_id, user_id, username, phone, member_position (smallint, no upper limit), created_at, joined_via (`signup` or `added`)
 - `daily_reposts`: id, user_id, repost_date, phone, status (`pending`/`verified`/`rejected`), verified_at, created_at (unique per user and date)
@@ -57,6 +57,7 @@ All are `SECURITY DEFINER` and read-only unless noted.
 - `_verify_repost(user, date)`: returns `no_pending_repost`, `cap_reached` or `verified`; on verify it calls `_grant_next_group`.
 - `register_or_fetch_user`: validates, auto-numbers duplicate usernames (chidera → chidera2), inserts the user, then places them in a group. Phone format is 11 digits starting with 0.
 - `submit_daily_repost`: returns `OK`, `ALREADY_REPOSTED_TODAY`, `REPOST_LIMIT_REACHED` or `USER_NOT_FOUND`.
+- `record_sync(user)`: stamps `users.last_synced_at` (called by `ContactSync.run` after every successful sync: button, first run, resume, background; opening the app does not count). Helpers `_inactive_after_days` (setting `inactive_after_days`, default 30) and `_is_inactive`.
 - `save_fcm_token`, `report_notifications_enabled`, `mark_notifications_read`, `record_notification_delivered/opened`.
 - `send_daily_repost_reminder`: inserts reminder notifications (run by cron).
 
@@ -122,3 +123,4 @@ Single-file page. Tabs cover users, pending reposts (verify/reject), settings, n
 - 2026-09-30: Home referral link restyled to match the earlier design: bordered see-through box in the green header, label "Your referral link" above the sliding link, white Copy button inside on the right. Share button removed from Home (Share stays on the Referral tab).
 - 2026-09-30: Home permission banner now also warns when Contacts are off and when battery optimization may stop background sync (was Notifications only). Profile got a **Sync every N hours** picker (1, 6, 12, 24). Device rule screens (ported from VGKontact, full screens): `DeviceBlockedActivity` (reason DEVICE: sign-up returned the phone's existing account, so it shows that account with a Log in button; reason NUMBER: login number belongs to another phone, shows a "verification code" (the Android ID, never called that on screen) to copy and a Contact customer care button) and `DeviceUnverifiedActivity` (phone returned no Android ID: Try again / Contact customer care). Both replace the old toasts in `RegisterActivity` and `LoginActivity`; only active when `require_android_id` is on. No database change.
 - 2026-09-30: Home referral link box made smaller (text 11/13sp, Copy button 36dp) so it matches the other Home cards. Layout only.
+- 2026-09-30: Inactivity (part 1). New `users.last_synced_at`, `record_sync`, `_inactive_after_days`, `_is_inactive` (SQL in `add_inactivity.sql`). App calls `record_sync` after every successful contact sync (not on app open) and shows a notification after 5 days with no successful sync (`InactivityWarningWorker`, timer restarted on every sync). Part 2 (hide users inactive 30+ days from `get_sync_contacts`) is pending; until it is done, being inactive (no sync for 30 days) changes nothing on the server.
