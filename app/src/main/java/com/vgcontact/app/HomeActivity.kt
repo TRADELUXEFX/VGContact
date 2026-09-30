@@ -80,10 +80,32 @@ class HomeActivity : AppCompatActivity() {
         }
         CommunityLink.refresh(this)
 
+        setupReferralLink()
+
         BottomNavHelper.setup(this, BottomNavHelper.Tab.HOME)
         contactUsFab = FloatingContactHelper.attach(this)
 
         findViewById<View>(R.id.home_content_scroll).post { showHomeTourIfNeeded() }
+    }
+
+    // Referral link row in the green header card: the link is LINK_BASE + the user's phone
+    // number (same value the Referral tab shares). Copy copies the full link.
+    private fun setupReferralLink() {
+        val phone = sessionManager.getPhone().orEmpty()
+        val link = if (phone.isNotBlank()) ReferralActivity.LINK_BASE + phone else ""
+        val card = findViewById<View>(R.id.home_referral_card)
+        if (link.isBlank()) {
+            card.visibility = View.GONE
+            return
+        }
+        // Full link, unshortened. It sits in a HorizontalScrollView, so the
+        // user slides it sideways to read the whole thing.
+        findViewById<TextView>(R.id.home_referral_link_text).text = link
+        findViewById<View>(R.id.home_referral_copy_btn).setOnClickListener {
+            val clipboard = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
+            clipboard.setPrimaryClip(android.content.ClipData.newPlainText("referral_link", link))
+            Toast.makeText(this, "Copied!", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun showHomeTourIfNeeded() {

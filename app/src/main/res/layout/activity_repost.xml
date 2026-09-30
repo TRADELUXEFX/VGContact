@@ -39,6 +39,57 @@
                 android:textColor="@color/white"
                 android:textAlignment="center" />
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Repost daily. Build your streak. Climb the board."
+                android:textSize="12sp"
+                android:textColor="@color/white"
+                android:alpha="0.9"
+                android:textAlignment="center"
+                android:fontFamily="@font/poppins" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/header_tab_track_background"
+                android:padding="4dp"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    android:id="@+id/repost_tab_mine"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="My Repost"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:includeFontPadding="false"
+                    android:textSize="13sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="@drawable/referral_tab_selected_background"
+                    android:textColor="@color/vg_green" />
+
+                <TextView
+                    android:id="@+id/repost_tab_board"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:gravity="center"
+                    android:text="Leaderboard"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:includeFontPadding="false"
+                    android:textSize="13sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:textColor="@color/white" />
+
+            </LinearLayout>
+
         </LinearLayout>
 
         <ScrollView
@@ -54,6 +105,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="16dp">
+
+                <!-- ===== MY REPOST PANEL ===== -->
+                <LinearLayout
+                    android:id="@+id/repost_panel_mine"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                 <!-- 3. How it works: its own card, three numbered steps.
                      The X hides the whole card; "Show how it works"
@@ -311,6 +369,89 @@
                     app:iconTint="@color/vg_green_dark"
                     app:iconGravity="textStart"
                     app:cornerRadius="16dp" />
+
+                </LinearLayout>
+
+                <!-- ===== LEADERBOARD PANEL ===== -->
+                <LinearLayout
+                    android:id="@+id/repost_panel_board"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <!-- VGK-style board: one card, column headers, numbered rows -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:background="@drawable/card_background"
+                        android:padding="20dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:paddingBottom="8dp">
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="RANK / USERNAME"
+                                android:textSize="11sp"
+                                android:letterSpacing="0.05"
+                                android:textColor="@color/text_muted" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="REPOSTS"
+                                android:textSize="11sp"
+                                android:letterSpacing="0.05"
+                                android:textColor="@color/text_muted" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/stats_card_border" />
+
+                        <LinearLayout
+                            android:id="@+id/board_list"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:orientation="vertical" />
+
+                        <HorizontalScrollView
+                            android:id="@+id/board_pager_scroll"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:scrollbars="none"
+                            android:visibility="gone">
+                            <LinearLayout
+                                android:id="@+id/board_pager"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center" />
+                        </HorizontalScrollView>
+
+                        <TextView
+                            android:id="@+id/board_message"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="24dp"
+                            android:gravity="center"
+                            android:textSize="13sp"
+                            android:textColor="@color/text_muted"
+                            android:text="Loading..." />
+
+                    </LinearLayout>
+
+                </LinearLayout>
 
             </LinearLayout>
         </ScrollView>

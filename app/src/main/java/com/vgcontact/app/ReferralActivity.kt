@@ -288,8 +288,9 @@ class ReferralActivity : AppCompatActivity() {
         line.addView(col)
 
         if (!atLastLevel) {
-            // Trailing pill: message icon, invite count, and an arrow when the
-            // person has invited others (so the row can be opened).
+            // Trailing pill: invite count, and an arrow when the person has
+            // invited others (so the row can be opened). The message icon sits
+            // outside the pill as its own round button.
             val count = item.invitedCount
             val pill = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
@@ -297,7 +298,6 @@ class ReferralActivity : AppCompatActivity() {
                 background = ContextCompat.getDrawable(this@ReferralActivity, R.drawable.freq_summary_pill_background)
                 setPadding(dp(12), dp(6), dp(12), dp(6))
             }
-            pill.addView(nudgeIcon(item, 18))
             pill.addView(TextView(this).apply {
                 text = if (count > 0) "$count invited" else "no invites yet"
                 textSize = 12f
@@ -310,7 +310,7 @@ class ReferralActivity : AppCompatActivity() {
                 if (count > 0) setTypeface(typeface, android.graphics.Typeface.BOLD)
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply { marginStart = dp(8) }
+                )
             })
             if (count > 0) {
                 pill.addView(ImageView(this).apply {
@@ -323,9 +323,12 @@ class ReferralActivity : AppCompatActivity() {
                 row.setOnClickListener { drillInto(item) }
             }
             line.addView(pill)
+            line.addView(nudgeIcon(item).apply {
+                (layoutParams as LinearLayout.LayoutParams).marginStart = dp(10)
+            })
         } else {
-            // Last level: nothing opens further, only the message icon.
-            line.addView(nudgeIcon(item, 24))
+            // Last level: nothing opens further, only the message button.
+            line.addView(nudgeIcon(item))
         }
 
         row.addView(line)
@@ -338,12 +341,16 @@ class ReferralActivity : AppCompatActivity() {
         return row
     }
 
-    private fun nudgeIcon(item: SupabaseClient.MyReferral, sizeDp: Int): ImageView =
+    // Round message button, shown outside the invite pill (same style as the
+    // copy button on the code card).
+    private fun nudgeIcon(item: SupabaseClient.MyReferral): ImageView =
         ImageView(this).apply {
             setImageResource(R.drawable.ic_chat)
-            setColorFilter(ContextCompat.getColor(this@ReferralActivity, R.color.vg_green))
+            setColorFilter(ContextCompat.getColor(this@ReferralActivity, R.color.vg_green_dark))
+            background = ContextCompat.getDrawable(this@ReferralActivity, R.drawable.icon_button_circle)
+            setPadding(dp(10), dp(10), dp(10), dp(10))
             contentDescription = "Message ${item.username} on WhatsApp"
-            layoutParams = LinearLayout.LayoutParams(dp(sizeDp), dp(sizeDp))
+            layoutParams = LinearLayout.LayoutParams(dp(40), dp(40))
             isClickable = true
             isFocusable = true
             setOnClickListener { openWhatsApp(item.phone) }

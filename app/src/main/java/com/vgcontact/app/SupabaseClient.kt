@@ -293,6 +293,43 @@ object SupabaseClient {
         return out
     }
 
+    // One row of the repost leaderboard. score = verified reposts (or, for the
+    // "streak" metric, current streak days). Usernames only, never phones.
+    data class RepostBoardEntry(
+        val rank: Int,
+        val userId: String,
+        val username: String,
+        val score: Int,
+        val isMe: Boolean
+    )
+
+    // Repost leaderboard via get_leaderboard. metric = "reposts" or "streak";
+    // all-time, top 50 plus the caller's own row even when outside the top.
+    // Blocking - call from a background thread. Null = failed.
+    fun fetchRepostLeaderboard(userId: String, metric: String): List<RepostBoardEntry>? {
+        val params = JSONObject().apply {
+            put("p_user_id", userId)
+            put("p_metric", metric)
+            put("p_period", "all")
+            put("p_limit", 50)
+        }
+        val arr = rpc("get_leaderboard", params) ?: return null
+        val out = mutableListOf<RepostBoardEntry>()
+        for (i in 0 until arr.length()) {
+            val r = arr.getJSONObject(i)
+            out.add(
+                RepostBoardEntry(
+                    rank = r.optInt("rank", i + 1),
+                    userId = r.optString("user_id"),
+                    username = r.optString("username"),
+                    score = r.optInt("score", 0),
+                    isMe = r.optBoolean("is_me", false)
+                )
+            )
+        }
+        return out
+    }
+
     // A notification the user can see: their own targeted rows (a group
     // they're in became full) plus every broadcast row (any group filled).
     data class AppNotification(

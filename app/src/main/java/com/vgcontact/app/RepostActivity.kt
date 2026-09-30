@@ -5,7 +5,11 @@ import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
+import android.graphics.Typeface
+import android.text.TextUtils
+import androidx.core.content.res.ResourcesCompat
 import android.widget.ImageView
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
@@ -23,11 +27,17 @@ import kotlin.concurrent.thread
  * against the admin's WhatsApp status viewers; once the admin marks the
  * repost 'verified' the user gets the "Repost verified" push and the
  * streak counts it. This screen never touches keys.
+ *
+ * Two tabs in the header: My Repost (the button and streak) and Leaderboard
+ * (hero rank card, top-3 podium, ranked list with a pager; styled after
+ * VGKontact's repost leaderboard). The board comes from get_leaderboard:
+ * usernames and counts only, never phone numbers.
  */
 class RepostActivity : AppCompatActivity() {
 
     companion object {
         private const val PREF_TODAYS_TASK_DISMISSED = "todays_task_dismissed"
+        private const val BOARD_PAGE_SIZE = 10
     }
 
     private lateinit var sessionManager: SessionManager
@@ -47,6 +57,22 @@ class RepostActivity : AppCompatActivity() {
     private lateinit var todaysTaskCard: LinearLayout
     private lateinit var todaysTaskClose: ImageView
     private lateinit var todaysTaskRestore: TextView
+
+    // Leaderboard tab
+    private lateinit var tabMine: TextView
+    private lateinit var tabBoard: TextView
+    private lateinit var panelMine: View
+    private lateinit var panelBoard: View
+    private lateinit var boardList: LinearLayout
+    private lateinit var boardPagerScroll: View
+    private lateinit var boardPager: LinearLayout
+    private lateinit var boardMessage: TextView
+
+    private var board: List<SupabaseClient.RepostBoardEntry> = emptyList()
+    private var boardStreaks: Map<String, Int> = emptyMap()
+    private var boardPage = 0
+    private var boardRequest = 0
+    private var onBoardTab = false
 
     // Both fetches must finish before the body is revealed on first
     // load (the green header stays visible the whole time, same as Get
@@ -90,6 +116,10 @@ class RepostActivity : AppCompatActivity() {
         todaysTaskRestore.setOnClickListener { restoreTodaysTask() }
         applyTodaysTaskVisibility()
 
+        bindBoardViews()
+        tabMine.setOnClickListener { showMineTab() }
+        tabBoard.setOnClickListener { showBoardTab() }
+
         repostTodayBtn.setOnClickListener { onRepostTodayClicked() }
         buyViewersBtn.setOnClickListener { openBuyViewers() }
 
@@ -120,6 +150,7 @@ class RepostActivity : AppCompatActivity() {
         // Covers the case where verification landed while the user was
         // away from this screen (e.g. reopening the app the next day).
         refreshTodayStatus()
+        if (onBoardTab) loadBoard()
     }
 
     private fun revealContentIfReady() {
@@ -287,6 +318,241 @@ class RepostActivity : AppCompatActivity() {
     // Opens a WhatsApp chat with support to buy status viewers.
     private fun openBuyViewers() {
         SupportContact.openBuyViewers(this)
+    }
+
+    // ------------------------------------------------------------------
+    // Tabs
+    // ------------------------------------------------------------------
+
+    private fun bindBoardViews() {
+        tabMine = findViewById(R.id.repost_tab_mine)
+        tabBoard = findViewById(R.id.repost_tab_board)
+        panelMine = findViewById(R.id.repost_panel_mine)
+        panelBoard = findViewById(R.id.repost_panel_board)
+        boardList = findViewById(R.id.board_list)
+        boardPagerScroll = findViewById(R.id.board_pager_scroll)
+        boardPager = findViewById(R.id.board_pager)
+        boardMessage = findViewById(R.id.board_message)
+    }
+
+    private fun showMineTab() {
+        onBoardTab = false
+        panelMine.visibility = View.VISIBLE
+        panelBoard.visibility = View.GONE
+        styleTab(tabMine, true)
+        styleTab(tabBoard, false)
+    }
+
+    private fun showBoardTab() {
+        onBoardTab = true
+        panelMine.visibility = View.GONE
+        panelBoard.visibility = View.VISIBLE
+        styleTab(tabBoard, true)
+        styleTab(tabMine, false)
+        // The board has its own loading text, so don't make it wait for
+        // today's repost status before the body shows.
+        if (!initialContentRevealed) {
+            initialContentRevealed = true
+            loadingState.visibility = View.GONE
+            contentScroll.visibility = View.VISIBLE
+        }
+        loadBoard()
+    }
+
+    private fun styleTab(tab: TextView, selected: Boolean) {
+        tab.background = if (selected)
+            ContextCompat.getDrawable(this, R.drawable.referral_tab_selected_background) else null
+        tab.setTextColor(ContextCompat.getColor(this, if (selected) R.color.vg_green else R.color.white))
+    }
+
+    // ------------------------------------------------------------------
+    // Leaderboard
+    // ------------------------------------------------------------------
+
+    private fun loadBoard() {
+        val userId = sessionManager.getUserId().orEmpty()
+        val requestId = ++boardRequest
+        if (board.isEmpty()) {
+            boardList.removeAllViews()
+            boardPagerScroll.visibility = View.GONE
+            boardMessage.visibility = View.VISIBLE
+            boardMessage.text = "Loading..."
+        }
+        if (userId.isBlank()) {
+            boardMessage.text = "No reposts yet. Be the first on the board."
+            return
+        }
+        thread {
+            val reposts = SupabaseClient.fetchRepostLeaderboard(userId, "reposts")
+            // Streaks only decorate the rows; if this call fails the board
+            // still shows, just without the flame chips.
+            val streaks = if (reposts != null)
+                SupabaseClient.fetchRepostLeaderboard(userId, "streak") else null
+            runOnUiThread {
+                if (isFinishing || requestId != boardRequest) return@runOnUiThread
+                if (reposts == null) {
+                    if (board.isEmpty()) {
+                        boardMessage.visibility = View.VISIBLE
+                        boardMessage.text = if (!SupabaseClient.isOnline(this))
+                            "No internet connection. Check your connection and try again."
+                        else "Couldn't load the leaderboard. Please try again."
+                    }
+                    return@runOnUiThread
+                }
+                board = reposts
+                boardStreaks = streaks?.associate { it.userId to it.score } ?: emptyMap()
+                boardPage = 0
+                renderBoard()
+            }
+        }
+    }
+
+    private fun renderBoard() {
+        boardList.removeAllViews()
+        if (board.isEmpty()) {
+            boardPagerScroll.visibility = View.GONE
+            boardMessage.visibility = View.VISIBLE
+            boardMessage.text = "No reposts yet. Be the first on the board."
+            return
+        }
+        boardMessage.visibility = View.GONE
+
+        // 10 rows per page, ranked by the server (ties share a rank).
+        val pages = maxOf(1, (board.size + BOARD_PAGE_SIZE - 1) / BOARD_PAGE_SIZE)
+        if (boardPage >= pages) boardPage = pages - 1
+        val start = boardPage * BOARD_PAGE_SIZE
+        val rows = board.subList(start, minOf(start + BOARD_PAGE_SIZE, board.size))
+        rows.forEachIndexed { i, entry ->
+            boardList.addView(buildBoardRow(entry))
+            if (i != rows.lastIndex) {
+                boardList.addView(View(this).apply {
+                    layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1)
+                    setBackgroundColor(ContextCompat.getColor(this@RepostActivity, R.color.stats_card_border))
+                })
+            }
+        }
+        buildBoardPager(pages)
+    }
+
+    private fun fontBold(): Typeface? = try {
+        ResourcesCompat.getFont(this, R.font.poppins_bold)
+    } catch (e: Exception) { null }
+
+    private fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
+
+    // One row, same scheme as VGKontact's repost board: numbered circle
+    // (gold / silver / bronze for 1-3, soft green after), name, flame streak
+    // chip at 3+ days, repost count on the right. The user's row is tinted.
+    private fun buildBoardRow(entry: SupabaseClient.RepostBoardEntry): View {
+        val row = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(dp(12), dp(16), dp(12), dp(16))
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            if (entry.isMe) setBackgroundResource(R.drawable.repost_row_me_background)
+        }
+
+        val top3 = entry.rank in 1..3
+        val badgeBg = when (entry.rank) {
+            1 -> R.drawable.repost_rank_1
+            2 -> R.drawable.repost_rank_2
+            3 -> R.drawable.repost_rank_3
+            else -> R.drawable.repost_rank_other
+        }
+        row.addView(TextView(this).apply {
+            text = entry.rank.toString()
+            textSize = 15f
+            typeface = fontBold()
+            includeFontPadding = false
+            gravity = Gravity.CENTER
+            setBackgroundResource(badgeBg)
+            setTextColor(ContextCompat.getColor(this@RepostActivity,
+                if (top3) R.color.white else R.color.vg_green_dark))
+            layoutParams = LinearLayout.LayoutParams(dp(36), dp(36))
+        })
+
+        val nameCol = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                .apply { marginStart = dp(14); marginEnd = dp(8) }
+        }
+        nameCol.addView(TextView(this).apply {
+            text = if (entry.isMe) "You" else entry.username
+            textSize = 16f
+            if (entry.isMe || top3) typeface = fontBold()
+            includeFontPadding = false
+            maxLines = 1
+            ellipsize = TextUtils.TruncateAt.END
+            setTextColor(ContextCompat.getColor(this@RepostActivity, R.color.vg_dark))
+        })
+        val streak = boardStreaks[entry.userId] ?: 0
+        if (streak >= 3) nameCol.addView(streakChip(streak))
+        row.addView(nameCol)
+
+        row.addView(TextView(this).apply {
+            text = entry.score.toString()
+            textSize = 18f
+            typeface = fontBold()
+            includeFontPadding = false
+            setTextColor(ContextCompat.getColor(this@RepostActivity, R.color.vg_green))
+        })
+        return row
+    }
+
+    private fun streakChip(days: Int): View {
+        val chip = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setBackgroundResource(R.drawable.repost_streak_chip)
+            setPadding(dp(8), dp(3), dp(8), dp(3))
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { marginStart = dp(8) }
+        }
+        chip.addView(ImageView(this).apply {
+            setImageResource(R.drawable.ic_repost)
+            setColorFilter(ContextCompat.getColor(this@RepostActivity, R.color.vg_green_dark))
+            layoutParams = LinearLayout.LayoutParams(dp(12), dp(12))
+        })
+        chip.addView(TextView(this).apply {
+            text = days.toString()
+            textSize = 11f
+            typeface = fontBold()
+            includeFontPadding = false
+            setTextColor(ContextCompat.getColor(this@RepostActivity, R.color.vg_green_dark))
+            setPadding(dp(3), 0, 0, 0)
+        })
+        return chip
+    }
+
+    // Numbered page circles, hidden when everything fits on one page.
+    private fun buildBoardPager(pages: Int) {
+        if (pages <= 1) {
+            boardPagerScroll.visibility = View.GONE
+            return
+        }
+        boardPagerScroll.visibility = View.VISIBLE
+        boardPager.removeAllViews()
+        for (i in 0 until pages) {
+            val selected = i == boardPage
+            boardPager.addView(TextView(this).apply {
+                text = (i + 1).toString()
+                textSize = 13f
+                gravity = Gravity.CENTER
+                setBackgroundResource(
+                    if (selected) R.drawable.page_button_selected_background
+                    else R.drawable.page_button_default_background
+                )
+                setTextColor(ContextCompat.getColor(this@RepostActivity, if (selected) R.color.white else R.color.vg_dark))
+                layoutParams = LinearLayout.LayoutParams(dp(34), dp(34)).apply {
+                    marginStart = if (i == 0) 0 else dp(8)
+                }
+                setOnClickListener { if (!selected) { boardPage = i; renderBoard() } }
+            })
+        }
     }
 
     private fun setupBottomNav() {
