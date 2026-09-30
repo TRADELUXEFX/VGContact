@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import org.json.JSONObject
 
-class SessionManager(context: Context) {
+class SessionManager(private val context: Context) {
     private val prefs: SharedPreferences = context.getSharedPreferences("vgkontact_session", Context.MODE_PRIVATE)
 
     fun saveUsername(username: String) {
@@ -71,6 +71,7 @@ class SessionManager(context: Context) {
 
     fun logout() {
         prefs.edit().clear().apply()
+        SyncPrefs.clear(context)
     }
 
     fun isLoggedIn(): Boolean {

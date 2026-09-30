@@ -220,12 +220,15 @@ class HomeActivity : AppCompatActivity() {
                 syncBtn.isEnabled = true
                 syncBtn.text = original
                 val message = when {
+                    result.error == ContactSync.ERR_BANNED -> "This account is banned"
+                    result.error == ContactSync.ERR_PAUSED -> "Syncing is paused. Tap Resume Syncing in Profile."
                     result.error == ContactSync.ERR_NO_INTERNET -> "No internet connection"
                     result.error == ContactSync.ERR_FETCH -> "Couldn't reach the server. Try again."
                     result.failed > 0 -> "${result.added} added, ${result.failed} failed"
+                    result.added == 0 && result.removed > 0 -> "${result.removed} inactive contact(s) removed"
                     result.added == 0 -> "Your contacts are up to date"
-                    result.added == 1 -> "1 new contact added"
-                    else -> "${result.added} new contacts added"
+                    SyncPrefs.getTodayAdded(this) == 1 -> "1 contact added today"
+                    else -> "${SyncPrefs.getTodayAdded(this)} contacts added today"
                 }
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show()
                 loadHome()

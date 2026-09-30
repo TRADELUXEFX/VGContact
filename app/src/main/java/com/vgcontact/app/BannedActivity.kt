@@ -100,7 +100,18 @@ class BannedActivity : AppCompatActivity() {
             findViewById<View>(R.id.bannedAccountSection).visibility = View.VISIBLE
         }
         showReason(BanPrefs.reason(this))
+        removeSavedContacts()
         findViewById<Button>(R.id.contactCareButton).setOnClickListener { openWhatsApp() }
+    }
+
+    // A banned account keeps no VGContact numbers on the phone: remove every
+    // contact the app saved (names ending in VGC<N>). Contacts without that
+    // tag are never touched. Syncing itself is blocked while banned, and
+    // starts again by itself if the ban is lifted.
+    private fun removeSavedContacts() {
+        if (!ContactSync.hasPermission(this)) return
+        val app = applicationContext
+        Thread { try { ContactSync.deleteAll(app) } catch (_: Throwable) { } }.start()
     }
 
     private fun showReason(code: String?) {

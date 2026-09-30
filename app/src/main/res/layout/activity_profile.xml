@@ -224,6 +224,25 @@
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:fontFamily="@font/poppins_bold"
+            android:includeFontPadding="false"
+            android:textSize="16sp"
+            android:id="@+id/delete_contacts_btn"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            android:text="Delete My Contacts"
+            android:textAllCaps="false"
+            android:textColor="@color/vg_red"
+            app:icon="@drawable/ic_delete"
+            app:iconTint="@color/vg_red"
+            app:iconGravity="textStart"
+            app:strokeColor="@color/vg_red"
+            app:strokeWidth="1.5dp"
+            app:cornerRadius="16dp" />
+
+        <com.google.android.material.button.MaterialButton
             android:fontFamily="@font/poppins_bold"
             android:includeFontPadding="false"
             android:textSize="16sp"

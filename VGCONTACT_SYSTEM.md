@@ -21,11 +21,13 @@ Three parts:
 1. **Signup.** The new user goes into the lowest-numbered group that is not full. If every group is full, a new group is created. A group fills at `group_size` signups (default 3). When it fills it becomes `is_full` and `is_published`.
 2. **Free viewers** = signups in your own default group, shown as current / group_size (for example 1/3).
 3. **Repost.** A user may submit one repost per UTC day. It starts `pending`. Blocked once the user has `free_repost_cap` verified reposts (default 3).
-4. **Verify.** The admin verifies a pending repost. The user is then added (`joined_via = 'added'`) to the lowest-numbered full group they are not already in. If no full group exists, they get nothing, and the verified repost still counts toward the cap.
+4. **Verify.** The admin verifies a pending repost. The user is then added (`joined_via = 'added'`) to the lowest-numbered full group they are not already in. If no full group exists, they get nothing, and the verified repost still counts toward the cap. **Catch-up:** every 10 minutes `_catch_up_group_grants` gives users any group they are owed (verified reposts, capped by `free_repost_cap`, minus their `added` groups) once a full group exists.
 5. **Extra viewers** = everyone in every other group the user belongs to, shown as current / max (max is the larger of group_size and the actual count, per group).
 6. **Referred viewers** = users whose `referred_by` matches this user's username (case-insensitive), or is all digits and matches the last 10 digits of this user's phone.
 7. **Verified badge.** A user is VERIFIED once they have at least one verified repost, otherwise PENDING.
 8. **Sync** (what the phone saves): the admin number (`admin_phone`, named `admin_contact_name` or "VGContact Admin"), the optional `anon_phone` (named `anon_contact_name` or "VGContact Status"), plus other members of your groups. Group members are included only if they are not banned and have at least one verified repost themselves. A group counts only if it is full, or if you were added to it.
+   **Referred users** (rule 6) are also in the sync list (from `get_sync_contacts`), named by username; banned ones are excluded, and no verified repost is required from them.
+   **On the phone:** each saved contact is named `<name> VGC<N>` (e.g. `Chidera VGC3`, N = lowest free number). The `VGC<N>` ending is how the app recognises its own contacts, read from the phone itself, so it survives clearing app data. Each sync also removes VGC contacts whose number is no longer in the server list (banned or removed member); contacts without the tag are never touched, and an empty server list never deletes anything.
 9. **Bans** block by user, phone and device (`banned_identities`). Banned users get `ACCOUNT_BANNED`.
 10. **Support.** "Buy Status Viewers" opens a WhatsApp chat with support (number in `SupportContact.kt`).
 
@@ -50,6 +52,7 @@ All are `SECURITY DEFINER` and read-only unless noted.
 
 **Writes:**
 - `_place_user_in_group(user)`: signup placement (advisory lock `vgcontact_group_placement`).
+- `_catch_up_group_grants()`: cron catch-up, calls `_grant_next_group` once per missing group, returns attempts (internal, not granted to anon).
 - `_grant_next_group(user)`: adds the user to the lowest full group they are not in (`joined_via='added'`).
 - `_verify_repost(user, date)`: returns `no_pending_repost`, `cap_reached` or `verified`; on verify it calls `_grant_next_group`.
 - `register_or_fetch_user`: validates, auto-numbers duplicate usernames (chidera → chidera2), inserts the user, then places them in a group. Phone format is 11 digits starting with 0.
@@ -64,7 +67,7 @@ All are `SECURITY DEFINER` and read-only unless noted.
 ## 7. Automatic things
 - **Triggers:** `a_block_signup_when_closed` (BEFORE INSERT on users, honours `registrations_open`); `on_repost_status_change` (AFTER UPDATE on daily_reposts, creates "Repost verified" or "Repost rejected" notifications); `on_notification_created` (AFTER INSERT on notifications, calls the `send-push` edge function).
 - **Push:** needs the secret `service_role_key` in Supabase Vault (confirmed present 2026-09-30). If it is missing, pushes silently do nothing.
-- **Cron:** `daily-repost-reminder` runs at `0 8 * * *` (08:00 UTC, 09:00 Nigeria time).
+- **Cron:** `daily-repost-reminder` runs at `0 8 * * *` (08:00 UTC, 09:00 Nigeria time). `catch-up-group-grants` runs every 10 minutes (`*/10 * * * *`).
 
 ## 8. Permissions gotcha (important)
 The app connects as the `anon` role and can only run functions it has `EXECUTE` on. A new or recreated function may lack it. Symptom: the call fails silently and the screen shows placeholders. Fix:
@@ -78,13 +81,14 @@ Check with `has_function_privilege('anon', p.oid, 'execute')`. Internal helpers 
 - `users.key_balance` still exists and is returned by `login_by_phone`, `register_or_fetch_user`, `admin_find_users` and `admin_pending_reposts`. Harmless. Decide whether to remove.
 - `admin_set_setting` still validates a `keys_per_repost` key. `admin_send_notification` still allows the `open_downloads` action.
 - Old key migrations in `supabase/migrations` are misleading. Decide whether to delete them.
-- A repost verified before any group is full gives nothing and is not retried later. Decide whether to add a catch-up.
+- ~~A repost verified before any group is full gives nothing~~ Resolved 2026-09-30 by the catch-up cron.
 
 ## 10. Android app map (`app/src/main/java/com/vgcontact/app`)
 - `SupabaseClient.kt`: every server call (`rpc("name", params)`); reads `SUPABASE_URL` and `SUPABASE_ANON_KEY` from BuildConfig.
 - `HomeActivity`: Free/Extra/Referred viewers (from `get_home`), Sync Contacts, Buy Status Viewers. Starts at 0 and /0; shows a toast if loading fails.
 - `RepostActivity` (no leaderboard; header title only), `ReferralActivity` (built like Repost: centered title, no Back arrow), `ProfileActivity`, `NotificationsActivity`, `LoginActivity`, `RegisterActivity`, `SessionManager` (stores `user_id`), `ContactSync` (writes contacts to the phone), `SupportContact.kt`, `LegalContent.kt` (Terms and Privacy, rewritten for groups and reposts).
-- `DailySyncWorker.kt`: background contact sync every ~24 hours (WorkManager), scheduled from `VGApp`. Same `ContactSync` as the Sync button; needs contacts permission, login and internet.
+- `DailySyncWorker.kt`: background contact sync every ~24 hours (WorkManager), scheduled from `VGApp`. Same `ContactSync` as the Sync button. Skips when logged out, banned or paused. Contacts permission off gives one reminder notification. Offline or server failure queues a one-time retry that fires when the network returns. New contacts added gives a notification like "3 contacts synced today at 10:30" (nothing is shown on Home). With data off, the sync waits and runs, with the notification, as soon as data is back.
+- `SyncPrefs.kt`: local paused flag (`vgc_sync` prefs). Profile > **Delete My Contacts** removes every `VGC<N>` contact and pauses all syncing (button, first-run, background); the same button becomes **Resume Syncing**, which unpauses and syncs at once. Pause is local only, not reported to the database.
 - `BuyKeysActivity.kt` and `DownloadsActivity.kt` are empty stubs and can be deleted from the repo.
 - Build: GitHub Actions (`.github/workflows/deploy.yml`) using secrets `SUPABASE_URL` and `SUPABASE_ANON_KEY`. Debug-signed APKs.
 - UI convention: green top, white bottom, Poppins font.
@@ -103,3 +107,10 @@ Single-file page. Tabs cover users, pending reposts (verify/reject), settings, n
 - 2026-09-30: Leaderboard removed from the Repost screen (tabs, layout, client code). Referral screen rebuilt from scratch to match Repost (no Back arrow, same header and cards). Phone Back on Repost, Referral and Profile now returns to Home; Home exits the app.
 - 2026-09-30: Permission screen now has step 2 (contacts). If allowed, the sync runs right there and saves the contacts (admin number, and verified group members) before Home opens. Before this, contacts were only requested when tapping Sync Contacts on Home.
 - 2026-09-30: Added background contact sync every ~24 hours (`DailySyncWorker`, WorkManager). There was no background sync before.
+- 2026-09-30: Contact naming and cleanup ported from VGKontact, tag `VGC`. Contacts saved as `<name> VGC<N>`; sync now removes VGC contacts that left the server list (with empty-list safety); Profile got Delete My Contacts / Resume Syncing with a local pause flag honoured by the background worker. No database change.
+- 2026-09-30: Banned screen now removes every VGC contact from the phone; `ContactSync.run` refuses to sync while `BanPrefs.isBanned` (resumes on its own if the ban is lifted). Background worker upgraded: retry on reconnect, permission-off reminder, new-contacts notification. No database change.
+- 2026-09-30: `get_sync_contacts` now also returns users referred by the caller (rule 6 matching, banned excluded). SQL in `get_sync_contacts_with_referrals.sql`. No app change.
+- 2026-09-30: Added `_catch_up_group_grants` and cron `catch-up-group-grants` (every 10 min) so reposts verified before any group was full get their groups later. SQL in `catch_up_group_grants.sql`. No app change.
+- 2026-09-30: Background sync notification now reads "N contacts synced today at HH:mm". No Home-screen line, no sync history screen.
+- 2026-09-30: Sync Contacts button message on Home now reads "N contacts added today". Problem messages (no internet, banned, paused) unchanged.
+- 2026-09-30: "N contacts added/synced today" (Sync button message and background notification) is now the running total for the day, kept in `SyncPrefs`; it resets on a new day and when Delete My Contacts is used.
