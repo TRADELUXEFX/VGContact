@@ -97,7 +97,7 @@ class HomeActivity : AppCompatActivity() {
             CoachMarkOverlay.Step(
                 findViewById(R.id.home_contacts_card),
                 "Your viewers",
-                "Free viewers come with your group. Extra viewers come from reposts and purchases.",
+                "Free viewers come with your group. Extra viewers come from verified reposts.",
                 dockAtBottom = true
             ),
             CoachMarkOverlay.Step(
@@ -141,11 +141,23 @@ class HomeActivity : AppCompatActivity() {
 
     private fun loadHome() {
         val userId = sessionManager.getUserId()
-        if (userId.isNullOrBlank()) return
+        if (userId.isNullOrBlank()) {
+            Toast.makeText(this, "No account id saved on this phone. Log out and log in again.", Toast.LENGTH_LONG).show()
+            return
+        }
         Thread {
             SupabaseClient.fetchHome(userId) { ok, home ->
+                val err = SupabaseClient.lastError
                 runOnUiThread {
-                    if (ok && home != null) showHome(home)
+                    if (ok && home != null) {
+                        showHome(home)
+                    } else {
+                        Toast.makeText(
+                            this,
+                            "Couldn't load your viewers: " + (err ?: "no account found for this login. Log out and log in again."),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             }
         }.start()

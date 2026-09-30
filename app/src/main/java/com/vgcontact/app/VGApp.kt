@@ -17,6 +17,7 @@ class VGApp : Application() {
         FloatingContactHelper.register(this)
         createNotificationChannel()
         clearStaleContactFiles()
+        DailySyncWorker.schedule(this)
     }
 
     // Saved contact lists are plaintext .vcf files; nothing needs them once
@@ -39,7 +40,7 @@ class VGApp : Application() {
             "VGContact notifications",
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
-            description = "New files, reposts and unlocks"
+            description = "New files, reposts and viewers"
         }
         manager.createNotificationChannel(channel)
     }

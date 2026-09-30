@@ -104,7 +104,7 @@ class VgFirebaseMessagingService : FirebaseMessagingService() {
                 "VGContact notifications",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "New files, reposts and unlocks"
+                description = "New files, reposts and viewers"
             }
             manager.createNotificationChannel(channel)
         }

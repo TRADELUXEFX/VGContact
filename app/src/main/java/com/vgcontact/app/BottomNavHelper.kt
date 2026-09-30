@@ -16,6 +16,19 @@ object BottomNavHelper {
     enum class Tab { HOME, REPOST, REFERRAL, PROFILE }
 
     fun setup(activity: Activity, selected: Tab) {
+        // Tab screens have no Back arrow. The phone's Back goes to Home
+        // (Home itself exits the app as usual).
+        if (selected != Tab.HOME && activity is androidx.activity.ComponentActivity) {
+            activity.onBackPressedDispatcher.addCallback(
+                activity,
+                object : androidx.activity.OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        activity.startActivity(Intent(activity, HomeActivity::class.java))
+                        activity.finish()
+                    }
+                }
+            )
+        }
         val tabs = listOf(
             Tab.HOME to Triple(R.id.navHomeTab, R.id.navHomeIcon, R.id.navHomeLabel),
             Tab.REPOST to Triple(R.id.navRepostTab, R.id.navRepostIcon, R.id.navRepostLabel),

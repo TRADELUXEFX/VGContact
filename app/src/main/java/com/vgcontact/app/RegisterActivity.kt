@@ -135,7 +135,7 @@ class RegisterActivity : AppCompatActivity() {
                             }
                             sessionManager.saveUsername(finalUsername)
                             sessionManager.savePhone(user.optString("phone", phone))
-                            sessionManager.saveUserId(user.optString("id", ""))
+                            sessionManager.saveUserId(user.optString("id", "").ifBlank { user.optString("user_id", "").ifBlank { user.optString("uid", "") } })
                             sessionManager.saveRegistrationFrom(user)
                             VgFirebaseMessagingService.flushPendingTokenIfAny(this)
                             // Clear the whole back stack so Back from Home can never return to Register/Login.

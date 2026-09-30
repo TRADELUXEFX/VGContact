@@ -22,19 +22,12 @@ import kotlin.concurrent.thread
  * logs a 'pending' row in daily_reposts. Reposts are checked manually
  * against the admin's WhatsApp status viewers; once the admin marks the
  * repost 'verified' the user gets the "Repost verified" push and the
- * streak / leaderboard count it. This screen never touches keys.
+ * streak counts it. This screen never touches keys.
  */
 class RepostActivity : AppCompatActivity() {
 
     companion object {
         private const val PREF_TODAYS_TASK_DISMISSED = "todays_task_dismissed"
-
-        // Leaderboard: ranks by verified reposts inside the chosen period.
-        private const val LB_METRIC = "reposts"
-        private const val LB_LIMIT = 20
-        private const val PERIOD_WEEK = "week"
-        private const val PERIOD_MONTH = "month"
-        private const val PERIOD_ALL = "all"
     }
 
     private lateinit var sessionManager: SessionManager
@@ -50,24 +43,6 @@ class RepostActivity : AppCompatActivity() {
     private lateinit var statusCard: LinearLayout
     private lateinit var statusIcon: ImageView
     private lateinit var statusTitle: TextView
-
-    private lateinit var streakTab: TextView
-    private lateinit var leaderboardTab: TextView
-
-    private lateinit var leaderboardRoot: FrameLayout
-    private lateinit var lbList: LinearLayout
-    private lateinit var lbEmpty: TextView
-    private lateinit var lbLoading: ProgressBar
-    private lateinit var lbYouCard: LinearLayout
-    private lateinit var lbYouRank: TextView
-    private lateinit var lbYouScore: TextView
-    private lateinit var lbChipWeek: TextView
-    private lateinit var lbChipMonth: TextView
-    private lateinit var lbChipAll: TextView
-
-    private var showingLeaderboard = false
-    private var lbPeriod = PERIOD_WEEK
-    private var lbRequestId = 0   // ignores stale responses when the user switches fast
 
     private lateinit var todaysTaskCard: LinearLayout
     private lateinit var todaysTaskClose: ImageView
@@ -108,12 +83,6 @@ class RepostActivity : AppCompatActivity() {
         statusIcon = findViewById(R.id.repost_status_icon)
         statusTitle = findViewById(R.id.repost_status_title)
 
-        streakTab = findViewById(R.id.repost_tab_streak)
-        leaderboardTab = findViewById(R.id.repost_tab_leaderboard)
-        streakTab.setOnClickListener { selectStreakTab() }
-        leaderboardTab.setOnClickListener { selectLeaderboardTab() }
-        setupLeaderboardViews()
-
         todaysTaskCard = findViewById(R.id.todays_task_card)
         todaysTaskClose = findViewById(R.id.todays_task_close)
         todaysTaskRestore = findViewById(R.id.todays_task_restore)
@@ -146,168 +115,11 @@ class RepostActivity : AppCompatActivity() {
         todaysTaskRestore.visibility = if (dismissed) android.view.View.VISIBLE else android.view.View.GONE
     }
 
-    private fun selectStreakTab() {
-        showingLeaderboard = false
-        lbRequestId++   // drop any leaderboard response still in flight
-        streakTab.background = ContextCompat.getDrawable(this, R.drawable.tab_selected_background)
-        streakTab.setTextColor(ContextCompat.getColor(this, R.color.vg_green_dark))
-        leaderboardTab.background = null
-        leaderboardTab.setTextColor(ContextCompat.getColor(this, R.color.white))
-
-        leaderboardRoot.visibility = View.GONE
-        if (initialContentRevealed) {
-            contentScroll.visibility = View.VISIBLE
-            loadingState.visibility = View.GONE
-        } else {
-            contentScroll.visibility = View.GONE
-            loadingState.visibility = View.VISIBLE
-        }
-    }
-
-    private fun selectLeaderboardTab() {
-        showingLeaderboard = true
-        leaderboardTab.background = ContextCompat.getDrawable(this, R.drawable.tab_selected_background)
-        leaderboardTab.setTextColor(ContextCompat.getColor(this, R.color.vg_green_dark))
-        streakTab.background = null
-        streakTab.setTextColor(ContextCompat.getColor(this, R.color.white))
-
-        contentScroll.visibility = View.GONE
-        loadingState.visibility = View.GONE
-        leaderboardRoot.visibility = View.VISIBLE
-        loadLeaderboard()
-    }
-
-    // ---------------------------------------------------------------
-    // Leaderboard (Option 1: podium for the top 3, list for the rest,
-    // "You" card pinned above the bottom nav).
-    // ---------------------------------------------------------------
-
-    private fun setupLeaderboardViews() {
-        leaderboardRoot = findViewById(R.id.repost_leaderboard_root)
-        lbList = findViewById(R.id.lb_list)
-        lbEmpty = findViewById(R.id.lb_empty)
-        lbLoading = findViewById(R.id.lb_loading)
-        lbYouCard = findViewById(R.id.lb_you_card)
-        lbYouRank = findViewById(R.id.lb_you_rank)
-        lbYouScore = findViewById(R.id.lb_you_score)
-        lbChipWeek = findViewById(R.id.lb_chip_week)
-        lbChipMonth = findViewById(R.id.lb_chip_month)
-        lbChipAll = findViewById(R.id.lb_chip_all)
-
-        lbChipWeek.setOnClickListener { selectPeriod(PERIOD_WEEK) }
-        lbChipMonth.setOnClickListener { selectPeriod(PERIOD_MONTH) }
-        lbChipAll.setOnClickListener { selectPeriod(PERIOD_ALL) }
-        lbEmpty.setOnClickListener { loadLeaderboard() }   // tap to retry after an error
-        styleChips()
-    }
-
-    private fun selectPeriod(period: String) {
-        if (period == lbPeriod) return
-        lbPeriod = period
-        styleChips()
-        lbList.removeAllViews()
-        loadLeaderboard()
-    }
-
-    private fun styleChips() {
-        val chips = listOf(
-            lbChipWeek to PERIOD_WEEK,
-            lbChipMonth to PERIOD_MONTH,
-            lbChipAll to PERIOD_ALL
-        )
-        for ((chip, period) in chips) {
-            val selected = period == lbPeriod
-            chip.background = ContextCompat.getDrawable(
-                this,
-                if (selected) R.drawable.filter_chip_selected_background
-                else R.drawable.filter_chip_default_background
-            )
-            chip.setTextColor(
-                ContextCompat.getColor(this, if (selected) R.color.white else R.color.vg_green_dark)
-            )
-        }
-    }
-
-    private fun loadLeaderboard() {
-        val userId = sessionManager.getUserId()
-        if (userId.isNullOrBlank()) {
-            showLeaderboardMessage("Couldn't verify your account. Please restart the app.")
-            return
-        }
-
-        val requestId = ++lbRequestId
-        lbLoading.visibility = View.VISIBLE
-        lbEmpty.visibility = View.GONE
-
-        thread {
-            SupabaseClient.fetchLeaderboard(userId, LB_METRIC, lbPeriod, LB_LIMIT) { success, entries ->
-                runOnUiThread {
-                    // Ignore if the user left the tab or switched period meanwhile.
-                    if (requestId != lbRequestId || !showingLeaderboard) return@runOnUiThread
-                    lbLoading.visibility = View.GONE
-                    if (success) {
-                        renderLeaderboard(entries)
-                    } else {
-                        showLeaderboardMessage("Couldn't load the leaderboard. Tap to try again.")
-                    }
-                }
-            }
-        }
-    }
-
-    private fun showLeaderboardMessage(message: String) {
-        lbList.removeAllViews()
-        lbYouCard.visibility = View.GONE
-        lbEmpty.text = message
-        lbEmpty.visibility = View.VISIBLE
-        lbLoading.visibility = View.GONE
-    }
-
-    private fun scoreLabel(score: Int): String = if (score == 1) "1 repost" else "$score reposts"
-
-    private fun renderLeaderboard(entries: List<SupabaseClient.LeaderboardEntry>) {
-        // The server always appends the caller's own row. When they are
-        // outside the top N it is only shown in the "You" card, not the list.
-        val me = entries.firstOrNull { it.isMe }
-        val visible = entries.filterNot { it.isMe && it.rank > LB_LIMIT }
-
-        lbList.removeAllViews()
-
-        if (visible.isEmpty()) {
-            lbEmpty.text = "No verified reposts yet for this period. Repost today to take the top spot."
-            lbEmpty.visibility = View.VISIBLE
-        } else {
-            lbEmpty.visibility = View.GONE
-            val inflater = LayoutInflater.from(this)
-            for (entry in visible) {
-                val row = inflater.inflate(R.layout.item_leaderboard_row, lbList, false)
-                row.findViewById<TextView>(R.id.lb_row_rank).text = entry.rank.toString()
-                row.findViewById<TextView>(R.id.lb_row_name).text = entry.username
-                row.findViewById<TextView>(R.id.lb_row_score).text = scoreLabel(entry.score)
-                if (entry.isMe) {
-                    row.background = ContextCompat.getDrawable(this, R.drawable.lb_row_me_background)
-                }
-                lbList.addView(row)
-            }
-        }
-
-        // "You" card
-        lbYouCard.visibility = View.VISIBLE
-        if (me != null) {
-            lbYouRank.text = "#${me.rank}"
-            lbYouScore.text = scoreLabel(me.score)
-        } else {
-            lbYouRank.text = "--"
-            lbYouScore.text = "Not ranked yet"
-        }
-    }
-
     override fun onResume() {
         super.onResume()
         // Covers the case where verification landed while the user was
         // away from this screen (e.g. reopening the app the next day).
         refreshTodayStatus()
-        if (showingLeaderboard) loadLeaderboard()
     }
 
     private fun revealContentIfReady() {
@@ -315,7 +127,7 @@ class RepostActivity : AppCompatActivity() {
         if (todayStatusLoaded) {
             initialContentRevealed = true
             loadingState.visibility = android.view.View.GONE
-            if (!showingLeaderboard) contentScroll.visibility = android.view.View.VISIBLE
+            contentScroll.visibility = android.view.View.VISIBLE
         }
     }
 

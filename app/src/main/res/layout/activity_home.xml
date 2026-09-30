@@ -233,7 +233,7 @@
                             android:includeFontPadding="false"
                             android:textSize="15sp"
                             android:textColor="@color/vg_dark"
-                            android:text="-" />
+                            android:text="0" />
 
                         <TextView
                             android:id="@+id/freeViewersMaxText"
@@ -243,7 +243,7 @@
                             android:includeFontPadding="false"
                             android:textSize="13sp"
                             android:textColor="@color/text_muted"
-                            android:text="" />
+                            android:text="/0" />
                     </LinearLayout>
 
                         <ProgressBar
@@ -292,7 +292,7 @@
                             android:includeFontPadding="false"
                             android:textSize="15sp"
                             android:textColor="@color/vg_dark"
-                            android:text="-" />
+                            android:text="0" />
 
                         <TextView
                             android:id="@+id/extraViewersMaxText"
@@ -302,7 +302,7 @@
                             android:includeFontPadding="false"
                             android:textSize="13sp"
                             android:textColor="@color/text_muted"
-                            android:text="" />
+                            android:text="/0" />
                     </LinearLayout>
 
 
@@ -342,7 +342,7 @@
                             android:includeFontPadding="false"
                             android:textSize="15sp"
                             android:textColor="@color/vg_dark"
-                            android:text="-" />
+                            android:text="0" />
 
                     </LinearLayout>
 

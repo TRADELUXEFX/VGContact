@@ -338,54 +338,6 @@ object SupabaseClient {
         callback(rpc("mark_notifications_read", JSONObject().apply { put("p_user_id", userId) }) != null)
     }
 
-    // One row of the leaderboard. rank is shared on ties (1, 2, 2, 4).
-    data class LeaderboardEntry(
-        val rank: Int,
-        val userId: String,
-        val username: String,
-        val score: Int,
-        val isMe: Boolean
-    )
-
-    // Top players plus this user's own row (even if they are outside the
-    // top), via the get_leaderboard RPC (SECURITY DEFINER - it returns only
-    // username + numbers, never phone/android_id).
-    //
-    // metric: "streak" | "reposts" | "referrals"
-    // period: "week" | "month" | "all"
-    fun fetchLeaderboard(
-        userId: String,
-        metric: String,
-        period: String,
-        limit: Int,
-        callback: (Boolean, List<LeaderboardEntry>) -> Unit
-    ) {
-        val arr = rpc("get_leaderboard", JSONObject().apply {
-            put("p_user_id", userId)
-            put("p_metric", metric)
-            put("p_period", period)
-            put("p_limit", limit)
-        })
-        if (arr == null) {
-            callback(false, emptyList())
-            return
-        }
-        val entries = mutableListOf<LeaderboardEntry>()
-        for (i in 0 until arr.length()) {
-            val row = arr.getJSONObject(i)
-            entries.add(
-                LeaderboardEntry(
-                    rank = row.optInt("rank", 0),
-                    userId = row.optString("user_id"),
-                    username = row.optString("username"),
-                    score = row.optInt("score", 0),
-                    isMe = row.optBoolean("is_me", false)
-                )
-            )
-        }
-        callback(true, entries)
-    }
-
     // One value from the app_settings table (null if missing / offline).
     fun fetchSetting(key: String, callback: (String?) -> Unit) {
         val arr = rpc("get_app_setting", JSONObject().apply { put("p_key", key) })

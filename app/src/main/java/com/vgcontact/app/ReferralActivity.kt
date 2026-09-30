@@ -47,7 +47,6 @@ class ReferralActivity : AppCompatActivity() {
         val username = sessionManager.getUsername().orEmpty()
         val link = if (phone.isNotBlank()) LINK_BASE + phone else ""
 
-        BackHeader.bind(this, "Refer and earn")
         window.statusBarColor = ContextCompat.getColor(this, R.color.vg_green)
         BottomNavHelper.setup(this, BottomNavHelper.Tab.REFERRAL)
 
