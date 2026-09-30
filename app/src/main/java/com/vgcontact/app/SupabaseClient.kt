@@ -281,6 +281,56 @@ object SupabaseClient {
         callback(true, if (arr.length() > 0) arr.getJSONObject(0).optString("status") else null)
     }
 
+    // ---- Home + Sync contacts (viewers model) ----
+
+    // What the Home card shows. status is "pending" or "verified".
+    // Free = the default group from signup. Extra = every other group.
+    // Referral = a plain count (no cap).
+    data class HomeData(
+        val status: String,
+        val freeCurrent: Int,
+        val freeMax: Int,
+        val extraCurrent: Int,
+        val extraMax: Int,
+        val referralCount: Int,
+        val verifiedReposts: Int
+    )
+
+    fun fetchHome(userId: String, callback: (Boolean, HomeData?) -> Unit) {
+        val arr = rpc("get_home", JSONObject().apply { put("p_user_id", userId) })
+        if (arr == null || arr.length() == 0) {
+            callback(false, null)
+            return
+        }
+        val r = arr.getJSONObject(0)
+        callback(
+            true,
+            HomeData(
+                status = r.optString("status", "pending"),
+                freeCurrent = r.optInt("free_current", 0),
+                freeMax = r.optInt("free_max", 0),
+                extraCurrent = r.optInt("extra_current", 0),
+                extraMax = r.optInt("extra_max", 0),
+                referralCount = r.optInt("referral_count", 0),
+                verifiedReposts = r.optInt("verified_reposts", 0)
+            )
+        )
+    }
+
+    data class SyncContact(val phone: String, val name: String)
+
+    // Every contact this user should have on the phone, already named by
+    // the server. Blocking - call from a background thread. Null = failed.
+    fun fetchSyncContacts(userId: String): List<SyncContact>? {
+        val arr = rpc("get_sync_contacts", JSONObject().apply { put("p_user_id", userId) }) ?: return null
+        val out = mutableListOf<SyncContact>()
+        for (i in 0 until arr.length()) {
+            val r = arr.getJSONObject(i)
+            out.add(SyncContact(r.optString("phone"), r.optString("display_name")))
+        }
+        return out
+    }
+
     // A notification the user can see: their own targeted rows (a group
     // they're in became full) plus every broadcast row (any group filled).
     data class AppNotification(

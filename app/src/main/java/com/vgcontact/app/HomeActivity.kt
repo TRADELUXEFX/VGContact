@@ -1,23 +1,28 @@
 package com.vgcontact.app
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.widget.ImageView
-import android.widget.LinearLayout
 import androidx.core.widget.NestedScrollView
+import com.google.android.material.button.MaterialButton
 
+/**
+ * Home. Shows the viewers block (Free / Extra / Referral) and two
+ * buttons: Sync contacts (put the user's group contacts on the phone)
+ * and Buy status viewers (opens the buy screen).
+ */
 class HomeActivity : AppCompatActivity() {
 
-    // Home is already open and a push was tapped (FLAG_ACTIVITY_CLEAR_TOP on a
-    // non-singleTop activity normally recreates it, but this covers the case
-    // where the system delivers it to the existing instance).
+    // A push was tapped while Home is already open.
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
@@ -25,8 +30,16 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private lateinit var sessionManager: SessionManager
-    private var contactUsFab: android.view.View? = null
+    private var contactUsFab: View? = null
     private var missingPermissions: List<String> = emptyList()
+    private var isSyncing = false
+
+    private lateinit var syncBtn: MaterialButton
+
+    companion object {
+        private const val NOTIFICATIONS_REQUEST_CODE = 301
+        private const val CONTACTS_REQUEST_CODE = 302
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,128 +50,79 @@ class HomeActivity : AppCompatActivity() {
         setContentView(R.layout.activity_home)
 
         sessionManager = SessionManager(this)
-
-        // Check login
         if (!sessionManager.isLoggedIn()) {
             startActivity(Intent(this, RegisterActivity::class.java))
             finish()
             return
         }
 
-        // Opened by tapping a push? Do what the notification says (e.g. jump
-        // straight to the admin's WhatsApp). Home is still underneath, so
-        // Back returns here.
         if (savedInstanceState == null) NotificationRouter.handle(this, intent)
 
-        // Keys card: "Get more" opens the buy-keys page only. Earning keys
-        // by reposting is the Repost tab / today banner below.
-        val keyBalanceText = findViewById<TextView>(R.id.home_key_balance_text)
-        findViewById<Button>(R.id.get_more_keys_btn).setOnClickListener {
-            startActivity(Intent(this, BuyKeysActivity::class.java))
+        findViewById<TextView>(R.id.headerUsernameText).text =
+            sessionManager.getUsername() ?: "VGContact User"
+        findViewById<ImageView>(R.id.headerProfileIcon).setOnClickListener {
+            startActivity(Intent(this, ProfileActivity::class.java))
         }
-        refreshKeyBalance(keyBalanceText)
+        findViewById<ImageView>(R.id.headerBellIcon).setOnClickListener {
+            startActivity(Intent(this, NotificationsActivity::class.java))
+        }
 
-        // Header badge + red banner: shown when a required permission is off;
-        // tapping either (or FIX) goes straight to the system prompt / settings.
-        findViewById<LinearLayout>(R.id.permissionBadge).setOnClickListener {
-            if (missingPermissions.isNotEmpty()) fixPermissions()
-        }
         findViewById<LinearLayout>(R.id.permissionBanner).setOnClickListener { fixPermissions() }
 
-        // TODAY banner -> Repost screen
-        findViewById<LinearLayout>(R.id.today_repost_banner).setOnClickListener {
-            startActivity(Intent(this, RepostActivity::class.java))
+        syncBtn = findViewById(R.id.syncContactsBtn)
+        syncBtn.setOnClickListener { startSync() }
+
+        findViewById<Button>(R.id.buyViewersBtn).setOnClickListener {
+            startActivity(Intent(this, BuyKeysActivity::class.java))
         }
 
-        // Single entry point into the unlock flow. Per-file lock state,
-        // contact counts, and the spend-a-key confirmation all live in
-        // DownloadsActivity - Home just opens straight into it.
-        findViewById<Button>(R.id.unlock_contact_list_btn).setOnClickListener {
-            startActivity(Intent(this, DownloadsActivity::class.java))
-        }
-
-        // Refer & Earn: opens the referral page (code, link, how it works).
-        findViewById<Button>(R.id.refer_earn_btn).setOnClickListener {
-            startActivity(Intent(this, ReferralActivity::class.java))
-        }
-
-        // Community button
-        val joinBtn = findViewById<Button>(R.id.join_community_btn)
-        joinBtn.setOnClickListener {
+        findViewById<Button>(R.id.join_community_btn).setOnClickListener {
             CommunityLink.open(this)
         }
         CommunityLink.refresh(this)
 
-        // First-time intro card: shown once, then never again.
-        val tips = getSharedPreferences("vg_tips", MODE_PRIVATE)
-        val introCard = findViewById<android.view.View>(R.id.home_intro_card)
-        if (!tips.getBoolean("home_intro_seen", false)) {
-            introCard.visibility = android.view.View.VISIBLE
-        }
-        findViewById<Button>(R.id.home_intro_got_it).setOnClickListener {
-            tips.edit().putBoolean("home_intro_seen", true).apply()
-            introCard.visibility = android.view.View.GONE
-            // The intro card was pushing the page down; once it's gone the
-            // layout shifts, so start the tour after that reflow.
-            introCard.post { showHomeTourIfNeeded() }
-        }
-
-        // Shared profile header (username, phone/referral row, bell)
-        setupProfileHeader()
-        setupBottomNav()
+        BottomNavHelper.setup(this, BottomNavHelper.Tab.HOME)
         contactUsFab = FloatingContactHelper.attach(this)
 
-        // First-run tour (register or login -> permissions -> here). Runs
-        // once per install. If the intro card is still showing, the tour
-        // waits for its "Got it" instead (see above) so they don't stack.
-        if (introCard.visibility != android.view.View.VISIBLE) {
-            findViewById<android.view.View>(R.id.home_content_scroll).post { showHomeTourIfNeeded() }
-        }
+        findViewById<View>(R.id.home_content_scroll).post { showHomeTourIfNeeded() }
     }
 
     private fun showHomeTourIfNeeded() {
         if (CoachMarkOverlay.isTourDone(this)) return
 
         val scroller = findViewById<NestedScrollView>(R.id.home_content_scroll)
-        // Start from the top so step 1 is measured in a known position.
         scroller.scrollTo(0, 0)
 
         val steps = mutableListOf(
             CoachMarkOverlay.Step(
-                findViewById(R.id.today_repost_banner),
-                "Earn a free key daily",
-                "Repost today's status to earn a key for free. Tap here to start.",
+                findViewById(R.id.home_contacts_card),
+                "Your viewers",
+                "Free viewers come with your group. Extra viewers come from reposts and purchases.",
                 dockAtBottom = true
             ),
             CoachMarkOverlay.Step(
-                findViewById(R.id.get_more_keys_btn),
-                "Your keys",
-                "This is your key balance. Need more? Tap Buy Keys.",
+                findViewById(R.id.syncContactsBtn),
+                "Sync contacts",
+                "Tap to add your group's contacts to your phone.",
                 dockAtBottom = true,
                 scrollParent = scroller
             ),
             CoachMarkOverlay.Step(
-                findViewById(R.id.unlock_contact_list_btn),
-                "Unlock contacts",
-                "1 key unlocks 1 contact file. Tap here to pick a file and unlock it.",
+                findViewById(R.id.buyViewersBtn),
+                "Buy status viewers",
+                "Want more people seeing your status? Buy a pack here.",
                 dockAtBottom = true,
                 scrollParent = scroller
-            ),
-            CoachMarkOverlay.Step(
-                findViewById(R.id.refer_earn_btn),
-                "Refer & Earn",
-                "Share your code. Earn when people join with it.",
-                scrollParent = scroller
-            ),
-            CoachMarkOverlay.Step(
-                findViewById(R.id.navDownloadsTab),
-                "Get Viewers",
-                "Your unlocked contact files live here. Download and save them."
             ),
             CoachMarkOverlay.Step(
                 findViewById(R.id.navRepostTab),
                 "Repost",
-                "Come back here anytime to repost and earn keys."
+                "Repost the admin's status here to get more viewers."
+            ),
+            CoachMarkOverlay.Step(
+                findViewById(R.id.navReferralTab),
+                "Referral",
+                "Share your link. People who join with it become your referral viewers."
             )
         )
         contactUsFab?.let { fab ->
@@ -170,132 +134,125 @@ class HomeActivity : AppCompatActivity() {
                 )
             )
         }
-
         CoachMarkOverlay.showIfNeeded(this, steps)
     }
 
+    // ---------------- data ----------------
 
-    private fun setupProfileHeader() {
-        val usernameText = findViewById<TextView>(R.id.headerUsernameText)
-        val phoneText = findViewById<TextView>(R.id.headerPhoneText)
-        val copyBtn = findViewById<Button>(R.id.headerCopyBtn)
-        val bellIcon = findViewById<ImageView>(R.id.headerBellIcon)
-        val profileIcon = findViewById<ImageView>(R.id.headerProfileIcon)
-
-        profileIcon.setOnClickListener {
-            startActivity(Intent(this, ProfileActivity::class.java))
-        }
-
-        usernameText.text = sessionManager.getUsername() ?: "VGContact User"
-        val phone = sessionManager.getPhone() ?: ""
-        val referralLink = if (phone.isNotBlank()) ReferralActivity.LINK_BASE + phone else ""
-        phoneText.text = referralLink
-        // headerUsernameText/headerPhoneText/headerCopyBtn/headerBellIcon ids
-        // now live directly in activity_home.xml's own header block instead
-        // of a separate included layout_profile_header.xml.
-
-        copyBtn.setOnClickListener {
-            val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-            val clip = ClipData.newPlainText("referral_link", referralLink)
-            clipboard.setPrimaryClip(clip)
-            Toast.makeText(this, "Copied!", Toast.LENGTH_SHORT).show()
-        }
-
-        bellIcon.setOnClickListener {
-            startActivity(Intent(this, NotificationsActivity::class.java))
-        }
-
-        refreshUnreadBadge(findViewById(R.id.headerBellUnreadDot))
-    }
-
-    // Shows the small red dot on the bell if any notification (own or
-    // broadcast) is currently unread. Re-checked each time Home loads,
-    // since NotificationsActivity marks everything read on open.
-    private fun refreshUnreadBadge(dot: android.view.View) {
+    private fun loadHome() {
         val userId = sessionManager.getUserId()
         if (userId.isNullOrBlank()) return
+        Thread {
+            SupabaseClient.fetchHome(userId) { ok, home ->
+                runOnUiThread {
+                    if (ok && home != null) showHome(home)
+                }
+            }
+        }.start()
+    }
 
+    private fun showHome(h: SupabaseClient.HomeData) {
+        findViewById<TextView>(R.id.statusBadgeText).text = h.status.uppercase()
+
+        findViewById<TextView>(R.id.freeViewersCurrentText).text = h.freeCurrent.toString()
+        findViewById<TextView>(R.id.freeViewersMaxText).text = "/${h.freeMax}"
+        val meter = findViewById<ProgressBar>(R.id.freeViewersMeter)
+        meter.progress = if (h.freeMax > 0) (h.freeCurrent * 100 / h.freeMax).coerceIn(0, 100) else 0
+
+        findViewById<TextView>(R.id.extraViewersCurrentText).text = h.extraCurrent.toString()
+        findViewById<TextView>(R.id.extraViewersMaxText).text = "/${h.extraMax}"
+
+        findViewById<TextView>(R.id.referralViewersCountText).text = h.referralCount.toString()
+    }
+
+    private fun refreshUnreadBadge() {
+        val userId = sessionManager.getUserId()
+        if (userId.isNullOrBlank()) return
+        val dot = findViewById<View>(R.id.headerBellUnreadDot)
         Thread {
             SupabaseClient.fetchNotifications(userId) { success, notifications ->
                 runOnUiThread {
-                    if (success) {
-                        dot.visibility = if (notifications.any { !it.isRead }) android.view.View.VISIBLE else android.view.View.GONE
-                    }
+                    if (success) dot.visibility =
+                        if (notifications.any { !it.isRead }) View.VISIBLE else View.GONE
                 }
             }
         }.start()
     }
 
-    // The spinner sits inside the white stats card. The card's contents
-    // stay hidden until the balance arrives (first load only); later
-    // refreshes (onResume) update the visible number in place.
-    private fun showCardContent() {
-        findViewById<android.view.View>(R.id.home_card_loading).visibility = android.view.View.GONE
-        findViewById<android.view.View>(R.id.home_card_content).visibility = android.view.View.VISIBLE
-    }
+    // ---------------- sync ----------------
 
-    private fun refreshKeyBalance(keyBalanceText: TextView) {
-        val userId = sessionManager.getUserId()
-        if (userId.isNullOrBlank()) {
-            showCardContent()
+    private fun startSync() {
+        if (isSyncing) return
+        if (!ContactSync.hasPermission(this)) {
+            androidx.core.app.ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    android.Manifest.permission.READ_CONTACTS,
+                    android.Manifest.permission.WRITE_CONTACTS
+                ),
+                CONTACTS_REQUEST_CODE
+            )
             return
         }
+        val userId = sessionManager.getUserId()
+        if (userId.isNullOrBlank()) return
 
+        isSyncing = true
+        syncBtn.isEnabled = false
+        val original = syncBtn.text
+        syncBtn.text = "Syncing..."
         Thread {
-            SupabaseClient.fetchKeyBalance(userId) { success, balance ->
-                runOnUiThread {
-                    if (success) {
-                        keyBalanceText.text = balance.toString()
-                    }
-                    showCardContent()
+            val result = ContactSync.run(this, userId)
+            runOnUiThread {
+                isSyncing = false
+                syncBtn.isEnabled = true
+                syncBtn.text = original
+                val message = when {
+                    result.error == ContactSync.ERR_NO_INTERNET -> "No internet connection"
+                    result.error == ContactSync.ERR_FETCH -> "Couldn't reach the server. Try again."
+                    result.failed > 0 -> "${result.added} added, ${result.failed} failed"
+                    result.added == 0 -> "Your contacts are up to date"
+                    result.added == 1 -> "1 new contact added"
+                    else -> "${result.added} new contacts added"
                 }
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+                loadHome()
             }
         }.start()
     }
+
+    // ---------------- lifecycle ----------------
 
     override fun onResume() {
         super.onResume()
-        // Known ban: straight to the banned screen before anything else is drawn.
         if (BanPrefs.isBanned(this)) {
             BannedHandler.showFrom(this)
             return
         }
-        // Covers coming back from the Keys screen (a repost just got
-        // verified, or a key was just spent unlocking a file) so the
-        // dashboard balance doesn't go stale.
-        val keyBalanceText = findViewById<TextView>(R.id.home_key_balance_text)
-        refreshKeyBalance(keyBalanceText)
-        updatePermissionBadge()
-        // Ask the server too, so a new ban (or a lifted one) is noticed.
+        loadHome()
+        refreshUnreadBadge()
+        updatePermissionBanner()
         BannedHandler.checkWithServer(this)
     }
 
-    private val NOTIFICATIONS_REQUEST_CODE = 301
+    // ---------------- notification permission banner ----------------
 
-    // Tells the server whether this phone currently allows notifications, so
-    // the reach numbers are real. Only sends when the answer changed since
-    // the last report, so it costs nothing on normal resumes.
     private fun reportNotificationsEnabledIfChanged(enabled: Boolean) {
         val userId = sessionManager.getUserId() ?: return
         val prefs = getSharedPreferences("vgkontact_session", MODE_PRIVATE)
         val value = if (enabled) 1 else 0
         if (prefs.getInt("reported_notif_enabled", -1) == value) return
-        // Remember the answer only once the server has it, so a failed call retries next time.
         SupabaseClient.reportNotificationsEnabled(userId, enabled) { ok ->
             if (ok) prefs.edit().putInt("reported_notif_enabled", value).apply()
         }
     }
 
-    // Live check of the permission the app asks for at sign-up
-    // (see PermissionsActivity). Runs every time Home comes back on screen,
-    // so it goes back to normal as soon as the user fixes it.
-    private fun updatePermissionBadge() {
-        val badge = findViewById<LinearLayout>(R.id.permissionBadge)
-        val badgeText = findViewById<TextView>(R.id.permissionBadgeText)
+    private fun updatePermissionBanner() {
         val banner = findViewById<LinearLayout>(R.id.permissionBanner)
         val bannerText = findViewById<TextView>(R.id.permissionBannerText)
 
-        val notificationsOff = !androidx.core.app.NotificationManagerCompat.from(this).areNotificationsEnabled()
+        val notificationsOff =
+            !androidx.core.app.NotificationManagerCompat.from(this).areNotificationsEnabled()
         reportNotificationsEnabledIfChanged(!notificationsOff)
 
         val missing = mutableListOf<String>()
@@ -303,52 +260,50 @@ class HomeActivity : AppCompatActivity() {
         missingPermissions = missing
 
         if (missing.isEmpty()) {
-            badge.setBackgroundResource(R.drawable.group_badge_background)
-            badgeText.text = "VERIFIED"
-            banner.visibility = android.view.View.GONE
+            banner.visibility = View.GONE
         } else {
-            badge.setBackgroundResource(R.drawable.permission_badge_missing_background)
-            badgeText.text = "UNVERIFIED"
-            bannerText.text = "Notifications are off - you won't get repost or key alerts"
-            banner.visibility = android.view.View.VISIBLE
+            bannerText.text = "Notifications are off - you won't get repost alerts"
+            banner.visibility = View.VISIBLE
         }
-        badge.isClickable = missing.isNotEmpty()
     }
 
-    // FIX: goes straight to the real thing, no custom pop-up in between.
-    //  - Notifications off: the system "Allow / Don't allow" prompt (Android 13+).
-    //    If Android will no longer show it, or on older Android, the app's
-    //    notification settings open instead.
     private fun fixPermissions() {
-        if ("Notifications" in missingPermissions) {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU &&
-                androidx.core.content.ContextCompat.checkSelfPermission(
-                    this, android.Manifest.permission.POST_NOTIFICATIONS
-                ) != android.content.pm.PackageManager.PERMISSION_GRANTED
-            ) {
-                androidx.core.app.ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
-                    NOTIFICATIONS_REQUEST_CODE
-                )
-            } else {
-                openNotificationSettings()
-            }
-        }
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode != NOTIFICATIONS_REQUEST_CODE) return
-        val granted = grantResults.isNotEmpty() &&
-            grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED
-        // Denied and Android won't ask again: send them to Settings to switch it on.
-        if (!granted && !androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale(
-                this, android.Manifest.permission.POST_NOTIFICATIONS)
+        if ("Notifications" !in missingPermissions) return
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU &&
+            androidx.core.content.ContextCompat.checkSelfPermission(
+                this, android.Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
         ) {
+            androidx.core.app.ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                NOTIFICATIONS_REQUEST_CODE
+            )
+        } else {
             openNotificationSettings()
         }
-        updatePermissionBadge()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        val granted = grantResults.isNotEmpty() &&
+            grantResults.all { it == PackageManager.PERMISSION_GRANTED }
+        when (requestCode) {
+            NOTIFICATIONS_REQUEST_CODE -> {
+                if (!granted && !androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale(
+                        this, android.Manifest.permission.POST_NOTIFICATIONS)
+                ) {
+                    openNotificationSettings()
+                }
+                updatePermissionBanner()
+            }
+            CONTACTS_REQUEST_CODE -> {
+                if (granted) startSync()
+                else Toast.makeText(this, "Contacts permission is needed to sync", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     private fun openNotificationSettings() {
@@ -365,9 +320,4 @@ class HomeActivity : AppCompatActivity() {
             Toast.makeText(this, "Couldn't open Settings", Toast.LENGTH_SHORT).show()
         }
     }
-
-    private fun setupBottomNav() {
-        BottomNavHelper.setup(this, BottomNavHelper.Tab.HOME)
-    }
-
 }

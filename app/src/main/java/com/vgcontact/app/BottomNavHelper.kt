@@ -9,18 +9,17 @@ import androidx.core.content.ContextCompat
 
 /**
  * Wires the floating pill bottom nav (bottom_nav_bar.xml) the same way
- * on every screen, replacing the old per-activity setupBottomNav() that
- * used to configure a BottomNavigationView + bottom_nav_menu.xml.
+ * on every screen. Four tabs: Home, Repost, Referral, Profile.
  */
 object BottomNavHelper {
 
-    enum class Tab { HOME, REPOST, DOWNLOADS, PROFILE }
+    enum class Tab { HOME, REPOST, REFERRAL, PROFILE }
 
     fun setup(activity: Activity, selected: Tab) {
         val tabs = listOf(
             Tab.HOME to Triple(R.id.navHomeTab, R.id.navHomeIcon, R.id.navHomeLabel),
             Tab.REPOST to Triple(R.id.navRepostTab, R.id.navRepostIcon, R.id.navRepostLabel),
-            Tab.DOWNLOADS to Triple(R.id.navDownloadsTab, R.id.navDownloadsIcon, R.id.navDownloadsLabel),
+            Tab.REFERRAL to Triple(R.id.navReferralTab, R.id.navReferralIcon, R.id.navReferralLabel),
             Tab.PROFILE to Triple(R.id.navProfileTab, R.id.navProfileIcon, R.id.navProfileLabel)
         )
 
@@ -38,8 +37,6 @@ object BottomNavHelper {
             icon?.setColorFilter(if (isSelected) activeColor else inactiveColor)
             label?.setTextColor(if (isSelected) activeColor else inactiveColor)
 
-            // Match VGKontact: active tab gets the soft green capsule,
-            // inactive tabs keep the plain borderless ripple.
             if (isSelected) {
                 row.background = activeTabBackground
             } else {
@@ -51,9 +48,7 @@ object BottomNavHelper {
             }
 
             row.setOnClickListener {
-                if (tab != selected) {
-                    navigateTo(activity, tab)
-                }
+                if (tab != selected) navigateTo(activity, tab)
             }
         }
     }
@@ -62,7 +57,7 @@ object BottomNavHelper {
         val target = when (tab) {
             Tab.HOME -> HomeActivity::class.java
             Tab.REPOST -> RepostActivity::class.java
-            Tab.DOWNLOADS -> DownloadsActivity::class.java
+            Tab.REFERRAL -> ReferralActivity::class.java
             Tab.PROFILE -> ProfileActivity::class.java
         }
         activity.startActivity(Intent(activity, target))

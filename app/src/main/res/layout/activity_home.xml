@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Root is a FrameLayout so the bottom nav bar can float over the
-    scrollable content as a rounded pill (see bottom_nav_bar.xml).
-    Structure matches VGKontact's activity_main_menu.xml: gradient
-    header with circular avatar + badge + referral row, then a body
-    with a stats card and action buttons below.
+    Home. VGKontact structure: gradient header, one card holding the
+    viewers block (Free / Extra / Referral) and the Sync contacts
+    button, then the Buy status viewers button. Root is a FrameLayout so
+    the floating nav pill sits over the scrolling content.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -25,204 +24,107 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- ================= HEADER ================= -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
             android:background="@drawable/header_gradient"
             android:paddingTop="48dp"
             android:paddingBottom="18dp"
             android:paddingStart="20dp"
             android:paddingEnd="20dp">
 
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/headerProfileIcon"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:src="@mipmap/ic_launcher_round"
+                android:background="@drawable/avatar_circle_background"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/CircleImageView"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Profile"
+                android:foreground="?android:attr/selectableItemBackgroundBorderless" />
+
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:orientation="vertical">
 
-                <FrameLayout
-                    android:layout_width="56dp"
-                    android:layout_height="56dp">
-
-                    <com.google.android.material.imageview.ShapeableImageView
-                        android:id="@+id/headerProfileIcon"
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:padding="0dp"
-                        android:src="@mipmap/ic_launcher_round"
-                        android:background="@drawable/avatar_circle_background"
-                        android:scaleType="centerCrop"
-                        app:shapeAppearanceOverlay="@style/CircleImageView"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?android:attr/selectableItemBackgroundBorderless" />
-
-                </FrameLayout>
+                <TextView
+                    android:id="@+id/headerUsernameText"
+                    android:fontFamily="@font/poppins_bold"
+                    android:includeFontPadding="false"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:textColor="@color/white"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="12dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:fontFamily="@font/poppins_bold"
-                        android:includeFontPadding="false"
-                        android:id="@+id/headerUsernameText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="18sp"
-                        android:letterSpacing="0.01"
-                        android:textColor="@color/white"
-                        android:maxLines="1"
-                        android:ellipsize="end" />
-
-                    <LinearLayout
-                        android:id="@+id/permissionBadge"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:background="@drawable/group_badge_background"
-                        android:paddingStart="8dp"
-                        android:paddingEnd="10dp"
-                        android:paddingTop="3dp"
-                        android:paddingBottom="3dp">
-
-                        <View
-                            android:layout_width="6dp"
-                            android:layout_height="6dp"
-                            android:layout_marginEnd="6dp"
-                            android:background="@drawable/badge_dot" />
-
-                        <TextView
-                            android:id="@+id/permissionBadgeText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="VERIFIED"
-                            android:textSize="9sp"
-                            android:textStyle="bold"
-                            android:textAllCaps="true"
-                            android:letterSpacing="0.04"
-                            android:textColor="@color/white" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <FrameLayout
-                    android:layout_width="56dp"
-                    android:layout_height="56dp">
-
-                    <ImageView
-                        android:id="@+id/headerBellIcon"
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:padding="12dp"
-                        android:src="@drawable/ic_notification_bell"
-                        android:background="@drawable/notification_circle_background"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:contentDescription="Notifications"
-                        app:tint="@color/white" />
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/group_badge_background"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="10dp"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp">
 
                     <View
-                        android:id="@+id/headerBellUnreadDot"
-                        android:layout_width="10dp"
-                        android:layout_height="10dp"
-                        android:layout_gravity="top|end"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:background="@drawable/notification_unread_dot"
-                        android:visibility="gone" />
-
-                </FrameLayout>
-
-            </LinearLayout>
-
-            <!-- Referral link container: the long link scrolls sideways and
-                 slides under the edge before the Copy button, which stays visible. -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="@drawable/header_referral_container_background"
-                android:paddingStart="14dp"
-                android:paddingEnd="8dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="10dp"
-                    android:orientation="vertical">
+                        android:layout_width="6dp"
+                        android:layout_height="6dp"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/badge_dot" />
 
                     <TextView
+                        android:id="@+id/statusBadgeText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Your referral link"
-                        android:textSize="11sp"
-                        android:textColor="#CCFFFFFF" />
-
-                    <!-- Swipe sideways to read the whole link. -->
-                    <HorizontalScrollView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:scrollbars="none"
-                        android:overScrollMode="never"
-                        android:fadingEdge="horizontal"
-                        android:fadingEdgeLength="20dp"
-                        android:requiresFadingEdge="horizontal">
-
-                        <TextView
-                            android:id="@+id/headerPhoneText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingEnd="16dp"
-                            android:textSize="13sp"
-                            android:textColor="@color/white"
-                            android:singleLine="true"
-                            android:maxLines="1" />
-
-                    </HorizontalScrollView>
-
+                        android:text="PENDING"
+                        android:textSize="9sp"
+                        android:textStyle="bold"
+                        android:textAllCaps="true"
+                        android:letterSpacing="0.04"
+                        android:textColor="@color/white" />
                 </LinearLayout>
-
-                <Button
-                    android:id="@+id/headerCopyBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:minWidth="0dp"
-                    android:minHeight="0dp"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp"
-                    android:text="Copy"
-                    android:textAllCaps="false"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/vg_green_dark"
-                    android:backgroundTint="@color/white"
-                    android:drawableStart="@drawable/ic_copy"
-                    android:drawableTint="@color/vg_green_dark"
-                    android:drawablePadding="6dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    app:cornerRadius="10dp" />
-
             </LinearLayout>
 
+            <FrameLayout
+                android:layout_width="56dp"
+                android:layout_height="56dp">
+
+                <ImageView
+                    android:id="@+id/headerBellIcon"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:padding="12dp"
+                    android:src="@drawable/ic_notification_bell"
+                    android:background="@drawable/notification_circle_background"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:contentDescription="Notifications"
+                    app:tint="@color/white" />
+
+                <View
+                    android:id="@+id/headerBellUnreadDot"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_gravity="top|end"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/notification_unread_dot"
+                    android:visibility="gone" />
+            </FrameLayout>
         </LinearLayout>
 
-        <!-- ================= BODY ================= -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -232,8 +134,6 @@
             android:paddingEnd="20dp"
             android:paddingBottom="8dp">
 
-            <!-- Red banner shown only while a required permission is off.
-                 FIX goes straight to the system prompt / settings. -->
             <LinearLayout
                 android:id="@+id/permissionBanner"
                 android:layout_width="match_parent"
@@ -274,357 +174,201 @@
                     android:text="FIX"
                     android:textSize="14sp"
                     android:textColor="@color/white" />
-
             </LinearLayout>
 
-            <!-- First-time intro, shown once (dismissed with "Got it") -->
             <LinearLayout
-                android:id="@+id/home_intro_card"
+                android:id="@+id/home_contacts_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp"
-                android:layout_marginBottom="20dp"
                 android:background="@drawable/card_background"
-                android:visibility="gone">
-
-                <TextView
-                    android:fontFamily="@font/poppins_bold"
-                    android:includeFontPadding="false"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="How VGContact works"
-                    android:textSize="18sp"
-                    android:textColor="@color/vg_dark" />
+                android:padding="16dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="14dp">
+                    android:orientation="vertical"
+                    android:background="@drawable/limit_block_background"
+                    android:padding="18dp">
 
                     <TextView
-                        android:fontFamily="@font/poppins_bold"
-                        android:includeFontPadding="false"
-                        android:layout_width="26dp"
-                        android:layout_height="26dp"
-                        android:background="@drawable/step_number_background"
-                        android:gravity="center"
-                        android:text="1"
-                        android:textSize="14sp"
-                        android:textColor="@color/vg_green_dark" />
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/home_contacts_label"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:textAllCaps="true"
+                        android:letterSpacing="0.05"
+                        android:textColor="@color/text_muted"
+                        android:gravity="center" />
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="12dp"
-                        android:orientation="vertical">
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="14dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp">
+
+                        <View
+                            android:layout_width="8dp"
+                            android:layout_height="8dp"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/viewers_dot_green" />
 
                         <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/label_free_viewers"
+                            android:textSize="13sp"
+                            android:textColor="@color/text_primary" />
+
+                        <TextView
+                            android:id="@+id/freeViewersCurrentText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:fontFamily="@font/poppins_bold"
                             android:includeFontPadding="false"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Get a key"
                             android:textSize="15sp"
-                            android:textColor="@color/vg_dark" />
+                            android:textColor="@color/vg_dark"
+                            android:text="-" />
 
                         <TextView
-                            android:layout_width="match_parent"
+                            android:id="@+id/freeViewersMaxText"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:lineSpacingExtra="2dp"
-                            android:text="Repost the admin's status on WhatsApp once a day for a free key, or buy keys for ₦1,000 each."
+                            android:fontFamily="@font/poppins_bold"
+                            android:includeFontPadding="false"
                             android:textSize="13sp"
-                            android:textColor="@color/text_secondary" />
+                            android:textColor="@color/text_muted"
+                            android:text="" />
                     </LinearLayout>
-                </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="14dp">
+                        <ProgressBar
+                            android:id="@+id/freeViewersMeter"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="8dp"
+                            android:layout_marginBottom="12dp"
+                            android:max="100"
+                            android:progress="0"
+                            android:progressDrawable="@drawable/limit_meter_progress" />
 
-                    <TextView
-                        android:fontFamily="@font/poppins_bold"
-                        android:includeFontPadding="false"
-                        android:layout_width="26dp"
-                        android:layout_height="26dp"
-                        android:background="@drawable/step_number_background"
-                        android:gravity="center"
-                        android:text="2"
-                        android:textSize="14sp"
-                        android:textColor="@color/vg_green_dark" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/card_border" />
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="12dp"
-                        android:orientation="vertical">
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="0dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp">
+
+                        <View
+                            android:layout_width="8dp"
+                            android:layout_height="8dp"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/viewers_dot_blue" />
 
                         <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/label_extra_viewers"
+                            android:textSize="13sp"
+                            android:textColor="@color/text_primary" />
+
+                        <TextView
+                            android:id="@+id/extraViewersCurrentText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:fontFamily="@font/poppins_bold"
                             android:includeFontPadding="false"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Unlock a contact list"
                             android:textSize="15sp"
-                            android:textColor="@color/vg_dark" />
+                            android:textColor="@color/vg_dark"
+                            android:text="-" />
 
                         <TextView
-                            android:layout_width="match_parent"
+                            android:id="@+id/extraViewersMaxText"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:lineSpacingExtra="2dp"
-                            android:text="1 key unlocks 1 contact list of up to 250 people who can then see your status."
+                            android:fontFamily="@font/poppins_bold"
+                            android:includeFontPadding="false"
                             android:textSize="13sp"
-                            android:textColor="@color/text_secondary" />
+                            android:textColor="@color/text_muted"
+                            android:text="" />
                     </LinearLayout>
-                </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="14dp">
 
-                    <TextView
-                        android:fontFamily="@font/poppins_bold"
-                        android:includeFontPadding="false"
-                        android:layout_width="26dp"
-                        android:layout_height="26dp"
-                        android:background="@drawable/step_number_background"
-                        android:gravity="center"
-                        android:text="3"
-                        android:textSize="14sp"
-                        android:textColor="@color/vg_green_dark" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/card_border" />
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="12dp"
-                        android:orientation="vertical">
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="0dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp">
+
+                        <View
+                            android:layout_width="8dp"
+                            android:layout_height="8dp"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/viewers_dot_amber" />
 
                         <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/label_referral_viewers"
+                            android:textSize="13sp"
+                            android:textColor="@color/text_primary" />
+
+                        <TextView
+                            android:id="@+id/referralViewersCountText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:fontFamily="@font/poppins_bold"
                             android:includeFontPadding="false"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Save the contacts"
                             android:textSize="15sp"
-                            android:textColor="@color/vg_dark" />
+                            android:textColor="@color/vg_dark"
+                            android:text="-" />
 
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:lineSpacingExtra="2dp"
-                            android:text="Tap Unlock and save. The contacts go into your phone, then post your WhatsApp status to get viewers."
-                            android:textSize="13sp"
-                            android:textColor="@color/text_secondary" />
                     </LinearLayout>
-                </LinearLayout>
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
-                    android:lineSpacingExtra="2dp"
-                    android:text="Keys from reposts and purchases are added within 24 hours. Every 10 friends you refer earns you 1 extra key."
-                    android:textSize="12sp"
-                    android:textColor="@color/text_muted" />
+
+                </LinearLayout>
 
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/syncContactsBtn"
                     android:fontFamily="@font/poppins_bold"
                     android:includeFontPadding="false"
                     android:textSize="16sp"
-                    android:id="@+id/home_intro_got_it"
-                    android:layout_width="wrap_content"
-                    android:layout_height="44dp"
-                    android:layout_gravity="end"
-                    android:layout_marginTop="8dp"
-                    android:text="Got it"
-                    android:textAllCaps="false"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="18dp"
+                    android:text="@string/btn_sync_contacts"
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.02"
                     android:textColor="@color/white"
                     android:backgroundTint="@color/vg_green"
-                    app:cornerRadius="22dp" />
-
+                    app:icon="@drawable/ic_sync"
+                    app:iconTint="@color/white"
+                    app:iconGravity="textStart"
+                    app:cornerRadius="16dp" />
             </LinearLayout>
-
-            <!-- TODAY: repost banner, first container on Home, above the keys card -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="TODAY"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.08"
-                android:textColor="@color/text_muted" />
-
-            <LinearLayout
-                android:id="@+id/today_repost_banner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="16dp"
-                android:background="@drawable/today_banner_background"
-                android:clickable="true"
-                android:focusable="true">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_repost"
-                    app:tint="@color/warning_amber"
-                    android:contentDescription="@null" />
-
-                <TextView
-                    android:fontFamily="@font/poppins_bold"
-                    android:includeFontPadding="false"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="12dp"
-                    android:text="Repost to earn today's key"
-                    android:textSize="17sp"
-                    android:textColor="@color/vg_dark" />
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_chevron_right"
-                    app:tint="@color/text_muted"
-                    android:contentDescription="@null" />
-
-            </LinearLayout>
-
-            <!-- Keys card. The spinner lives INSIDE
-                 the card: while the balance loads, the contents stay
-                 invisible (they keep their space so the card never
-                 resizes) and the spinner is centered in the card. -->
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:background="@drawable/card_background">
-
-                <ProgressBar
-                    android:id="@+id/home_card_loading"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_gravity="center"
-                    android:indeterminateTint="@color/vg_green"
-                    android:visibility="visible" />
-
-                <LinearLayout
-                    android:id="@+id/home_card_content"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:padding="16dp"
-                    android:visibility="invisible">
-
-                    <FrameLayout
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:background="@drawable/file_row_icon_background">
-
-                        <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_key"
-                            app:tint="@color/vg_green_dark"
-                            android:contentDescription="@null" />
-
-                    </FrameLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="14dp"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:fontFamily="@font/poppins_bold"
-                            android:includeFontPadding="false"
-                            android:id="@+id/home_key_balance_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0"
-                            android:textSize="30sp"
-                            android:textColor="@color/vg_green_dark" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Your keys"
-                            android:textSize="13sp"
-                            android:textColor="@color/text_secondary" />
-
-                    </LinearLayout>
-
-                    <!-- Opens BuyKeysActivity (buy keys only). Earning keys
-                         by reposting lives on the Repost tab. -->
-                    <com.google.android.material.button.MaterialButton
-                        android:fontFamily="@font/poppins_bold"
-                        android:includeFontPadding="false"
-                        android:textSize="16sp"
-                        android:id="@+id/get_more_keys_btn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="44dp"
-                        android:text="Buy Keys"
-                        android:textAllCaps="true"
-                        android:textColor="@color/white"
-                        android:backgroundTint="@color/vg_green"
-                        app:cornerRadius="22dp" />
-
-                </LinearLayout>
-
-            </FrameLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginStart="4dp"
-                android:text="1 key unlocks 1 contact file"
-                android:textSize="12sp"
-                android:textColor="@color/text_muted" />
-
-            <!-- Single entry point into the unlock flow. No file preview,
-                 no contact counts here - just the action. The real list,
-                 lock state per file, and the spend-a-key confirmation all
-                 live in DownloadsActivity (see confirmUnlock/unlockWithKey
-                 in DownloadsActivity.kt), which this opens directly. -->
-            <com.google.android.material.button.MaterialButton
-                android:fontFamily="@font/poppins_bold"
-                android:includeFontPadding="false"
-                android:textSize="16sp"
-                android:id="@+id/unlock_contact_list_btn"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="22dp"
-                android:text="Unlock Contact List"
-                android:textAllCaps="true"
-                android:textColor="@color/white"
-                android:backgroundTint="@color/vg_green"
-                app:icon="@drawable/ic_unlock"
-                app:iconTint="@color/white"
-                app:iconGravity="textStart"
-                app:cornerRadius="16dp" />
-
         </LinearLayout>
 
-        <!-- ================= ACTIONS ================= -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -634,30 +378,29 @@
             android:paddingTop="8dp"
             android:paddingBottom="26dp">
 
-            <!-- Refer & Earn: opens the Referral page (code, link, how it
-                 works, share). -->
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/buyViewersBtn"
                 android:fontFamily="@font/poppins_bold"
                 android:includeFontPadding="false"
                 android:textSize="16sp"
-                android:id="@+id/refer_earn_btn"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginBottom="12dp"
-                android:text="Refer &amp; Earn"
+                android:text="@string/btn_buy_viewers"
                 android:textAllCaps="true"
+                android:letterSpacing="0.02"
                 android:textColor="@color/white"
                 android:backgroundTint="@color/vg_green"
-                app:icon="@drawable/ic_people"
+                app:icon="@drawable/ic_viewers"
                 app:iconTint="@color/white"
                 app:iconGravity="textStart"
                 app:cornerRadius="16dp" />
 
             <Button
+                android:id="@+id/join_community_btn"
                 android:fontFamily="@font/poppins_bold"
                 android:includeFontPadding="false"
                 android:textSize="16sp"
-                android:id="@+id/join_community_btn"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="Join Our Community"
@@ -667,9 +410,7 @@
                 app:strokeColor="@color/vg_green_dark"
                 android:textColor="@color/vg_green_dark"
                 app:cornerRadius="16dp" />
-
         </LinearLayout>
-
     </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

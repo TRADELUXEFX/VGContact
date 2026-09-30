@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Floating pill nav bar, matching VGKontact's style. Meant to be the
-    last child of a FrameLayout, positioned bottom|center with side/
-    bottom margins so it floats above the content edge-to-edge with a
-    gap, instead of the old flat full-width in-flow BottomNavigationView.
+    Floating pill nav bar, VGKontact style. Four tabs: Home, Repost,
+    Referral, Profile. Last child of a FrameLayout.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -40,6 +38,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:src="@drawable/ic_home"
+            android:contentDescription="@null"
             app:tint="@color/text_muted" />
 
         <TextView
@@ -48,38 +47,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
             android:text="@string/nav_home"
-            android:textSize="10sp"
-            android:textStyle="bold"
-            android:textColor="@color/text_muted" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/navDownloadsTab"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?android:attr/selectableItemBackgroundBorderless"
-        android:paddingTop="6dp"
-        android:paddingBottom="6dp">
-
-        <ImageView
-            android:id="@+id/navDownloadsIcon"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/ic_people"
-            app:tint="@color/text_muted" />
-
-        <TextView
-            android:id="@+id/navDownloadsLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
-            android:text="@string/nav_downloads"
             android:textSize="10sp"
             android:textStyle="bold"
             android:textColor="@color/text_muted" />
@@ -104,6 +71,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:src="@drawable/ic_repost"
+            android:contentDescription="@null"
             app:tint="@color/text_muted" />
 
         <TextView
@@ -112,6 +80,39 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
             android:text="@string/nav_repost"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_muted" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/navReferralTab"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp">
+
+        <ImageView
+            android:id="@+id/navReferralIcon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_referral"
+            android:contentDescription="@null"
+            app:tint="@color/text_muted" />
+
+        <TextView
+            android:id="@+id/navReferralLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:text="@string/nav_referral"
             android:textSize="10sp"
             android:textStyle="bold"
             android:textColor="@color/text_muted" />
@@ -136,6 +137,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:src="@drawable/ic_profile"
+            android:contentDescription="@null"
             app:tint="@color/text_muted" />
 
         <TextView
