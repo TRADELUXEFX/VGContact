@@ -27,4 +27,15 @@ object SupportContact {
             Toast.makeText(context, "WhatsApp not installed", Toast.LENGTH_SHORT).show()
         }
     }
+
+    /** Opens a WhatsApp chat with support with a ready-made message. */
+    fun openSupport(context: Context, message: String) {
+        try {
+            context.startActivity(
+                Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/$WHATSAPP?text=${Uri.encode(message)}"))
+            )
+        } catch (e: Exception) {
+            Toast.makeText(context, "WhatsApp not installed", Toast.LENGTH_SHORT).show()
+        }
+    }
 }

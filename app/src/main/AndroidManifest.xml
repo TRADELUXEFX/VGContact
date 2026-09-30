@@ -48,6 +48,18 @@
             android:exported="false"
             android:screenOrientation="portrait" />
 
+        <!-- One account per phone: shown when sign-up / login is stopped by the device rule -->
+        <activity
+            android:name=".DeviceBlockedActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- One account per phone: shown when the phone returns no Android ID -->
+        <activity
+            android:name=".DeviceUnverifiedActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
         <!-- Permissions: shown once after register/login, before Home -->
         <activity
             android:name=".PermissionsActivity"

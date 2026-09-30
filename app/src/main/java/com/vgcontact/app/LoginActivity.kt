@@ -68,7 +68,7 @@ class LoginActivity : AppCompatActivity() {
 
             val androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
             if (androidId.isNullOrBlank()) {
-                Toast.makeText(this, "Couldn't verify this device. Please restart the app and try again.", Toast.LENGTH_LONG).show()
+                startActivity(Intent(this, DeviceUnverifiedActivity::class.java))
                 return@setOnClickListener
             }
 
@@ -91,11 +91,12 @@ class LoginActivity : AppCompatActivity() {
                                 finish()
                             }
                             found && !deviceMatches -> {
-                                Toast.makeText(
-                                    this,
-                                    "This number is registered on a different device. Please use the device you originally signed up with.",
-                                    Toast.LENGTH_LONG
-                                ).show()
+                                startActivity(
+                                    Intent(this, DeviceBlockedActivity::class.java)
+                                        .putExtra(DeviceBlockedActivity.EXTRA_REASON, DeviceBlockedActivity.REASON_NUMBER)
+                                        .putExtra(DeviceBlockedActivity.EXTRA_NUMBER, phone)
+                                        .putExtra(DeviceBlockedActivity.EXTRA_ANDROID_ID, androidId)
+                                )
                             }
                             SupabaseClient.lastError != null -> {
                                 // Server/network problem - NOT "no account".

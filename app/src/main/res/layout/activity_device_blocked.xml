@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- GREEN HEADER -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:background="@drawable/header_gradient"
+            android:paddingTop="56dp"
+            android:paddingStart="28dp"
+            android:paddingEnd="28dp"
+            android:paddingBottom="32dp">
+
+            <TextView android:id="@+id/headerLineOne"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins"
+                android:text="This phone already has an"
+                android:textSize="15sp"
+                android:alpha="0.92"
+                android:gravity="center"
+                android:textColor="@color/white" />
+
+            <TextView android:id="@+id/headerLineTwo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_bold"
+                android:text="Account"
+                android:textSize="26sp"
+                android:layout_marginTop="2dp"
+                android:gravity="center"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+        <!-- WHITE BODY -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:id="@+id/accountCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:background="@drawable/card_background"
+                android:padding="20dp"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    android:id="@+id/accountLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_bold"
+                    android:text="YOUR ACCOUNT"
+                    android:textSize="11sp"
+                    android:letterSpacing="0.05"
+                    android:textColor="@color/text_muted"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/accountNameText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_bold"
+                    android:text="—"
+                    android:textSize="18sp"
+                    android:textColor="@color/vg_dark"
+                    android:gravity="center" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:background="@drawable/card_background"
+                android:padding="20dp"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    android:id="@+id/registeredNumberLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_bold"
+                    android:text="REGISTERED NUMBER"
+                    android:textSize="11sp"
+                    android:letterSpacing="0.05"
+                    android:textColor="@color/text_muted"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/registeredNumberText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_bold"
+                    android:text="—"
+                    android:textSize="18sp"
+                    android:textColor="@color/vg_dark"
+                    android:gravity="center" />
+            </LinearLayout>
+            <TextView
+                android:id="@+id/bodyText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins"
+                android:text="Only one account is allowed per phone."
+                android:textSize="13sp"
+                android:textColor="@color/text_muted"
+                android:gravity="center"
+                android:lineSpacingMultiplier="1.3"
+                android:layout_marginTop="16dp" />
+            <LinearLayout
+                android:id="@+id/newDeviceIdCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:background="@drawable/card_background"
+                android:padding="20dp"
+                android:layout_marginTop="16dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_bold"
+                    android:text="VERIFICATION CODE"
+                    android:textSize="11sp"
+                    android:letterSpacing="0.05"
+                    android:textColor="@color/text_muted"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/newDeviceIdText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_bold"
+                    android:text="—"
+                    android:textSize="15sp"
+                    android:textColor="@color/vg_dark"
+                    android:gravity="center" />
+
+                <TextView
+                    android:id="@+id/copyDeviceIdText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins"
+                    android:text="Tap to copy"
+                    android:textSize="12sp"
+                    android:textColor="@color/vg_green_dark"
+                    android:layout_marginTop="6dp"
+                    android:padding="4dp" />
+            </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- BUTTONS -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/loginButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:fontFamily="@font/poppins_bold"
+                android:includeFontPadding="false"
+                android:text="Log in"
+                android:textSize="16sp"
+                android:textAllCaps="false"
+                android:backgroundTint="@color/vg_green"
+                android:textColor="@color/white"
+                android:layout_marginBottom="12dp"
+                app:cornerRadius="16dp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/contactCareButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:fontFamily="@font/poppins_bold"
+                android:includeFontPadding="false"
+                android:text="Contact customer care"
+                android:textSize="15sp"
+                android:textAllCaps="false"
+                android:textColor="@color/vg_green_dark"
+                app:strokeColor="@color/vg_green"
+                app:strokeWidth="1.5dp"
+                app:backgroundTint="@android:color/transparent"
+                app:cornerRadius="16dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>

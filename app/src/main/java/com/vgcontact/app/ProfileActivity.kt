@@ -57,6 +57,11 @@ class ProfileActivity : AppCompatActivity() {
             finish()
         }
 
+        // Sync frequency (1 / 6 / 12 / 24 hours)
+        syncFrequencyBtn = findViewById(R.id.sync_frequency_btn)
+        syncFrequencyBtn.setOnClickListener { showSyncFrequencyDialog() }
+        refreshSyncFrequencyButton()
+
         // Delete My Contacts / Resume Syncing
         deleteContactsBtn = findViewById(R.id.delete_contacts_btn)
         deleteContactsBtn.setOnClickListener { onDeleteOrResumeClicked() }
@@ -67,6 +72,34 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private lateinit var deleteContactsBtn: com.google.android.material.button.MaterialButton
+    private lateinit var syncFrequencyBtn: com.google.android.material.button.MaterialButton
+
+    private fun hoursLabel(h: Int) = if (h == 1) "hour" else "hours"
+
+    private fun refreshSyncFrequencyButton() {
+        val h = SyncPrefs.getIntervalHours(this)
+        syncFrequencyBtn.text = if (h == 1) "Sync every hour" else "Sync every $h hours"
+    }
+
+    private fun showSyncFrequencyDialog() {
+        val choices = SyncPrefs.INTERVAL_CHOICES
+        val labels = choices.map { if (it == 1) "Every hour" else "Every $it hours" }.toTypedArray()
+        val current = choices.indexOf(SyncPrefs.getIntervalHours(this)).coerceAtLeast(0)
+        AlertDialog.Builder(this)
+            .setTitle("How often should contacts sync?")
+            .setSingleChoiceItems(labels, current) { dialog, which ->
+                val hours = choices[which]
+                if (hours != SyncPrefs.getIntervalHours(this)) {
+                    SyncPrefs.setIntervalHours(this, hours)
+                    DailySyncWorker.reschedule(this)
+                    refreshSyncFrequencyButton()
+                    Toast.makeText(this, "Contacts will sync every $hours ${hoursLabel(hours)}", Toast.LENGTH_SHORT).show()
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
 
     // One button, two states: normal = Delete My Contacts (red outline),
     // paused = Resume Syncing (green).

@@ -113,7 +113,7 @@ class RegisterActivity : AppCompatActivity() {
             val androidId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
 
             if (androidId.isNullOrBlank()) {
-                Toast.makeText(this, "Couldn't verify this device. Please restart the app and try again.", Toast.LENGTH_LONG).show()
+                startActivity(Intent(this, DeviceUnverifiedActivity::class.java))
                 return@setOnClickListener
             }
 
@@ -125,22 +125,18 @@ class RegisterActivity : AppCompatActivity() {
                         setLoading(false)
 
                         if (success && user != null) {
-                            val finalUsername = user.optString("username", username)
-                            if (finalUsername != username) {
-                                Toast.makeText(
-                                    this,
-                                    "That name was taken. Your username is $finalUsername",
-                                    Toast.LENGTH_LONG
-                                ).show()
+                            val returnedPhone = PhoneUtils.clean(user.optString("phone", phone))
+                            if (returnedPhone != phone) {
+                                // One account per device: the server handed back the account this
+                                // phone already has instead of creating a new one.
+                                startActivity(
+                                    Intent(this, DeviceBlockedActivity::class.java)
+                                        .putExtra(DeviceBlockedActivity.EXTRA_REASON, DeviceBlockedActivity.REASON_DEVICE)
+                                        .putExtra(DeviceBlockedActivity.EXTRA_USER_JSON, user.toString())
+                                )
+                            } else {
+                                finishSignIn(user, username, phone)
                             }
-                            sessionManager.saveUsername(finalUsername)
-                            sessionManager.savePhone(user.optString("phone", phone))
-                            sessionManager.saveUserId(user.optString("id", "").ifBlank { user.optString("user_id", "").ifBlank { user.optString("uid", "") } })
-                            sessionManager.saveRegistrationFrom(user)
-                            VgFirebaseMessagingService.flushPendingTokenIfAny(this)
-                            // Clear the whole back stack so Back from Home can never return to Register/Login.
-                            startActivity(Intent(this, PermissionsActivity::class.java).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK) })
-                            finish()
                         } else {
                             val err = SupabaseClient.lastError.orEmpty()
                             val msg = when {
@@ -159,6 +155,26 @@ class RegisterActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    // Saves the session and moves on to the permissions screen.
+    private fun finishSignIn(user: org.json.JSONObject, typedUsername: String, typedPhone: String) {
+        val finalUsername = user.optString("username", typedUsername)
+        if (finalUsername != typedUsername) {
+            Toast.makeText(
+                this,
+                "That name was taken. Your username is $finalUsername",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+        sessionManager.saveUsername(finalUsername)
+        sessionManager.savePhone(user.optString("phone", typedPhone))
+        sessionManager.saveUserId(user.optString("id", "").ifBlank { user.optString("user_id", "").ifBlank { user.optString("uid", "") } })
+        sessionManager.saveRegistrationFrom(user)
+        VgFirebaseMessagingService.flushPendingTokenIfAny(this)
+        // Clear the whole back stack so Back from Home can never return to Register/Login.
+        startActivity(Intent(this, PermissionsActivity::class.java).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK) })
+        finish()
     }
 
     private fun setLoading(loading: Boolean) {

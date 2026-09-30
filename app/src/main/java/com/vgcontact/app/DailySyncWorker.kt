@@ -22,7 +22,7 @@ import androidx.work.WorkerParameters
 import java.util.concurrent.TimeUnit
 
 /**
- * Background contact sync, about once every 24 hours. Runs the same
+ * Background contact sync, every 24 hours by default (Profile > Sync every... can change it to 1, 6 or 12). Runs the same
  * ContactSync as the Sync Contacts button (the server decides which numbers
  * to save; contacts that left the list are removed, nothing is renamed).
  *
@@ -111,15 +111,20 @@ class DailySyncWorker(context: Context, params: WorkerParameters) : CoroutineWor
         private const val RETRY_WORK_NAME = "vgcontact_contact_sync_retry"
 
         /** Safe to call on every app start: an existing schedule is kept. */
-        fun schedule(context: Context) {
-            val request = PeriodicWorkRequestBuilder<DailySyncWorker>(24, TimeUnit.HOURS)
+        fun schedule(context: Context) = enqueue(context, ExistingPeriodicWorkPolicy.KEEP)
+
+        /** Called when the user picks a new frequency: replaces the schedule. */
+        fun reschedule(context: Context) = enqueue(context, ExistingPeriodicWorkPolicy.UPDATE)
+
+        private fun enqueue(context: Context, policy: ExistingPeriodicWorkPolicy) {
+            val request = PeriodicWorkRequestBuilder<DailySyncWorker>(
+                SyncPrefs.getIntervalHours(context).toLong(), TimeUnit.HOURS
+            )
                 .setConstraints(
                     Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
                 )
                 .build()
-            WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-                WORK_NAME, ExistingPeriodicWorkPolicy.KEEP, request
-            )
+            WorkManager.getInstance(context).enqueueUniquePeriodicWork(WORK_NAME, policy, request)
         }
     }
 }

@@ -289,32 +289,78 @@ class HomeActivity : AppCompatActivity() {
             !androidx.core.app.NotificationManagerCompat.from(this).areNotificationsEnabled()
         reportNotificationsEnabledIfChanged(!notificationsOff)
 
+        // Contacts and battery only matter while syncing is not paused.
+        val syncOn = !SyncPrefs.isPaused(this)
         val missing = mutableListOf<String>()
+        if (syncOn && !ContactSync.hasPermission(this)) missing.add("Contacts")
         if (notificationsOff) missing.add("Notifications")
+        if (syncOn && isBatteryRestricted()) missing.add("Battery")
         missingPermissions = missing
 
         if (missing.isEmpty()) {
             banner.visibility = View.GONE
         } else {
-            bannerText.text = "Notifications are off - you won't get repost alerts"
+            // One line, most important problem first.
+            bannerText.text = when (missing.first()) {
+                "Contacts" -> "Contacts are off - new viewers can't be saved to your phone"
+                "Notifications" -> "Notifications are off - you won't get repost alerts"
+                else -> "Battery saver may stop your daily contact sync"
+            }
             banner.visibility = View.VISIBLE
         }
     }
 
-    private fun fixPermissions() {
-        if ("Notifications" !in missingPermissions) return
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU &&
-            androidx.core.content.ContextCompat.checkSelfPermission(
-                this, android.Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            androidx.core.app.ActivityCompat.requestPermissions(
-                this,
-                arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
-                NOTIFICATIONS_REQUEST_CODE
+    private fun isBatteryRestricted(): Boolean {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.M) return false
+        val pm = getSystemService(POWER_SERVICE) as android.os.PowerManager
+        return !pm.isIgnoringBatteryOptimizations(packageName)
+    }
+
+    private fun openAppSettings() {
+        try {
+            startActivity(
+                Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    .setData(Uri.parse("package:$packageName"))
             )
-        } else {
-            openNotificationSettings()
+        } catch (e: Exception) {
+            Toast.makeText(this, "Couldn't open Settings", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun openBatterySettings() {
+        try {
+            startActivity(Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+        } catch (e: Exception) {
+            openAppSettings()
+        }
+    }
+
+    private fun fixPermissions() {
+        when (missingPermissions.firstOrNull()) {
+            "Contacts" -> androidx.core.app.ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    android.Manifest.permission.READ_CONTACTS,
+                    android.Manifest.permission.WRITE_CONTACTS
+                ),
+                CONTACTS_REQUEST_CODE
+            )
+            "Notifications" -> {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU &&
+                    androidx.core.content.ContextCompat.checkSelfPermission(
+                        this, android.Manifest.permission.POST_NOTIFICATIONS
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    androidx.core.app.ActivityCompat.requestPermissions(
+                        this,
+                        arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                        NOTIFICATIONS_REQUEST_CODE
+                    )
+                } else {
+                    openNotificationSettings()
+                }
+            }
+            "Battery" -> openBatterySettings()
         }
     }
 
@@ -335,7 +381,14 @@ class HomeActivity : AppCompatActivity() {
             }
             CONTACTS_REQUEST_CODE -> {
                 if (granted) startSync()
-                else Toast.makeText(this, "Contacts permission is needed to sync", Toast.LENGTH_LONG).show()
+                else {
+                    Toast.makeText(this, "Contacts permission is needed to sync", Toast.LENGTH_LONG).show()
+                    // "Don't ask again" was chosen: only Settings can turn it on now.
+                    if (!androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale(
+                            this, android.Manifest.permission.READ_CONTACTS)
+                    ) openAppSettings()
+                }
+                updatePermissionBanner()
             }
         }
     }

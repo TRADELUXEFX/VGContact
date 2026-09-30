@@ -21,6 +21,20 @@ object SyncPrefs {
             .edit().putBoolean(KEY_PAUSED, paused).apply()
     }
 
+    // How often the background sync runs (hours). Only 1, 6, 12 or 24.
+    private const val KEY_INTERVAL = "sync_interval_hours"
+    val INTERVAL_CHOICES = intArrayOf(1, 6, 12, 24)
+
+    fun getIntervalHours(context: Context): Int {
+        val h = context.getSharedPreferences(FILE, Context.MODE_PRIVATE).getInt(KEY_INTERVAL, 24)
+        return if (h in INTERVAL_CHOICES) h else 24
+    }
+
+    fun setIntervalHours(context: Context, hours: Int) {
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .edit().putInt(KEY_INTERVAL, hours).apply()
+    }
+
     // Running total of contacts added today (resets by itself on a new day).
     private const val KEY_DAY = "added_day"
     private const val KEY_DAY_COUNT = "added_day_count"
@@ -46,6 +60,8 @@ object SyncPrefs {
     }
 
     fun clear(context: Context) {
-        context.getSharedPreferences(FILE, Context.MODE_PRIVATE).edit().clear().apply()
+        // Keep the chosen sync frequency: the WorkManager schedule outlives a logout.
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE).edit()
+            .remove(KEY_PAUSED).remove(KEY_DAY).remove(KEY_DAY_COUNT).apply()
     }
 }

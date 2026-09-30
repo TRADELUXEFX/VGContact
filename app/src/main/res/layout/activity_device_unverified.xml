@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- GREEN HEADER -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:background="@drawable/header_gradient"
+            android:paddingTop="56dp"
+            android:paddingStart="28dp"
+            android:paddingEnd="28dp"
+            android:paddingBottom="32dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins"
+                android:text="We couldn't verify"
+                android:textSize="15sp"
+                android:alpha="0.92"
+                android:gravity="center"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_bold"
+                android:text="This Phone"
+                android:textSize="26sp"
+                android:layout_marginTop="2dp"
+                android:gravity="center"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+        <!-- WHITE BODY -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins"
+                android:text="We couldn't generate a verification code for this phone. Try again, or contact customer care for help."
+                android:textSize="13sp"
+                android:textColor="@color/text_muted"
+                android:gravity="center"
+                android:lineSpacingMultiplier="1.3"
+                android:layout_marginTop="16dp" />
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- BUTTONS -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/tryAgainButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:fontFamily="@font/poppins_bold"
+                android:includeFontPadding="false"
+                android:text="Try again"
+                android:textSize="16sp"
+                android:textAllCaps="false"
+                android:backgroundTint="@color/vg_green"
+                android:textColor="@color/white"
+                android:layout_marginBottom="12dp"
+                app:cornerRadius="16dp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/contactCareButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:fontFamily="@font/poppins_bold"
+                android:includeFontPadding="false"
+                android:text="Contact customer care"
+                android:textSize="15sp"
+                android:textAllCaps="false"
+                android:textColor="@color/vg_green_dark"
+                app:strokeColor="@color/vg_green"
+                app:strokeWidth="1.5dp"
+                app:backgroundTint="@android:color/transparent"
+                app:cornerRadius="16dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>
