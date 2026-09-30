@@ -16,8 +16,8 @@ import android.widget.Toast
  *
  * Android has no API to read that setting back, so the app cannot know whether
  * the switch is on. Instead it watches the result: the banner only shows when
- * no sync has succeeded for a while (SyncPrefs.isSyncStalled), and it rests for
- * 3 days after the user has been sent to the brand screen.
+ * no sync has succeeded for a while (SyncPrefs.isSyncStalled), and it goes away
+ * by itself as soon as a sync succeeds.
  *
  * The screens below are undocumented brand-specific activities. They can
  * change or disappear between OS versions, so each one is tried in turn and
@@ -35,26 +35,15 @@ object OemAutostart {
 
     fun isKnownOem(): Boolean = Build.MANUFACTURER.lowercase() in KNOWN_OEMS
 
-    // After the user has been sent to the brand screen, stay quiet this long.
-    private const val QUIET_MS = 3L * 24 * 60 * 60 * 1000
-
     /**
      * True only on a listed brand AND only while the background sync really looks
-     * stalled (SyncPrefs.isSyncStalled). Once the user has been sent to the brand
-     * screen it stays quiet for 3 days; if the sync is still stuck after that, it
-     * shows again. As soon as a sync succeeds it disappears by itself.
+     * stalled (SyncPrefs.isSyncStalled). It disappears by itself as soon as a
+     * sync succeeds.
      */
-    fun needsPrompt(activity: Activity): Boolean {
-        if (!isKnownOem()) return false
-        if (!SyncPrefs.isSyncStalled(activity)) return false
-        val last = SyncPrefs.getOemAutostartPromptedAt(activity)
-        return last == 0L || System.currentTimeMillis() - last > QUIET_MS
-    }
+    fun needsPrompt(activity: Activity): Boolean =
+        isKnownOem() && SyncPrefs.isSyncStalled(activity)
 
     fun openSettings(activity: Activity) {
-        // Note the time first so the banner rests even if the fallback fires.
-        SyncPrefs.markOemAutostartPrompted(activity)
-
         val m = Build.MANUFACTURER.lowercase()
         fun c(pkg: String, cls: String) = Intent().setComponent(ComponentName(pkg, cls))
 

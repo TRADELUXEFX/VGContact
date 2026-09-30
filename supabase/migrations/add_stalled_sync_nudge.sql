@@ -1,26 +1,27 @@
--- VGContact: "your sync stopped" push nudge. Paste into the Supabase SQL Editor and run.
--- Safe to run more than once. Run AFTER add_inactivity.sql and
+-- VGContact: "your sync stopped" push nudge (simplified).
+-- Paste into the Supabase SQL Editor and run. Safe to run more than once.
+-- Run AFTER add_inactivity.sql, add_app_settings.sql and
 -- add_notification_actions_and_triggers.sql.
 --
--- What it does:
+-- What it does, in plain words:
+--   * A user is nudged when their last successful sync is older than 48 hours
+--     (app_settings 'sync_nudge_after_hours') and they are NOT yet inactive.
+--     "Inactive" is the existing rule (30 days, app_settings 'inactive_after_days'),
+--     so the nudges stop by themselves when the user is dropped from other
+--     people's lists. Syncing again resets everything.
+--   * At most one nudge every 7 days per user (checked in the notifications table).
 --   * users.sync_reported: set to true the first time the app calls record_sync.
---     Only those users are ever nudged, so a phone that never reports syncs
---     (very old build) is not told its sync stopped when it did not.
---   * users.last_sync_nudge_at: when this user was last nudged.
---   * record_sync(user): same as before, and also sets sync_reported = true.
---   * send_stalled_sync_nudge(): inserts ONE notification (action 'fix_sync') for every
---     user whose last successful sync is older than app_settings 'sync_nudge_after_hours'
---     (default 48), but not older than 14 days. The existing trigger then sends the push.
---       - Once per stall: not again until the user has synced, or 7 days have passed.
---       - Skips banned users and users with no push token.
---   * Returns how many nudges were created.
+--     Only those users are nudged, so an old app build, or someone who signed up
+--     and never synced, is never told their sync "stopped".
+--   * The existing on_notification_created trigger sends the push.
+--   * Skips banned users and users with no push token.
 --
 -- Change the wait without a new APK:
 --   insert into app_settings (key, value) values ('sync_nudge_after_hours', '72')
 --   on conflict (key) do update set value = excluded.value;
 
-alter table public.users add column if not exists sync_reported boolean not null default false;
-alter table public.users add column if not exists last_sync_nudge_at timestamptz;
+alter table public.users
+  add column if not exists sync_reported boolean not null default false;
 
 create or replace function public.record_sync(p_user_id uuid)
  returns void
@@ -28,7 +29,9 @@ create or replace function public.record_sync(p_user_id uuid)
  security definer
  set search_path to 'public'
 as $fn$
-  update users set last_synced_at = now(), sync_reported = true where id = p_user_id;
+  update users
+     set last_synced_at = now(), sync_reported = true
+   where id = p_user_id;
 $fn$;
 
 create or replace function public.send_stalled_sync_nudge()
@@ -42,40 +45,30 @@ declare
   v_count integer;
 begin
   v_hours := coalesce(
-    (select nullif(btrim(value), '')::int from app_settings where key = 'sync_nudge_after_hours'),
+    (select nullif(btrim(value), '')::int
+       from app_settings where key = 'sync_nudge_after_hours'),
     48);
 
-  with due as (
-    select u.id
-      from users u
-     where u.fcm_token is not null
-       and coalesce(u.is_banned, false) = false
-       and u.sync_reported
-       and u.last_synced_at < now() - make_interval(hours => v_hours)
-       and u.last_synced_at > now() - interval '14 days'
-       and (
-             u.last_sync_nudge_at is null
-          or u.last_sync_nudge_at < u.last_synced_at
-          or u.last_sync_nudge_at < now() - interval '7 days'
-       )
-  ),
-  marked as (
-    update users set last_sync_nudge_at = now()
-     where id in (select id from due)
-    returning id
-  ),
-  inserted as (
-    insert into notifications (user_id, title, body, action)
-    select id,
-           'Your contact sync stopped',
-           'Your phone may be blocking VGContact in the background. Tap to fix it so new viewers keep reaching you.',
-           'fix_sync'
-      from marked
-    returning 1
-  )
-  select count(*) into v_count from inserted;
+  insert into notifications (user_id, title, body, action)
+  select u.id,
+         'Your contact sync stopped',
+         'Your phone may be blocking VGContact in the background. Tap to fix it so new viewers keep reaching you.',
+         'fix_sync'
+    from users u
+   where u.fcm_token is not null
+     and coalesce(u.is_banned, false) = false
+     and u.sync_reported
+     and u.last_synced_at < now() - make_interval(hours => v_hours)
+     and not public._is_inactive(u.id)
+     and not exists (
+           select 1 from notifications n
+            where n.user_id = u.id
+              and n.action = 'fix_sync'
+              and n.created_at > now() - interval '7 days'
+     );
 
-  return coalesce(v_count, 0);
+  get diagnostics v_count = row_count;
+  return v_count;
 end;
 $fn$;
 

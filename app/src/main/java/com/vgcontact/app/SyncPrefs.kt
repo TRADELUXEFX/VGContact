@@ -17,11 +17,8 @@ object SyncPrefs {
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE).getBoolean(KEY_PAUSED, false)
 
     fun setPaused(context: Context, paused: Boolean) {
-        val e = context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
-            .edit().putBoolean(KEY_PAUSED, paused)
-        // Resuming starts a fresh watch: time spent paused must not look like a stall.
-        if (!paused) e.putLong(KEY_WATCH_SINCE, System.currentTimeMillis())
-        e.apply()
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .edit().putBoolean(KEY_PAUSED, paused).apply()
     }
 
     // How often the background sync runs (hours). Only 1, 6, 12 or 24.
@@ -41,10 +38,6 @@ object SyncPrefs {
     // When the last successful sync finished (ms since 1970). 0 = none yet.
     // Set by ContactSync.run as soon as the server answers.
     private const val KEY_LAST_SYNC = "last_sync_at"
-    // When we started watching for a stalled sync. Used when there is no
-    // successful sync on record yet (fresh install, just updated, just resumed),
-    // so nobody is warned the moment they open the app.
-    private const val KEY_WATCH_SINCE = "sync_watch_since"
 
     fun recordSyncSuccess(context: Context) {
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
@@ -52,20 +45,15 @@ object SyncPrefs {
     }
 
     /**
-     * True when the background sync looks stuck: no successful sync for longer
-     * than [stallLimitMs]. Never true before that much time has passed since we
-     * first started watching, so a new install or a fresh update is not flagged.
+     * True when a sync worked before but the last successful one is older than
+     * [stallLimitMs]. If no sync has ever been recorded on this phone, it is
+     * false, so a new install or a fresh update never shows the banner.
      */
     fun isSyncStalled(context: Context): Boolean {
-        val p = context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
-        val now = System.currentTimeMillis()
-        var since = p.getLong(KEY_WATCH_SINCE, 0L)
-        if (since == 0L) {
-            since = now
-            p.edit().putLong(KEY_WATCH_SINCE, now).apply()
-        }
-        val base = maxOf(p.getLong(KEY_LAST_SYNC, 0L), since)
-        return now - base > stallLimitMs(context)
+        val last = context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .getLong(KEY_LAST_SYNC, 0L)
+        if (last == 0L) return false
+        return System.currentTimeMillis() - last > stallLimitMs(context)
     }
 
     // Twice the chosen sync interval, but never less than 30 hours. Android may run
@@ -73,18 +61,6 @@ object SyncPrefs {
     private fun stallLimitMs(context: Context): Long {
         val hours = maxOf(30, 2 * getIntervalHours(context))
         return hours * 60L * 60L * 1000L
-    }
-
-    // When we last sent the user to their phone brand's autostart screen (ms). 0 = never.
-    // Deliberately NOT cleared by clear(): it describes the phone, not the account.
-    private const val KEY_OEM_PROMPTED_AT = "oem_autostart_prompted_at"
-
-    fun getOemAutostartPromptedAt(context: Context): Long =
-        context.getSharedPreferences(FILE, Context.MODE_PRIVATE).getLong(KEY_OEM_PROMPTED_AT, 0L)
-
-    fun markOemAutostartPrompted(context: Context) {
-        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
-            .edit().putLong(KEY_OEM_PROMPTED_AT, System.currentTimeMillis()).apply()
     }
 
     // Running total of contacts added today (resets by itself on a new day).
@@ -115,6 +91,6 @@ object SyncPrefs {
         // Keep the chosen sync frequency: the WorkManager schedule outlives a logout.
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE).edit()
             .remove(KEY_PAUSED).remove(KEY_DAY).remove(KEY_DAY_COUNT)
-            .remove(KEY_LAST_SYNC).remove(KEY_WATCH_SINCE).apply()
+            .remove(KEY_LAST_SYNC).apply()
     }
 }
