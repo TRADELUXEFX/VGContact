@@ -297,7 +297,7 @@ class HomeActivity : AppCompatActivity() {
                     )
                 }
             else -> builder
-                .setMessage("Your phone may be stopping VGContact in the background. Allow it to keep running, then sync once to check.")
+                .setMessage("Your phone may be stopping VGContact in the background. Allow it to keep running. This warning goes away after the next automatic sync works.")
                 .setPositiveButton("Fix now") { _, _ ->
                     when {
                         OemAutostart.isKnownOem() -> OemAutostart.openSettings(this)

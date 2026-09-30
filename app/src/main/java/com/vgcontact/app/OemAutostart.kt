@@ -16,8 +16,8 @@ import android.widget.Toast
  *
  * Android has no API to read that setting back, so the app cannot know whether
  * the switch is on. Instead it watches the result: the banner only shows when
- * no sync has succeeded for a while (SyncPrefs.isSyncStalled), and it goes away
- * by itself as soon as a sync succeeds.
+ * no BACKGROUND sync has succeeded for a while (SyncPrefs.isSyncStalled), and it
+ * goes away by itself as soon as a background sync succeeds.
  *
  * The screens below are undocumented brand-specific activities. They can
  * change or disappear between OS versions, so each one is tried in turn and
@@ -38,7 +38,7 @@ object OemAutostart {
     /**
      * True only on a listed brand AND only while the background sync really looks
      * stalled (SyncPrefs.isSyncStalled). It disappears by itself as soon as a
-     * sync succeeds.
+     * background sync succeeds (the Sync button does not clear it).
      */
     fun needsPrompt(activity: Activity): Boolean =
         isKnownOem() && SyncPrefs.isSyncStalled(activity)
