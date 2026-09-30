@@ -1,5 +1,5 @@
 -- VGContact: inactivity tracking (part 1 of 2). Paste into the Supabase SQL Editor and run.
--- Safe to run more than once. The app starts calling record_sync as soon as this exists.
+-- Safe to run more than once. If the editor errors, run each statement on its own. The app starts calling record_sync as soon as this exists.
 --
 -- What it does:
 --   * users.last_synced_at: when contacts last synced successfully (opening the app alone does not count).
@@ -21,11 +21,11 @@ create or replace function public._inactive_after_days()
  stable
  security definer
  set search_path to 'public'
-as $$
+as $fn$
   select coalesce(
     (select nullif(btrim(value), '')::int from app_settings where key = 'inactive_after_days'),
     30);
-$$;
+$fn$;
 
 create or replace function public._is_inactive(p_user_id uuid)
  returns boolean
@@ -33,21 +33,21 @@ create or replace function public._is_inactive(p_user_id uuid)
  stable
  security definer
  set search_path to 'public'
-as $$
+as $fn$
   select coalesce(
     (select u.last_synced_at < now() - make_interval(days => public._inactive_after_days())
        from users u where u.id = p_user_id),
     false);
-$$;
+$fn$;
 
 create or replace function public.record_sync(p_user_id uuid)
  returns void
  language sql
  security definer
  set search_path to 'public'
-as $$
+as $fn$
   update users set last_synced_at = now() where id = p_user_id;
-$$;
+$fn$;
 
 revoke all on function public._inactive_after_days() from public, anon, authenticated;
 revoke all on function public._is_inactive(uuid) from public, anon, authenticated;

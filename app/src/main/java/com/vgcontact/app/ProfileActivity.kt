@@ -49,14 +49,6 @@ class ProfileActivity : AppCompatActivity() {
             Toast.makeText(this, "Username copied", Toast.LENGTH_SHORT).show()
         }
 
-        // Logout button
-        val logoutBtn = findViewById<Button>(R.id.logout_btn)
-        logoutBtn.setOnClickListener {
-            sessionManager.logout()
-            startActivity(Intent(this, RegisterActivity::class.java).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK) })
-            finish()
-        }
-
         // Sync frequency (1 / 6 / 12 / 24 hours)
         syncFrequencyBtn = findViewById(R.id.sync_frequency_btn)
         syncFrequencyBtn.setOnClickListener { showSyncFrequencyDialog() }

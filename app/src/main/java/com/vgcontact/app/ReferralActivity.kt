@@ -220,8 +220,10 @@ class ReferralActivity : AppCompatActivity() {
 
     private fun applyListSearch() {
         val q = searchMine.text.toString().trim().lowercase(Locale.getDefault())
+        val qDigits = q.filter { it.isDigit() }
         filtered = if (q.isEmpty()) all else all.filter {
-            it.username.lowercase(Locale.getDefault()).contains(q)
+            it.username.lowercase(Locale.getDefault()).contains(q) ||
+                (qDigits.isNotEmpty() && it.phone.filter { c -> c.isDigit() }.contains(qDigits))
         }
         page = 0
         renderList()

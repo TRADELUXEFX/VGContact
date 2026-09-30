@@ -261,23 +261,6 @@
             app:strokeWidth="1.5dp"
             app:cornerRadius="16dp" />
 
-        <com.google.android.material.button.MaterialButton
-            android:fontFamily="@font/poppins_bold"
-            android:includeFontPadding="false"
-            android:textSize="16sp"
-            android:id="@+id/logout_btn"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="16dp"
-            android:text="Log Out"
-            android:textAllCaps="false"
-            android:backgroundTint="@color/vg_red"
-            android:textColor="@color/white"
-            app:icon="@drawable/ic_logout"
-            app:iconTint="@color/white"
-            app:iconGravity="textStart"
-            app:cornerRadius="16dp" />
-
     </LinearLayout>
 
     </ScrollView>
