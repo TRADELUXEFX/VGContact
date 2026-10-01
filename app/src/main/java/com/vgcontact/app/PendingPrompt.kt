@@ -32,6 +32,7 @@ object PendingPrompt {
     private const val PREFS = "vg_pending_prompt"
     private const val KEY_SHOWN = "sheet_shown"
     private const val KEY_PENDING = "is_pending"
+    private const val PAY_AMOUNT = "₦1,500"
 
     fun wasShown(context: Context): Boolean =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_SHOWN, false)
@@ -123,7 +124,7 @@ object PendingPrompt {
                         activity.runOnUiThread {
                             alreadyLogged = true
                             chip.visibility = View.VISIBLE
-                            verifyBtn.text = "Open WhatsApp again"
+                            verifyBtn.text = "Post again"
                         }
                     }
                 }
@@ -135,6 +136,16 @@ object PendingPrompt {
             verifyTapped = true
             dialog.dismiss()
             repostNow(activity, alreadyLogged)
+        }
+        // Skip the post: pay for verification by chatting with support on WhatsApp.
+        view.findViewById<View>(R.id.pendingSheetPayBtn).setOnClickListener {
+            dialog.dismiss()
+            val username = SessionManager(activity).getUsername()
+            SupportContact.openSupport(
+                activity,
+                "Hi VGContact, I want to pay $PAY_AMOUNT to get verified." +
+                    if (username.isNullOrBlank()) "" else " My username is $username."
+            )
         }
         view.findViewById<View>(R.id.pendingSheetLaterBtn).setOnClickListener { dialog.dismiss() }
 

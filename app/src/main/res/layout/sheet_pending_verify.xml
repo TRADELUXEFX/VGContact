@@ -6,240 +6,224 @@
     android:overScrollMode="never"
     android:scrollbars="none">
 
-<LinearLayout
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:gravity="center_horizontal"
-    android:paddingStart="22dp"
-    android:paddingEnd="22dp"
-    android:paddingTop="26dp"
-    android:paddingBottom="14dp">
-
-    <FrameLayout
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:background="@drawable/pending_sheet_icon_background">
-
-        <ImageView
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_repost"
-            app:tint="@color/warning_amber"
-            android:contentDescription="@null" />
-    </FrameLayout>
-
-    <TextView
-        android:fontFamily="@font/poppins_bold"
-        android:includeFontPadding="false"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:gravity="center"
-        android:text="Unlock 500+ status viewers"
-        android:textSize="20sp"
-        android:textColor="@color/vg_dark" />
-
-    <TextView
-        android:fontFamily="@font/poppins"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:gravity="center"
-        android:text="Your account is pending. Post on your WhatsApp status to get verified."
-        android:textSize="14sp"
-        android:textColor="@color/text_secondary" />
-
     <LinearLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
         android:orientation="vertical"
-        android:background="@drawable/pending_step_card"
-        android:padding="16dp">
+        android:gravity="center_horizontal"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="28dp"
+        android:paddingBottom="12dp">
+
+        <FrameLayout
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:background="@drawable/pending_sheet_icon_background">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_repost"
+                app:tint="@color/warning_amber"
+                android:contentDescription="@null" />
+        </FrameLayout>
+
+        <TextView
+            android:fontFamily="@font/poppins_bold"
+            android:includeFontPadding="false"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:gravity="center"
+            android:text="Unlock 500+ status viewers"
+            android:textSize="20sp"
+            android:textColor="@color/vg_dark" />
+
+        <TextView
+            android:fontFamily="@font/poppins"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="Your account is pending. Verify it in 3 simple steps."
+            android:textSize="14sp"
+            android:textColor="@color/text_secondary" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="14dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:background="@drawable/pending_step_number"
-                android:fontFamily="@font/poppins_bold"
-                android:gravity="center"
-                android:includeFontPadding="false"
-                android:text="1"
-                android:textColor="@color/white"
-                android:textSize="13sp" />
+            android:layout_marginTop="18dp"
+            android:orientation="vertical"
+            android:background="@drawable/pending_step_card"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp">
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="12dp"
-                android:orientation="vertical">
+                android:layout_marginBottom="12dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@drawable/pending_step_number"
+                    android:fontFamily="@font/poppins_bold"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:text="1"
+                    android:textColor="@color/white"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
                     android:fontFamily="@font/poppins_bold"
                     android:includeFontPadding="false"
-                    android:text="Post on your status"
+                    android:text="Post on your WhatsApp status"
                     android:textColor="@color/vg_dark"
                     android:textSize="14sp" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@drawable/pending_step_number"
+                    android:fontFamily="@font/poppins_bold"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:text="2"
+                    android:textColor="@color/white"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:fontFamily="@font/poppins"
-                    android:text="Tap the button below, pick what to post, then post it on your WhatsApp status."
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:fontFamily="@font/poppins_bold"
+                    android:includeFontPadding="false"
+                    android:text="We verify it within 24 hours"
+                    android:textColor="@color/vg_dark"
+                    android:textSize="14sp" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="0dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@drawable/pending_step_number"
+                    android:fontFamily="@font/poppins_bold"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:text="3"
+                    android:textColor="@color/white"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:fontFamily="@font/poppins_bold"
+                    android:includeFontPadding="false"
+                    android:text="Claim 500+ status viewers"
+                    android:textColor="@color/vg_dark"
+                    android:textSize="14sp" />
             </LinearLayout>
         </LinearLayout>
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/pendingSheetChip"
+            android:fontFamily="@font/poppins_bold"
+            android:includeFontPadding="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="14dp"
-            android:orientation="horizontal">
+            android:layout_marginTop="16dp"
+            android:background="@drawable/pending_chip_background"
+            android:gravity="center"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:text="Repost logged. Verification pending"
+            android:textColor="@color/vg_dark"
+            android:textSize="13sp"
+            android:visibility="gone" />
 
-            <TextView
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:background="@drawable/pending_step_number"
-                android:fontFamily="@font/poppins_bold"
-                android:gravity="center"
-                android:includeFontPadding="false"
-                android:text="2"
-                android:textColor="@color/white"
-                android:textSize="13sp" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="12dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/poppins_bold"
-                    android:includeFontPadding="false"
-                    android:text="We verify it"
-                    android:textColor="@color/vg_dark"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:fontFamily="@font/poppins"
-                    android:text="We check your repost within 24 hours."
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/pendingSheetVerifyBtn"
+            android:fontFamily="@font/poppins_bold"
+            android:includeFontPadding="false"
             android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="18dp"
+            android:text="Post on my status"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:letterSpacing="0.02"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/vg_green"
+            app:icon="@drawable/ic_repost"
+            app:iconTint="@color/white"
+            app:iconGravity="textStart"
+            app:cornerRadius="16dp" />
+
+        <TextView
+            android:fontFamily="@font/poppins"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="0dp"
-            android:orientation="horizontal">
+            android:layout_marginTop="14dp"
+            android:text="Don't want to post?"
+            android:textSize="13sp"
+            android:textColor="@color/text_secondary" />
 
-            <TextView
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:background="@drawable/pending_step_number"
-                android:fontFamily="@font/poppins_bold"
-                android:gravity="center"
-                android:includeFontPadding="false"
-                android:text="3"
-                android:textColor="@color/white"
-                android:textSize="13sp" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/pendingSheetPayBtn"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:fontFamily="@font/poppins_bold"
+            android:includeFontPadding="false"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="8dp"
+            android:text="Pay ₦1,500 to verify"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textColor="@color/vg_green_dark"
+            app:strokeColor="@color/vg_green"
+            app:strokeWidth="1.5dp"
+            app:cornerRadius="16dp" />
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="12dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/poppins_bold"
-                    android:includeFontPadding="false"
-                    android:text="Claim 500+ viewers"
-                    android:textColor="@color/vg_dark"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:fontFamily="@font/poppins"
-                    android:text="Once verified, you claim 500+ status viewers."
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
-            </LinearLayout>
-        </LinearLayout>
+        <TextView
+            android:id="@+id/pendingSheetLaterBtn"
+            android:fontFamily="@font/poppins_bold"
+            android:includeFontPadding="false"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:padding="12dp"
+            android:text="Not now"
+            android:textSize="14sp"
+            android:textColor="@color/text_secondary"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true" />
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/pendingSheetChip"
-        android:fontFamily="@font/poppins_bold"
-        android:includeFontPadding="false"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
-        android:background="@drawable/pending_chip_background"
-        android:gravity="center"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:text="Repost logged. Verification pending"
-        android:textColor="@color/vg_dark"
-        android:textSize="13sp"
-        android:visibility="gone" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/pendingSheetVerifyBtn"
-        android:fontFamily="@font/poppins_bold"
-        android:includeFontPadding="false"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_marginTop="16dp"
-        android:text="Repost on WhatsApp"
-        android:textAllCaps="false"
-        android:textSize="16sp"
-        android:letterSpacing="0.02"
-        android:textColor="@color/white"
-        android:backgroundTint="@color/vg_green"
-        app:icon="@drawable/ic_repost"
-        app:iconTint="@color/white"
-        app:iconGravity="textStart"
-        app:cornerRadius="16dp" />
-
-    <TextView
-        android:id="@+id/pendingSheetLaterBtn"
-        android:fontFamily="@font/poppins_bold"
-        android:includeFontPadding="false"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:padding="12dp"
-        android:text="Not now"
-        android:textSize="14sp"
-        android:textColor="@color/text_secondary"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:clickable="true"
-        android:focusable="true" />
-</LinearLayout>
 </ScrollView>
