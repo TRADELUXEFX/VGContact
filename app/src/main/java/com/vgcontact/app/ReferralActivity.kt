@@ -42,6 +42,8 @@ class ReferralActivity : AppCompatActivity() {
         // Each user's link is this base + their phone number.
         const val LINK_BASE = "https://vgcontact.netlify.app?ref="
         private const val PER_PAGE = 10
+        // My referrals list is taller per row, so it pages at 3.
+        private const val LIST_PER_PAGE = 3
         private const val MAX_DEPTH = 2 // stack size 2 = level 3, the last level
     }
 
@@ -248,13 +250,13 @@ class ReferralActivity : AppCompatActivity() {
         listSpinner.visibility = View.GONE
         listMessage.visibility = View.GONE
 
-        val start = page * PER_PAGE
-        val end = minOf(start + PER_PAGE, filtered.size)
+        val start = page * LIST_PER_PAGE
+        val end = minOf(start + LIST_PER_PAGE, filtered.size)
         val pageItems = filtered.subList(start, end)
         for ((i, item) in pageItems.withIndex()) {
             listBox.addView(buildReferralRow(item, i != pageItems.lastIndex))
         }
-        buildPager(pagerBox, pagerScroll, filtered.size, page) { p -> page = p; renderList() }
+        buildPager(pagerBox, pagerScroll, filtered.size, page, LIST_PER_PAGE) { p -> page = p; renderList() }
     }
 
     private fun buildReferralRow(item: SupabaseClient.MyReferral, divider: Boolean): View {
@@ -284,7 +286,11 @@ class ReferralActivity : AppCompatActivity() {
                 .apply { marginStart = dp(12) }
         }
         col.addView(TextView(this).apply {
-            text = item.username
+            text = if (showNumber) {
+                if (item.phone.isNotBlank()) formatPhone(item.phone) else item.username
+            } else {
+                if (item.username.isNotBlank()) item.username else formatPhone(item.phone)
+            }
             textSize = 14f
             setTextColor(ContextCompat.getColor(this@ReferralActivity, R.color.vg_dark))
             maxLines = 1
@@ -518,9 +524,10 @@ class ReferralActivity : AppCompatActivity() {
 
     // Numbered page circles (1, 2, 3...), hidden when everything fits on one page.
     private fun buildPager(
-        box: LinearLayout, scroll: View, total: Int, current: Int, onPage: (Int) -> Unit
+        box: LinearLayout, scroll: View, total: Int, current: Int, perPage: Int = PER_PAGE,
+        onPage: (Int) -> Unit
     ) {
-        val pages = (total + PER_PAGE - 1) / PER_PAGE
+        val pages = (total + perPage - 1) / perPage
         if (pages <= 1) {
             scroll.visibility = View.GONE
             return
@@ -595,6 +602,7 @@ class ReferralActivity : AppCompatActivity() {
         codeCardRender?.invoke()
         styleBoardSwitch()
         if (boardLoaded) renderBoard()
+        if (listLoadedOnce) renderList()
     }
 
     private fun styleBoardSwitch() {

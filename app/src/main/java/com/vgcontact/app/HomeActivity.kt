@@ -312,7 +312,7 @@ class HomeActivity : AppCompatActivity() {
                 }
                 .setNeutralButton("Sync now") { _, _ -> startSync() }
         }
-        builder.show()
+        RoundedDialog.style(builder.show())
     }
 
     // ---------------- notification permission banner ----------------

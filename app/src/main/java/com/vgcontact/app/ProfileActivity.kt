@@ -90,7 +90,7 @@ class ProfileActivity : AppCompatActivity() {
                 dialog.dismiss()
             }
             .setNegativeButton("Cancel", null)
-            .show()
+            .show().also { RoundedDialog.style(it) }
     }
 
     // One button, two states: normal = Delete My Contacts (red outline),
@@ -134,7 +134,7 @@ class ProfileActivity : AppCompatActivity() {
             )
             .setNegativeButton("Cancel", null)
             .setPositiveButton("Delete") { _, _ -> deleteContacts() }
-            .show()
+            .show().also { RoundedDialog.style(it) }
     }
 
     private fun deleteContacts() {

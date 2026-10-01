@@ -395,14 +395,52 @@
                             android:paddingStart="12dp"
                             android:paddingEnd="12dp"
                             android:paddingBottom="8dp">
-                            <TextView
+                            <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="RANK / USERNAME"
-                                android:textSize="11sp"
-                                android:letterSpacing="0.05"
-                                android:textColor="@color/text_muted" />
+                                android:gravity="start|center_vertical">
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:padding="2dp"
+                                    android:background="@drawable/referral_switch_track">
+
+                                    <TextView
+                                        android:id="@+id/repost_board_tab_number"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:paddingStart="10dp"
+                                        android:paddingEnd="10dp"
+                                        android:paddingTop="4dp"
+                                        android:paddingBottom="4dp"
+                                        android:text="Phone number"
+                                        android:fontFamily="@font/poppins_semibold"
+                                        android:includeFontPadding="false"
+                                        android:textSize="11sp"
+                                        android:textColor="@color/text_secondary"
+                                        android:clickable="true"
+                                        android:focusable="true" />
+                                    <TextView
+                                        android:id="@+id/repost_board_tab_username"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:paddingStart="10dp"
+                                        android:paddingEnd="10dp"
+                                        android:paddingTop="4dp"
+                                        android:paddingBottom="4dp"
+                                        android:text="Username"
+                                        android:fontFamily="@font/poppins_semibold"
+                                        android:includeFontPadding="false"
+                                        android:textSize="11sp"
+                                        android:textColor="@color/white"
+                                        android:background="@drawable/referral_switch_selected"
+                                        android:clickable="true"
+                                        android:focusable="true" />
+                                </LinearLayout>
+                            </LinearLayout>
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"

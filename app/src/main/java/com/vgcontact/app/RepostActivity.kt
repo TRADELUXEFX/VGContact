@@ -73,6 +73,8 @@ class RepostActivity : AppCompatActivity() {
     private var boardPage = 0
     private var boardRequest = 0
     private var onBoardTab = false
+    // Phone number / Username switch in the leaderboard header (default Username).
+    private var showNumber = false
 
     // Both fetches must finish before the body is revealed on first
     // load (the green header stays visible the whole time, same as Get
@@ -117,6 +119,7 @@ class RepostActivity : AppCompatActivity() {
         applyTodaysTaskVisibility()
 
         bindBoardViews()
+        setupBoardSwitch()
         tabMine.setOnClickListener { showMineTab() }
         tabBoard.setOnClickListener { showBoardTab() }
 
@@ -324,6 +327,35 @@ class RepostActivity : AppCompatActivity() {
     // Tabs
     // ------------------------------------------------------------------
 
+    private fun setupBoardSwitch() {
+        val tabNumber = findViewById<TextView>(R.id.repost_board_tab_number)
+        val tabUsername = findViewById<TextView>(R.id.repost_board_tab_username)
+        fun render() {
+            tabNumber.background =
+                if (showNumber) ContextCompat.getDrawable(this, R.drawable.referral_switch_selected) else null
+            tabUsername.background =
+                if (!showNumber) ContextCompat.getDrawable(this, R.drawable.referral_switch_selected) else null
+            tabNumber.setTextColor(
+                ContextCompat.getColor(this, if (showNumber) R.color.white else R.color.text_secondary)
+            )
+            tabUsername.setTextColor(
+                ContextCompat.getColor(this, if (!showNumber) R.color.white else R.color.text_secondary)
+            )
+            if (board.isNotEmpty()) renderBoard()
+        }
+        tabNumber.setOnClickListener { showNumber = true; render() }
+        tabUsername.setOnClickListener { showNumber = false; render() }
+        render()
+    }
+
+    // 09110321143 -> 0911 032 1143 (display only).
+    private fun formatPhone(raw: String): String {
+        val digits = raw.filter { it.isDigit() }
+        return if (digits.length == 11) {
+            "${digits.substring(0, 4)} ${digits.substring(4, 7)} ${digits.substring(7)}"
+        } else raw
+    }
+
     private fun bindBoardViews() {
         tabMine = findViewById(R.id.repost_tab_mine)
         tabBoard = findViewById(R.id.repost_tab_board)
@@ -480,7 +512,11 @@ class RepostActivity : AppCompatActivity() {
                 .apply { marginStart = dp(14); marginEnd = dp(8) }
         }
         nameCol.addView(TextView(this).apply {
-            text = if (entry.isMe) "You" else entry.username
+            text = if (entry.isMe) "You" else if (showNumber) {
+                if (entry.phone.isNotBlank()) formatPhone(entry.phone) else entry.username
+            } else {
+                if (entry.username.isNotBlank()) entry.username else formatPhone(entry.phone)
+            }
             textSize = 16f
             if (entry.isMe || top3) typeface = fontBold()
             includeFontPadding = false

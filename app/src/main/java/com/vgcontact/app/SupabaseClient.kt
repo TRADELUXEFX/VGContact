@@ -266,13 +266,14 @@ object SupabaseClient {
         return out
     }
 
-    // One row of the repost leaderboard. score = verified reposts. Usernames only, never phones.
+    // One row of the repost leaderboard. score = verified reposts. Username, plus phone when the server sends it (get_repost_leaderboard_phone).
     data class RepostBoardEntry(
         val rank: Int,
         val userId: String,
         val username: String,
         val score: Int,
-        val isMe: Boolean
+        val isMe: Boolean,
+        val phone: String = ""
     )
 
     // Repost leaderboard via get_leaderboard. metric = "reposts" (the only one the server accepts);
@@ -285,7 +286,8 @@ object SupabaseClient {
             put("p_period", "all")
             put("p_limit", 50)
         }
-        val arr = rpc("get_leaderboard", params) ?: return null
+        val arr = rpc("get_repost_leaderboard_phone", JSONObject().apply { put("p_user_id", userId) })
+            ?: rpc("get_leaderboard", params) ?: return null
         val out = mutableListOf<RepostBoardEntry>()
         for (i in 0 until arr.length()) {
             val r = arr.getJSONObject(i)
@@ -295,7 +297,8 @@ object SupabaseClient {
                     userId = r.optString("user_id"),
                     username = r.optString("username"),
                     score = r.optInt("score", 0),
-                    isMe = r.optBoolean("is_me", false)
+                    isMe = r.optBoolean("is_me", false),
+                    phone = r.optString("phone")
                 )
             )
         }
