@@ -16,17 +16,7 @@ class VGApp : Application() {
         instance = this
         FloatingContactHelper.register(this)
         createNotificationChannel()
-        clearStaleContactFiles()
         DailySyncWorker.schedule(this)
-    }
-
-    // Saved contact lists are plaintext .vcf files; nothing needs them once
-    // the process restarts, so wipe them on every cold start.
-    private fun clearStaleContactFiles() {
-        try {
-            java.io.File(cacheDir, "vcf").listFiles()?.forEach { it.delete() }
-        } catch (_: Exception) {
-        }
     }
 
     // Firebase draws pushes itself when the app is closed/backgrounded, and

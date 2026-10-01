@@ -86,12 +86,6 @@
             android:exported="false"
             android:screenOrientation="portrait" />
 
-        <!-- Community Screen -->
-        <activity
-            android:name=".CommunityActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-
         <!-- Profile Screen -->
         <activity
             android:name=".ProfileActivity"
@@ -101,12 +95,6 @@
         <!-- Notifications: reached from the header bell icon -->
         <activity
             android:name=".NotificationsActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-
-        <!-- Chat Support: reached from the global floating chat button -->
-        <activity
-            android:name=".ChatSupportActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 
@@ -137,19 +125,6 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
-        <!-- Serves generated .vcf files (see ContactSync) out to the
-             device's contacts app via a content:// URI, since Android 7+
-             blocks passing raw file:// paths between apps. -->
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
-        </provider>
 
     </application>
 

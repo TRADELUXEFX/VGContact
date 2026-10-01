@@ -1,18 +1,16 @@
-# VGContact MVP
+# VGContact
 
-A clean, minimal Android MVP for the VGContact repost-to-unlock contact platform.
+Android app for the VGContact repost-to-grow-viewers platform. Backend is Supabase.
+See VGCONTACT_SYSTEM.md for how everything works.
 
 ## Tech Stack
 - Kotlin + XML layouts
-- Material Components 3
-- Supabase backend
+- Material Components
+- Supabase backend (database functions called with the anon key)
 - OkHttp3 for API calls
 
 ## Setup
+1. Create `local.properties` from `local.properties.example` with your Supabase credentials
+2. Run `./gradlew assembleDebug`
 
-1. Create `local.properties` with your Supabase credentials
-2. Deploy `supabase-schema.sql` to your Supabase project
-3. Run `./gradlew assembleDebug`
-4. Install APK on device
-
-## Project Structure
+The database lives in Supabase and is the source of truth. Files in `supabase/migrations` are history, not a full copy of it.

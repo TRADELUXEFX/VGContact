@@ -28,7 +28,7 @@ import kotlin.concurrent.thread
  * repost 'verified' the user gets the "Repost verified" push and the
  * streak counts it. This screen never touches keys.
  *
- * Two tabs in the header: My Repost (the button and streak) and Leaderboard
+ * Two tabs in the header: My Repost (the button) and Leaderboard
  * (hero rank card, top-3 podium, ranked list with a pager; styled after
  * VGKontact's repost leaderboard). The board comes from get_leaderboard:
  * usernames and counts only, never phone numbers.
@@ -69,7 +69,6 @@ class RepostActivity : AppCompatActivity() {
     private lateinit var boardMessage: TextView
 
     private var board: List<SupabaseClient.RepostBoardEntry> = emptyList()
-    private var boardStreaks: Map<String, Int> = emptyMap()
     private var boardPage = 0
     private var boardRequest = 0
     private var onBoardTab = false
@@ -384,10 +383,6 @@ class RepostActivity : AppCompatActivity() {
         }
         thread {
             val reposts = SupabaseClient.fetchRepostLeaderboard(userId, "reposts")
-            // Streaks only decorate the rows; if this call fails the board
-            // still shows, just without the flame chips.
-            val streaks = if (reposts != null)
-                SupabaseClient.fetchRepostLeaderboard(userId, "streak") else null
             runOnUiThread {
                 if (isFinishing || requestId != boardRequest) return@runOnUiThread
                 if (reposts == null) {
@@ -400,7 +395,6 @@ class RepostActivity : AppCompatActivity() {
                     return@runOnUiThread
                 }
                 board = reposts
-                boardStreaks = streaks?.associate { it.userId to it.score } ?: emptyMap()
                 boardPage = 0
                 renderBoard()
             }
@@ -441,8 +435,8 @@ class RepostActivity : AppCompatActivity() {
     private fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
 
     // One row, same scheme as VGKontact's repost board: numbered circle
-    // (gold / silver / bronze for 1-3, soft green after), name, flame streak
-    // chip at 3+ days, repost count on the right. The user's row is tinted.
+    // (gold / silver / bronze for 1-3, soft green after), name,
+    // repost count on the right. The user's row is tinted.
     private fun buildBoardRow(entry: SupabaseClient.RepostBoardEntry): View {
         val row = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -488,8 +482,6 @@ class RepostActivity : AppCompatActivity() {
             ellipsize = TextUtils.TruncateAt.END
             setTextColor(ContextCompat.getColor(this@RepostActivity, R.color.vg_dark))
         })
-        val streak = boardStreaks[entry.userId] ?: 0
-        if (streak >= 3) nameCol.addView(streakChip(streak))
         row.addView(nameCol)
 
         row.addView(TextView(this).apply {
@@ -500,32 +492,6 @@ class RepostActivity : AppCompatActivity() {
             setTextColor(ContextCompat.getColor(this@RepostActivity, R.color.vg_green))
         })
         return row
-    }
-
-    private fun streakChip(days: Int): View {
-        val chip = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-            setBackgroundResource(R.drawable.repost_streak_chip)
-            setPadding(dp(8), dp(3), dp(8), dp(3))
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply { marginStart = dp(8) }
-        }
-        chip.addView(ImageView(this).apply {
-            setImageResource(R.drawable.ic_repost)
-            setColorFilter(ContextCompat.getColor(this@RepostActivity, R.color.vg_green_dark))
-            layoutParams = LinearLayout.LayoutParams(dp(12), dp(12))
-        })
-        chip.addView(TextView(this).apply {
-            text = days.toString()
-            textSize = 11f
-            typeface = fontBold()
-            includeFontPadding = false
-            setTextColor(ContextCompat.getColor(this@RepostActivity, R.color.vg_green_dark))
-            setPadding(dp(3), 0, 0, 0)
-        })
-        return chip
     }
 
     // Numbered page circles, hidden when everything fits on one page.

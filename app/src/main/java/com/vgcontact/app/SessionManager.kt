@@ -53,22 +53,6 @@ class SessionManager(private val context: Context) {
         return prefs.getString("referred_by", null)?.ifBlank { null }
     }
 
-    fun saveTotalDownloads(count: Int) {
-        prefs.edit().putInt("total_downloads", count).apply()
-    }
-
-    fun getTotalDownloads(): Int {
-        return prefs.getInt("total_downloads", 0)
-    }
-
-    fun saveTotalReposts(count: Int) {
-        prefs.edit().putInt("total_reposts", count).apply()
-    }
-
-    fun getTotalReposts(): Int {
-        return prefs.getInt("total_reposts", 0)
-    }
-
     fun logout() {
         prefs.edit().clear().apply()
         SyncPrefs.clear(context)

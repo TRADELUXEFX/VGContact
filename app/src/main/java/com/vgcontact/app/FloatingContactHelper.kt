@@ -34,16 +34,14 @@ object FloatingContactHelper {
 
     /**
      * Screens that must NOT show the floating button (auth / onboarding /
-     * splash / permissions / legal, the chat-support screen itself,
+     * permissions / legal,
      * Notifications, and Banned).
      */
     private val EXCLUDED: Set<Class<out Activity>> = setOf(
-        SplashActivity::class.java,
         RegisterActivity::class.java,
         LoginActivity::class.java,
         PermissionsActivity::class.java,
         LegalActivity::class.java,
-        ChatSupportActivity::class.java,
         NotificationsActivity::class.java,
         BannedActivity::class.java
     )

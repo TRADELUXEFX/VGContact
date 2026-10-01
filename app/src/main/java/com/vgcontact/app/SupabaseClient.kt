@@ -133,35 +133,6 @@ object SupabaseClient {
         callback(row.optBoolean("banned", false), if (row.isNull("reason")) null else row.optString("reason").ifBlank { null })
     }
 
-    // Published (full) contact groups, newest-filled first.
-    fun fetchGroups(callback: (Boolean, org.json.JSONArray?) -> Unit) {
-        if (!isConfigured()) {
-            callback(false, null)
-            return
-        }
-
-        try {
-            val url = "$supabaseUrl/rest/v1/contact_groups?is_published=eq.true&select=*&order=filled_at.desc"
-            val request = Request.Builder()
-                .url(url)
-                .addHeader("apikey", anonKey)
-                .addHeader("Authorization", "Bearer $anonKey")
-                .get()
-                .build()
-
-            client.newCall(request).execute().use { response ->
-                if (response.isSuccessful) {
-                    val arr = org.json.JSONArray(response.body?.string() ?: "[]")
-                    callback(true, arr)
-                } else {
-                    callback(false, null)
-                }
-            }
-        } catch (e: Exception) {
-            callback(false, null)
-        }
-    }
-
     // Records today's repost attempt as 'pending'. It only becomes
     // 'verified' once the admin checks it against WhatsApp status viewers
     // and marks it in the daily_reposts table. One attempt
@@ -293,8 +264,7 @@ object SupabaseClient {
         return out
     }
 
-    // One row of the repost leaderboard. score = verified reposts (or, for the
-    // "streak" metric, current streak days). Usernames only, never phones.
+    // One row of the repost leaderboard. score = verified reposts. Usernames only, never phones.
     data class RepostBoardEntry(
         val rank: Int,
         val userId: String,
@@ -303,7 +273,7 @@ object SupabaseClient {
         val isMe: Boolean
     )
 
-    // Repost leaderboard via get_leaderboard. metric = "reposts" or "streak";
+    // Repost leaderboard via get_leaderboard. metric = "reposts" (the only one the server accepts);
     // all-time, top 50 plus the caller's own row even when outside the top.
     // Blocking - call from a background thread. Null = failed.
     fun fetchRepostLeaderboard(userId: String, metric: String): List<RepostBoardEntry>? {
