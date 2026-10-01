@@ -241,17 +241,13 @@ class RepostActivity : AppCompatActivity() {
             return
         }
 
-        // Send the user to the admin's WhatsApp chat (same number used by
-        // Contact Us) so they can view and repost the admin's status.
-        try {
-            val message = Uri.encode("Hi VGContact, I want to repost today's status")
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse("https://wa.me/${SupportContact.WHATSAPP}?text=$message")
-            startActivity(intent)
-        } catch (e: Exception) {
-            Toast.makeText(this, "WhatsApp not installed", Toast.LENGTH_SHORT).show()
-        }
+        // The user picks what to post (text + link, or image + link). Once the share
+        // sheet opens, today's repost is logged as pending for the admin to verify.
+        val phone = sessionManager.getPhone().orEmpty()
+        ShareHelper.showMenu(this, phone) { logRepost(userId) }
+    }
 
+    private fun logRepost(userId: String) {
         if (repostedToday) {
             // Already logged today: no second submit, just re-show status.
             refreshTodayStatus()

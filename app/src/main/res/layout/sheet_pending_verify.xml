@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/pending_popup_background"
+    android:overScrollMode="never"
+    android:scrollbars="none">
+
+<LinearLayout
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:gravity="center_horizontal"
-    android:background="@drawable/pending_sheet_background"
     android:paddingStart="22dp"
     android:paddingEnd="22dp"
-    android:paddingTop="12dp"
-    android:paddingBottom="24dp">
-
-    <View
-        android:layout_width="40dp"
-        android:layout_height="4dp"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/pending_sheet_handle" />
+    android:paddingTop="26dp"
+    android:paddingBottom="14dp">
 
     <FrameLayout
         android:layout_width="64dp"
@@ -48,7 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
         android:gravity="center"
-        android:text="Your account is pending. Repost our post on your WhatsApp status to get verified."
+        android:text="Your account is pending. Post on your WhatsApp status to get verified."
         android:textSize="14sp"
         android:textColor="@color/text_secondary" />
 
@@ -89,7 +89,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_bold"
                     android:includeFontPadding="false"
-                    android:text="Repost our post"
+                    android:text="Post on your status"
                     android:textColor="@color/vg_dark"
                     android:textSize="14sp" />
 
@@ -98,7 +98,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:fontFamily="@font/poppins"
-                    android:text="Tap the button below, then repost our status on your WhatsApp status."
+                    android:text="Tap the button below, pick what to post, then post it on your WhatsApp status."
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp" />
             </LinearLayout>
@@ -242,3 +242,4 @@
         android:clickable="true"
         android:focusable="true" />
 </LinearLayout>
+</ScrollView>

@@ -3,19 +3,22 @@ package com.vgcontact.app
 import android.app.Activity
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.app.Dialog
+import android.view.ViewGroup
+import android.view.Window
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlin.concurrent.thread
 
 /**
  * Gate for pending (unverified) users.
  *
- *  - First open: the sheet shows once per install ([show]).
+ *  - First open: the popup shows once per install ([show]).
  *  - After "Not now": Home shows the slim strip and dims the viewers card.
  *  - While pending, the only thing that works is the sheet's button. It does what the
  *    Repost screen's button does: opens the admin's WhatsApp (so the user can repost the
@@ -48,11 +51,17 @@ object PendingPrompt {
     }
 
     /**
-     * Same as the Repost screen's button: opens the admin's WhatsApp, then logs today's
-     * repost as 'pending' (once per day; a second tap only re-opens WhatsApp).
+     * Same as the Repost screen's button: the user picks what to post (text + link or
+     * image + link), the share sheet opens, then today's repost is logged as 'pending'
+     * (once per day; a second tap only shows the picker again).
      */
     private fun repostNow(context: Context, alreadyLogged: Boolean) {
-        SupportContact.openSupport(context, "Hi VGContact, I want to repost today's status")
+        val phone = SessionManager(context).getPhone().orEmpty()
+        if (context !is Activity) return
+        ShareHelper.showMenu(context, phone) { logRepost(context, alreadyLogged) }
+    }
+
+    private fun logRepost(context: Context, alreadyLogged: Boolean) {
         if (alreadyLogged) return
         val userId = SessionManager(context).getUserId()
         if (userId.isNullOrBlank()) {
@@ -88,15 +97,18 @@ object PendingPrompt {
 
     /**
      * [onLater] runs for every way of closing without the button: Not now, back,
-     * swipe down, tap outside.
+     * tap outside.
      */
     fun show(activity: Activity, onLater: () -> Unit) {
         if (visible || activity.isFinishing || activity.isDestroyed) return
         visible = true
         markShown(activity)
-        val dialog = BottomSheetDialog(activity)
+        // A centered popup (not a bottom sheet): rounded white card with a dimmed background.
+        val dialog = Dialog(activity)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         val view = LayoutInflater.from(activity).inflate(R.layout.sheet_pending_verify, null)
         dialog.setContentView(view)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         val chip = view.findViewById<TextView>(R.id.pendingSheetChip)
         val verifyBtn = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.pendingSheetVerifyBtn)
@@ -127,9 +139,9 @@ object PendingPrompt {
         view.findViewById<View>(R.id.pendingSheetLaterBtn).setOnClickListener { dialog.dismiss() }
 
         dialog.setOnShowListener {
-            // Let the layout's own rounded white background show instead of the default sheet surface.
-            dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
-                ?.setBackgroundColor(Color.TRANSPARENT)
+            // Popup is 90% of the screen width, centered.
+            val w = (activity.resources.displayMetrics.widthPixels * 0.9).toInt()
+            dialog.window?.setLayout(w, ViewGroup.LayoutParams.WRAP_CONTENT)
         }
         dialog.setOnDismissListener {
             visible = false
