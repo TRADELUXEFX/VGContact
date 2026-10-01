@@ -185,6 +185,8 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun showHome(h: SupabaseClient.HomeData) {
+        findViewById<View>(R.id.home_limits_loading).visibility = View.GONE
+        findViewById<View>(R.id.home_limits_block).visibility = View.VISIBLE
         findViewById<TextView>(R.id.statusBadgeText).text = h.status.uppercase()
 
         findViewById<TextView>(R.id.freeViewersCurrentText).text = h.freeCurrent.toString()
@@ -227,6 +229,9 @@ class HomeActivity : AppCompatActivity() {
         }
         val userId = sessionManager.getUserId()
         if (userId.isNullOrBlank()) return
+
+        // Sync now also resumes: no need to go to Profile after deleting contacts.
+        if (SyncPrefs.isPaused(this)) SyncPrefs.setPaused(this, false)
 
         isSyncing = true
         syncBtn.isEnabled = false
@@ -274,7 +279,7 @@ class HomeActivity : AppCompatActivity() {
     /** Opened by the server's stalled-sync push (action fix_sync). */
     fun showSyncHelp() {
         if (isFinishing) return
-        val builder = androidx.appcompat.app.AlertDialog.Builder(this)
+        val builder = com.google.android.material.dialog.MaterialAlertDialogBuilder(this, R.style.VGRoundedAlertDialog)
             .setTitle("Your contact sync stopped")
             .setNegativeButton("Close", null)
 

@@ -67,6 +67,7 @@ class RepostActivity : AppCompatActivity() {
     private lateinit var boardPagerScroll: View
     private lateinit var boardPager: LinearLayout
     private lateinit var boardMessage: TextView
+    private lateinit var boardSpinner: View
 
     private var board: List<SupabaseClient.RepostBoardEntry> = emptyList()
     private var boardPage = 0
@@ -332,6 +333,7 @@ class RepostActivity : AppCompatActivity() {
         boardPagerScroll = findViewById(R.id.board_pager_scroll)
         boardPager = findViewById(R.id.board_pager)
         boardMessage = findViewById(R.id.board_message)
+        boardSpinner = findViewById(R.id.repost_board_spinner)
     }
 
     private fun showMineTab() {
@@ -374,10 +376,11 @@ class RepostActivity : AppCompatActivity() {
         if (board.isEmpty()) {
             boardList.removeAllViews()
             boardPagerScroll.visibility = View.GONE
-            boardMessage.visibility = View.VISIBLE
-            boardMessage.text = "Loading..."
+            boardMessage.visibility = View.GONE; boardSpinner.visibility = View.VISIBLE
         }
         if (userId.isBlank()) {
+            boardSpinner.visibility = View.GONE
+            boardMessage.visibility = View.VISIBLE
             boardMessage.text = "No reposts yet. Be the first on the board."
             return
         }
@@ -387,6 +390,7 @@ class RepostActivity : AppCompatActivity() {
                 if (isFinishing || requestId != boardRequest) return@runOnUiThread
                 if (reposts == null) {
                     if (board.isEmpty()) {
+                        boardSpinner.visibility = View.GONE
                         boardMessage.visibility = View.VISIBLE
                         boardMessage.text = if (!SupabaseClient.isOnline(this))
                             "No internet connection. Check your connection and try again."
@@ -405,10 +409,12 @@ class RepostActivity : AppCompatActivity() {
         boardList.removeAllViews()
         if (board.isEmpty()) {
             boardPagerScroll.visibility = View.GONE
+            boardSpinner.visibility = View.GONE
             boardMessage.visibility = View.VISIBLE
             boardMessage.text = "No reposts yet. Be the first on the board."
             return
         }
+        boardSpinner.visibility = View.GONE
         boardMessage.visibility = View.GONE
 
         // 10 rows per page, ranked by the server (ties share a rank).

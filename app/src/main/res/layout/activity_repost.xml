@@ -447,7 +447,27 @@
                             android:gravity="center"
                             android:textSize="13sp"
                             android:textColor="@color/text_muted"
-                            android:text="Loading..." />
+                            android:text=""
+                            android:visibility="gone" />
+
+                        <ProgressBar
+
+                            android:id="@+id/repost_board_spinner"
+
+                            android:layout_width="36dp"
+
+                            android:layout_height="36dp"
+
+                            android:layout_gravity="center_horizontal"
+
+                            android:layout_marginTop="24dp"
+
+                            android:layout_marginBottom="24dp"
+
+                            android:indeterminate="true"
+
+                            android:indeterminateTint="@color/vg_green" />
+
 
                     </LinearLayout>
 

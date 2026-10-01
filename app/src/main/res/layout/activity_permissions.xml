@@ -149,7 +149,8 @@
             android:layout_marginTop="20dp"
             android:textSize="13sp"
             android:textColor="@color/text_muted"
-            android:text="Setting things up..." />
+            android:text=""
+            android:visibility="gone" />
 
     </LinearLayout>
 

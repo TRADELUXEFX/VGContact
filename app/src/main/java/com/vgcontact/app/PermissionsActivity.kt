@@ -159,7 +159,6 @@ class PermissionsActivity : AppCompatActivity() {
         }
 
         // Contacts allowed: import them now, same logic as the Sync button.
-        findViewById<TextView>(R.id.loadingText).text = "Adding your contacts..."
         Thread {
             val result = ContactSync.run(this, userId)
             runOnUiThread {

@@ -77,7 +77,7 @@ class ProfileActivity : AppCompatActivity() {
         val choices = SyncPrefs.INTERVAL_CHOICES
         val labels = choices.map { if (it == 1) "Every hour" else "Every $it hours" }.toTypedArray()
         val current = choices.indexOf(SyncPrefs.getIntervalHours(this)).coerceAtLeast(0)
-        AlertDialog.Builder(this)
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this, R.style.VGRoundedAlertDialog)
             .setTitle("How often should contacts sync?")
             .setSingleChoiceItems(labels, current) { dialog, which ->
                 val hours = choices[which]
@@ -95,6 +95,11 @@ class ProfileActivity : AppCompatActivity() {
 
     // One button, two states: normal = Delete My Contacts (red outline),
     // paused = Resume Syncing (green).
+    override fun onResume() {
+        super.onResume()
+        if (::deleteContactsBtn.isInitialized) refreshDeleteButton()
+    }
+
     private fun refreshDeleteButton() {
         if (SyncPrefs.isPaused(this)) {
             deleteContactsBtn.text = "Resume Syncing"
@@ -120,7 +125,7 @@ class ProfileActivity : AppCompatActivity() {
             Toast.makeText(this, "Allow Contacts permission first", Toast.LENGTH_LONG).show()
             return
         }
-        AlertDialog.Builder(this)
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this, R.style.VGRoundedAlertDialog)
             .setTitle("Delete My Contacts?")
             .setMessage(
                 "This removes every contact VGContact saved to your phone (the ones ending in VGC) " +

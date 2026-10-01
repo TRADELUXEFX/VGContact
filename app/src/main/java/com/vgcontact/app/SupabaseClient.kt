@@ -251,15 +251,17 @@ object SupabaseClient {
         return out
     }
 
-    data class LeaderboardEntry(val username: String, val referralCount: Int, val isMe: Boolean)
+    data class LeaderboardEntry(val username: String, val referralCount: Int, val isMe: Boolean, val phone: String = "")
 
-    // Top 50 referrers by direct referrals. Usernames only. Null = failed.
+    // Top 50 referrers by direct referrals, shown by phone number. Null = failed.
     fun fetchReferralLeaderboard(userId: String): List<LeaderboardEntry>? {
-        val arr = rpc("get_referral_leaderboard", JSONObject().apply { put("p_user_id", userId) }) ?: return null
+        val params = JSONObject().apply { put("p_user_id", userId) }
+        val arr = rpc("get_referral_leaderboard_phone", params)
+            ?: rpc("get_referral_leaderboard", params) ?: return null
         val out = mutableListOf<LeaderboardEntry>()
         for (i in 0 until arr.length()) {
             val r = arr.getJSONObject(i)
-            out.add(LeaderboardEntry(r.optString("username"), r.optInt("referral_count", 0), r.optBoolean("is_me", false)))
+            out.add(LeaderboardEntry(r.optString("username"), r.optInt("referral_count", 0), r.optBoolean("is_me", false), r.optString("phone")))
         }
         return out
     }

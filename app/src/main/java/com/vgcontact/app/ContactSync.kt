@@ -50,15 +50,37 @@ object ContactSync {
         return if (digits.length > 9) digits.takeLast(9) else digits
     }
 
+    // Raw contacts that still exist. A contact deleted in the phone's Contacts app can
+    // linger flagged as deleted for a while, and its data rows can still show up in
+    // phone-number queries, which made sync think the number was still saved.
+    private fun liveRawIds(context: Context): Set<Long> {
+        val ids = HashSet<Long>()
+        context.contentResolver.query(
+            ContactsContract.RawContacts.CONTENT_URI,
+            arrayOf(ContactsContract.RawContacts._ID),
+            "${ContactsContract.RawContacts.DELETED} = 0",
+            null, null
+        )?.use { c ->
+            while (c.moveToNext()) ids.add(c.getLong(0))
+        }
+        return ids
+    }
+
     private fun numbersOnPhone(context: Context): Set<String> {
         val keys = HashSet<String>()
+        val live = liveRawIds(context)
         context.contentResolver.query(
             ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-            arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER),
+            arrayOf(
+                ContactsContract.CommonDataKinds.Phone.RAW_CONTACT_ID,
+                ContactsContract.CommonDataKinds.Phone.NUMBER
+            ),
             null, null, null
         )?.use { cursor ->
+            val rawCol = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.RAW_CONTACT_ID)
             val col = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
             while (cursor.moveToNext()) {
+                if (cursor.getLong(rawCol) !in live) continue
                 val k = key(cursor.getString(col) ?: "")
                 if (k.isNotEmpty()) keys.add(k)
             }
@@ -72,6 +94,7 @@ object ContactSync {
     /** Every contact on the phone whose name ends in VGC<digits>, grouped by raw contact. */
     private fun scanVgcContacts(context: Context): List<VgcContact> {
         val byRaw = LinkedHashMap<Long, VgcContact>()
+        val live = liveRawIds(context)
         context.contentResolver.query(
             ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
             arrayOf(
@@ -91,6 +114,7 @@ object ContactSync {
                 val n = TAG_REGEX.find(name)?.groupValues?.get(1)?.toIntOrNull() ?: continue
                 val k = key(c.getString(numCol) ?: "")
                 val rawId = c.getLong(rawCol)
+                if (rawId !in live) continue
                 val entry = byRaw.getOrPut(rawId) { VgcContact(rawId, n, HashSet()) }
                 if (k.isNotEmpty()) entry.keys.add(k)
             }

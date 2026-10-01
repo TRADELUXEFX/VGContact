@@ -29,7 +29,7 @@ import java.util.TimeZone
  *    then the people they referred. Tap a person who has invited others to see
  *    their referrals (level 2), and tap again for level 3. The server only
  *    answers for people inside the user's own 3 levels.
- *  - Leaderboard tab: top referrers by direct referrals (usernames only).
+ *  - Leaderboard tab: top referrers by direct referrals (shown by phone number).
  *
  * The referral code is the user's phone number (same value new users type
  * into the "Referral Username" box at sign-up; users.referred_by stores it).
@@ -74,10 +74,12 @@ class ReferralActivity : AppCompatActivity() {
     private lateinit var totalText: TextView
     private lateinit var listBox: LinearLayout
     private lateinit var listMessage: TextView
+    private lateinit var listSpinner: View
     private lateinit var pagerScroll: View
     private lateinit var pagerBox: LinearLayout
     private lateinit var boardBox: LinearLayout
     private lateinit var boardMessage: TextView
+    private lateinit var boardSpinner: View
     private lateinit var boardPagerScroll: View
     private lateinit var boardPagerBox: LinearLayout
 
@@ -106,6 +108,7 @@ class ReferralActivity : AppCompatActivity() {
 
         bindViews()
         setupCodeCard()
+        setupBoardSwitch()
 
         tabMine.setOnClickListener { showMineTab() }
         tabBoard.setOnClickListener { showBoardTab() }
@@ -136,10 +139,12 @@ class ReferralActivity : AppCompatActivity() {
         totalText = findViewById(R.id.referral_total_text)
         listBox = findViewById(R.id.referral_list)
         listMessage = findViewById(R.id.referral_list_message)
+        listSpinner = findViewById(R.id.referral_list_spinner)
         pagerScroll = findViewById(R.id.referral_pager_scroll)
         pagerBox = findViewById(R.id.referral_pager)
         boardBox = findViewById(R.id.referral_board_list)
         boardMessage = findViewById(R.id.referral_board_message)
+        boardSpinner = findViewById(R.id.referral_board_spinner)
         boardPagerScroll = findViewById(R.id.referral_board_pager_scroll)
         boardPagerBox = findViewById(R.id.referral_board_pager)
     }
@@ -185,10 +190,11 @@ class ReferralActivity : AppCompatActivity() {
         val requestId = ++listRequest
         listBox.removeAllViews()
         pagerScroll.visibility = View.GONE
-        listMessage.visibility = View.VISIBLE
-        listMessage.text = "Loading..."
+        listMessage.visibility = View.GONE; listSpinner.visibility = View.VISIBLE
         if (stack.isEmpty()) totalPill.visibility = View.INVISIBLE
         if (userId.isBlank()) {
+            listSpinner.visibility = View.GONE
+            listMessage.visibility = View.VISIBLE
             listMessage.text = "No referrals yet."
             return
         }
@@ -198,6 +204,7 @@ class ReferralActivity : AppCompatActivity() {
             runOnUiThread {
                 if (isFinishing || requestId != listRequest) return@runOnUiThread
                 if (result == null) {
+                    listSpinner.visibility = View.GONE
                     listMessage.visibility = View.VISIBLE
                     listMessage.text = if (!SupabaseClient.isOnline(this))
                         "No internet connection. Check your connection and try again."
@@ -232,11 +239,13 @@ class ReferralActivity : AppCompatActivity() {
     private fun renderList() {
         listBox.removeAllViews()
         if (filtered.isEmpty()) {
+            listSpinner.visibility = View.GONE
             listMessage.visibility = View.VISIBLE
             listMessage.text = if (all.isEmpty()) "No referrals yet." else "No matches."
             pagerScroll.visibility = View.GONE
             return
         }
+        listSpinner.visibility = View.GONE
         listMessage.visibility = View.GONE
 
         val start = page * PER_PAGE
@@ -405,9 +414,10 @@ class ReferralActivity : AppCompatActivity() {
         val userId = sessionManager.getUserId().orEmpty()
         boardBox.removeAllViews()
         boardPagerScroll.visibility = View.GONE
-        boardMessage.visibility = View.VISIBLE
-        boardMessage.text = "Loading..."
+        boardMessage.visibility = View.GONE; boardSpinner.visibility = View.VISIBLE
         if (userId.isBlank()) {
+            boardSpinner.visibility = View.GONE
+            boardMessage.visibility = View.VISIBLE
             boardMessage.text = "No referrals yet."
             return
         }
@@ -416,6 +426,8 @@ class ReferralActivity : AppCompatActivity() {
             runOnUiThread {
                 if (isFinishing) return@runOnUiThread
                 if (result == null) {
+                    boardSpinner.visibility = View.GONE
+                    boardMessage.visibility = View.VISIBLE
                     boardMessage.text = if (!SupabaseClient.isOnline(this))
                         "No internet connection. Check your connection and try again."
                     else "Couldn't load the leaderboard. Please try again."
@@ -433,8 +445,10 @@ class ReferralActivity : AppCompatActivity() {
 
     private fun applyBoardSearch() {
         val q = searchBoard.text.toString().trim().lowercase(Locale.getDefault())
+        val qDigits = q.filter { it.isDigit() }
         boardFiltered = if (q.isEmpty()) board else board.filter {
-            it.username.lowercase(Locale.getDefault()).contains(q)
+            (qDigits.isNotEmpty() && it.phone.filter { c -> c.isDigit() }.contains(qDigits)) ||
+                it.username.lowercase(Locale.getDefault()).contains(q)
         }
         boardPage = 0
         renderBoard()
@@ -443,11 +457,13 @@ class ReferralActivity : AppCompatActivity() {
     private fun renderBoard() {
         boardBox.removeAllViews()
         if (boardFiltered.isEmpty()) {
+            boardSpinner.visibility = View.GONE
             boardMessage.visibility = View.VISIBLE
             boardMessage.text = if (board.isEmpty()) "No referrals yet." else "No matches."
             boardPagerScroll.visibility = View.GONE
             return
         }
+        boardSpinner.visibility = View.GONE
         boardMessage.visibility = View.GONE
 
         val start = boardPage * PER_PAGE
@@ -465,7 +481,12 @@ class ReferralActivity : AppCompatActivity() {
                 setPadding(0, dp(16), 0, dp(16))
             }
             line.addView(TextView(this).apply {
-                text = if (e.isMe) "${e.username} (you)" else e.username
+                val who = if (showNumber) {
+                    if (e.phone.isNotBlank()) formatPhone(e.phone) else e.username
+                } else {
+                    if (e.username.isNotBlank()) e.username else formatPhone(e.phone)
+                }
+                text = if (e.isMe) "$who (you)" else who
                 textSize = 14f
                 setTextColor(
                     ContextCompat.getColor(
@@ -564,6 +585,39 @@ class ReferralActivity : AppCompatActivity() {
 
     // ------------------------------------------------------------ code card
 
+    // One Number / Username switch shared by the code card and the leaderboard header:
+    // flipping either one flips both, and the leaderboard rows follow it.
+    private var showNumber = true
+    private var codeCardRender: (() -> Unit)? = null
+
+    private fun setSwitch(number: Boolean) {
+        showNumber = number
+        codeCardRender?.invoke()
+        styleBoardSwitch()
+        if (boardLoaded) renderBoard()
+    }
+
+    private fun styleBoardSwitch() {
+        val tabNumber = findViewById<TextView>(R.id.referral_board_tab_number)
+        val tabUsername = findViewById<TextView>(R.id.referral_board_tab_username)
+        tabNumber.background =
+            if (showNumber) ContextCompat.getDrawable(this, R.drawable.referral_switch_selected) else null
+        tabUsername.background =
+            if (!showNumber) ContextCompat.getDrawable(this, R.drawable.referral_switch_selected) else null
+        tabNumber.setTextColor(
+            ContextCompat.getColor(this, if (showNumber) R.color.white else R.color.text_secondary)
+        )
+        tabUsername.setTextColor(
+            ContextCompat.getColor(this, if (!showNumber) R.color.white else R.color.text_secondary)
+        )
+    }
+
+    private fun setupBoardSwitch() {
+        findViewById<View>(R.id.referral_board_tab_number).setOnClickListener { setSwitch(true) }
+        findViewById<View>(R.id.referral_board_tab_username).setOnClickListener { setSwitch(false) }
+        styleBoardSwitch()
+    }
+
     private fun setupCodeCard() {
         val phone = sessionManager.getPhone().orEmpty()
         val username = sessionManager.getUsername().orEmpty()
@@ -574,30 +628,30 @@ class ReferralActivity : AppCompatActivity() {
         val tabUsername = findViewById<TextView>(R.id.referral_tab_username)
 
         // The code shown (and copied / shared) follows the Number / Username switch.
-        var showingNumber = true
-        fun currentValue(): String = if (showingNumber) phone else username
+        fun currentValue(): String = if (showNumber) phone else username
 
         fun render() {
             val value = currentValue()
             codeText.text = when {
                 value.isBlank() -> "Unavailable"
-                showingNumber -> formatPhone(value)
+                showNumber -> formatPhone(value)
                 else -> value
             }
             tabNumber.background =
-                if (showingNumber) ContextCompat.getDrawable(this, R.drawable.referral_switch_selected) else null
+                if (showNumber) ContextCompat.getDrawable(this, R.drawable.referral_switch_selected) else null
             tabUsername.background =
-                if (!showingNumber) ContextCompat.getDrawable(this, R.drawable.referral_switch_selected) else null
+                if (!showNumber) ContextCompat.getDrawable(this, R.drawable.referral_switch_selected) else null
             tabNumber.setTextColor(
-                ContextCompat.getColor(this, if (showingNumber) R.color.white else R.color.text_secondary)
+                ContextCompat.getColor(this, if (showNumber) R.color.white else R.color.text_secondary)
             )
             tabUsername.setTextColor(
-                ContextCompat.getColor(this, if (!showingNumber) R.color.white else R.color.text_secondary)
+                ContextCompat.getColor(this, if (!showNumber) R.color.white else R.color.text_secondary)
             )
         }
 
-        tabNumber.setOnClickListener { showingNumber = true; render() }
-        tabUsername.setOnClickListener { showingNumber = false; render() }
+        tabNumber.setOnClickListener { setSwitch(true) }
+        tabUsername.setOnClickListener { setSwitch(false) }
+        codeCardRender = { render() }
         render()
 
         findViewById<View>(R.id.referral_copy_code_btn).setOnClickListener {
