@@ -67,6 +67,10 @@ class HomeActivity : AppCompatActivity() {
         }
 
         findViewById<LinearLayout>(R.id.permissionBanner).setOnClickListener { fixPermissions() }
+        // Pending users: the banner opens the Repost screen, where the admin WhatsApp button is.
+        findViewById<LinearLayout>(R.id.pendingBanner).setOnClickListener {
+            startActivity(Intent(this, RepostActivity::class.java))
+        }
 
         syncBtn = findViewById(R.id.syncContactsBtn)
         syncBtn.setOnClickListener { startSync() }
@@ -188,6 +192,8 @@ class HomeActivity : AppCompatActivity() {
         findViewById<View>(R.id.home_limits_loading).visibility = View.GONE
         findViewById<View>(R.id.home_limits_block).visibility = View.VISIBLE
         findViewById<TextView>(R.id.statusBadgeText).text = h.status.uppercase()
+        findViewById<View>(R.id.pendingBanner).visibility =
+            if (h.status == "pending") View.VISIBLE else View.GONE
 
         findViewById<TextView>(R.id.freeViewersCurrentText).text = h.freeCurrent.toString()
         findViewById<TextView>(R.id.freeViewersMaxText).text = "/${h.freeMax}"
