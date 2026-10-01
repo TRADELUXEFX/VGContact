@@ -3,7 +3,7 @@
 > **For any Claude chat reading this:** this file describes the whole system. Read it before touching anything.
 > **Rule for maintainers:** whenever you change the database, the app or the admin page, update this file in the same delivery and add a line to the Changelog at the bottom. Always ship it at the root of the ZIP.
 > **SQL rule:** every new SQL is BOTH saved in the repo (`supabase/migrations/<name>.sql`, inside the ZIP, as history) AND sent separately in the chat (as a `.sql` file and pasted in a code block) so the owner can run it. The owner runs nothing from the ZIP, so the chat copy is the one that matters: always say clearly that it must be run in Supabase > SQL Editor. In the Changelog, name the function and the SQL file.
-> Last verified against the live database: 2026-09-30.
+> Last verified against the live database: 2026-10-01 (group, verify and register functions, triggers, columns and constraints checked against live definitions).
 
 ## 1. Goal and ground rules
 - The **live Supabase database is the source of truth**. The Android app and the admin dashboard must follow it. Do not change the database to fit them.
@@ -11,7 +11,7 @@
 - The owner writes short dictated messages. Act without asking questions, make small step-by-step edits, deliver ZIPs with files at the root, and check JS syntax before delivering.
 
 ## 2. The idea in plain words
-Users want more people to see their WhatsApp status. Users are put into groups of 3. The app saves other group members' phone numbers into your phone, so you and they can see each other's statuses.
+Users want more people to see their WhatsApp status. Users are put into groups of 3 once their first repost is verified. The app saves other group members' phone numbers into your phone, so you and they can see each other's statuses.
 
 Three parts:
 - **Database (Supabase)** holds every rule and decision.
@@ -19,10 +19,11 @@ Three parts:
 - **Admin dashboard (`index.html`)** is the owner's control panel. Only the admin email hardcoded in `_is_admin()` may use it.
 
 ## 3. The rules
-1. **Signup.** The new user goes into the lowest-numbered group that is not full. If every group is full, a new group is created. A group fills at `group_size` signups (default 3). When it fills it becomes `is_full` and `is_published`.
-2. **Free viewers** = signups in your own default group, shown as current / group_size (for example 1/3).
+1. **Signup.** The new user is registered but placed in NO group. They are PENDING: Home shows 0/3 and the phone gets only the admin and anon numbers (plus their referrals).
+   **Placement happens at the first verified repost** (trigger `place_on_repost_verified` -> `_place_on_verify` -> `_place_user_in_group`): the user goes into the lowest-numbered group with fewer than `group_size` verified members (`joined_via = 'signup'`, the default group); if none, a new group is created. A group fills at `group_size` verified members and becomes `is_full` and `is_published`. Groups therefore only hold verified users, no matter how long verification takes (changed 2026-10-01).
+2. **Free viewers** = verified members of your own default group (0 while pending), shown as current / group_size (for example 1/3).
 3. **Repost.** A user may submit one repost per UTC day. It starts `pending`. Blocked once the user has `free_repost_cap` verified reposts (default 3).
-4. **Verify.** The admin verifies a pending repost. The user is then added (`joined_via = 'added'`) to the lowest-numbered full group they are not already in. If no full group exists, they get nothing, and the verified repost still counts toward the cap. **Catch-up:** once a day `_catch_up_group_grants` gives users any group they are owed (verified reposts, capped by `free_repost_cap`, minus their `added` groups) once a full group exists.
+4. **Verify.** The admin verifies a pending repost. The first verification also places the user in their default group (rule 1). Each verified repost then adds the user (`joined_via = 'added'`) to the lowest-numbered full group they are not already in. If no full group exists, they get nothing, and the verified repost still counts toward the cap. **Catch-up:** once a day `_catch_up_group_grants` gives users any group they are owed (verified reposts, capped by `free_repost_cap`, minus their `added` groups) once a full group exists.
 5. **Extra viewers** = everyone in every other group the user belongs to, shown as current / max (max is the larger of group_size and the actual count, per group).
 6. **Referred viewers** = users whose `referred_by` matches this user's username (case-insensitive), or is all digits and matches the last 10 digits of this user's phone.
 7. **Verified badge.** A user is VERIFIED once they have at least one verified repost, otherwise PENDING.
@@ -52,11 +53,11 @@ All are `SECURITY DEFINER` and read-only unless noted.
 **Helpers (internal, not callable by the app):** `_ref_match`, `_group_size`, `_repost_cap`, `_setting_int`, `_android_id_required`, `_is_admin`, `_is_banned`, `_is_verified`, `_count_referrals`.
 
 **Writes:**
-- `_place_user_in_group(user)`: signup placement (advisory lock `vgcontact_group_placement`).
+- `_place_user_in_group(user)`: default-group placement (advisory lock `vgcontact_group_placement`; lowest group with `is_full = false`, creates one if none; only signups count toward `member_count`/`is_full`; does nothing if the user already has a default group). Now called only by trigger function `_place_on_verify`, not at signup.
 - `_catch_up_group_grants()`: cron catch-up, calls `_grant_next_group` once per missing group, returns attempts (internal, not granted to anon).
 - `_grant_next_group(user)`: adds the user to the lowest full group they are not in (`joined_via='added'`).
 - `_verify_repost(user, date)`: returns `no_pending_repost`, `cap_reached` or `verified`; on verify it calls `_grant_next_group`.
-- `register_or_fetch_user`: validates, auto-numbers duplicate usernames (chidera → chidera2), inserts the user, then places them in a group. Phone format is 11 digits starting with 0.
+- `register_or_fetch_user`: validates, auto-numbers duplicate usernames (chidera → chidera2), inserts the user (no group yet). Phone format is 11 digits starting with 0.
 - `submit_daily_repost`: returns `OK`, `ALREADY_REPOSTED_TODAY`, `REPOST_LIMIT_REACHED` or `USER_NOT_FOUND`.
 - `record_sync(user)`: stamps `users.last_synced_at` (called by `ContactSync.run` after every successful sync: button, first run, resume, background; opening the app does not count). Helpers `_inactive_after_days` (setting `inactive_after_days`, default 30) and `_is_inactive`.
 - `save_fcm_token`, `report_notifications_enabled`, `mark_notifications_read`, `record_notification_delivered/opened`.
@@ -67,7 +68,7 @@ All are `SECURITY DEFINER` and read-only unless noted.
 **Admin only (checked by `_is_admin()`):** `admin_find_users`, `admin_pending_reposts`, `admin_set_repost` (verify or reject), `admin_set_banned`, `admin_get_settings`, `admin_set_setting`, `admin_send_notification`, `admin_notification_history`, `admin_notification_stats`, `admin_notification_reach`. Also defined but not used by the admin page: `admin_verify_reposts` (bulk verify by username, with preview) and `admin_add_user_to_group`.
 
 ## 7. Automatic things
-- **Triggers:** `a_block_signup_when_closed` (BEFORE INSERT on users, honours `registrations_open`); `on_repost_status_change` (AFTER UPDATE on daily_reposts, creates "Repost verified" or "Repost rejected" notifications); `on_notification_created` (AFTER INSERT on notifications, calls the `send-push` edge function).
+- **Triggers:** `place_on_repost_verified` (AFTER UPDATE on daily_reposts when status becomes `verified`; places the user in a group); `a_block_signup_when_closed` (BEFORE INSERT on users, honours `registrations_open`); `on_repost_status_change` (AFTER UPDATE on daily_reposts, creates "Repost verified" or "Repost rejected" notifications); `on_notification_created` (AFTER INSERT on notifications, calls the `send-push` edge function).
 - **Push:** needs the secret `service_role_key` in Supabase Vault (confirmed present 2026-09-30). If it is missing, pushes silently do nothing.
 - **Cron:** `daily-repost-reminder` runs at `0 8 * * *` (08:00 UTC, 09:00 Nigeria time). `catch-up-group-grants` runs once a day at `0 6 * * *` (06:00 UTC, 07:00 Nigeria time).
 
@@ -82,7 +83,8 @@ Check with `has_function_privilege('anon', p.oid, 'execute')`. Internal helpers 
 ## 9. Known leftovers and open decisions
 - `users.key_balance` still exists and is returned by `login_by_phone`, `register_or_fetch_user`, `admin_find_users` and `admin_pending_reposts`. Harmless. Decide whether to remove.
 - `admin_set_setting` still validates a `keys_per_repost` key. `admin_send_notification` still allows the `open_downloads` action.
-- Key-era migrations (`add_batch_unlock`, `add_referral_milestones`, `add_repost_key_grant`) and the old `add_leaderboard.sql` and `supabase-schema.sql` were removed from the repo on 2026-10-01 (their tables and functions do not exist in the live database).
+- Key-era files (`add_batch_unlock.sql`, `add_referral_milestones.sql`, `add_repost_key_grant.sql`, `add_leaderboard.sql`, `supabase-schema.sql`) are meant to be gone from the repo (their tables and functions do not exist in the live database) but were still present on 2026-10-01; delete them by hand (see `DELETE_BY_HAND.txt`). Do not run them.
+- Older SQL files that define a function later redefined are history only and now carry a "do not re-run" header: re-running them would overwrite the live function with an older version (for `register_or_fetch_user`, that would also bring back placement at signup and drop the ban check).
 - ~~A repost verified before any group is full gives nothing~~ Resolved 2026-09-30 by the catch-up cron.
 
 ## 10. Android app map (`app/src/main/java/com/vgcontact/app`)
@@ -91,17 +93,17 @@ Check with `has_function_privilege('anon', p.oid, 'execute')`. Internal helpers 
 - `RepostActivity` (header has a My Repost / Leaderboard switcher. Leaderboard tab = VGKontact-style single card: column header, numbered rows (gold/silver/bronze badges for 1-3), 10 per page, own row tinted "You"; a Phone number / Username switch in the column header (default Username); data from `get_repost_leaderboard_phone`, falling back to `get_leaderboard`, metric `reposts`), `ReferralActivity` (laid out like VGKontact's Referrals page: header with a My referrals / Leaderboard switcher and search; My referrals = code card + referral list with tap-to-drill-in to levels 2 and 3, rows with invites open, level 3 is the last; Leaderboard = top 50 by direct referrals, a Phone number / Username switch in the column header shows either one; it is linked to the Number / Username switch on the code card (flip one, the other follows; default Number); search matches both; data from `get_referral_leaderboard_phone`; banned users hidden; 10 per page; no Back arrow, but phone Back goes up one level while drilled in), `ProfileActivity`, `NotificationsActivity`, `LoginActivity`, `RegisterActivity`, `SessionManager` (stores `user_id`), `ContactSync` (writes contacts to the phone), `SupportContact.kt`, `LegalContent.kt` (Terms and Privacy, rewritten for groups and reposts).
 - `DailySyncWorker.kt`: background contact sync, every ~24 hours by default (WorkManager); Profile > **Sync every N hours** lets the user pick 1, 6, 12 or 24 (stored in `SyncPrefs`, applied with `DailySyncWorker.reschedule`; kept across logout), scheduled from `VGApp`. Same `ContactSync` as the Sync button. Skips when logged out, banned or paused. Contacts permission off gives one reminder notification. Offline or server failure queues a one-time retry that fires when the network returns. New contacts added gives a notification like "3 contacts synced today at 10:30" (nothing is shown on Home). With data off, the sync waits and runs, with the notification, as soon as data is back.
 - `SyncPrefs.kt`: local paused flag (`vgc_sync` prefs). Profile > **Delete My Contacts** removes every `VGC<N>` contact and pauses all syncing (button, first-run, background); the same button becomes **Resume Syncing**, which unpauses and syncs at once. Pause is local only, not reported to the database.
-- Build: GitHub Actions (`.github/workflows/deploy.yml`) using secrets `SUPABASE_URL` and `SUPABASE_ANON_KEY`. Debug-signed APKs.
+- Build: GitHub Actions (`.github/workflows/deploy.yml`, `gradle assembleRelease`) using secrets `SUPABASE_URL` and `SUPABASE_ANON_KEY`; signed with the release keystore when `KEYSTORE_BASE64` (and its password/alias secrets) exist, otherwise the debug key. How zips are deployed: `incoming/DEPLOY_WORKFLOW.md`.
 - UI convention: green top, white bottom, Poppins font.
 
 ## 11. Admin dashboard (`index.html`)
 Single-file page. Tabs cover users, pending reposts (verify/reject), settings, notifications and stats. The Key purchases tab, key log and add-keys were removed.
 
 ## 12. Test loop (expected results)
-1. Register users 1, 2 and 3: group 1 fills, each shows Free 3/3.
-2. Register user 4: lands in group 2, shows 1/3.
-3. User 4 submits a repost; admin verifies it.
-4. User 4 shows Extra 3/3 and gets a "Repost verified" push. Sync Contacts adds users 1 to 3, provided they have a verified repost themselves.
+1. Register users 1 to 4: all pending, Free 0/3, no group rows, phones sync only admin/anon.
+2. Users 1, 2, 3 each repost; admin verifies each. After the first: group 1 exists with 1 member; after the third: group 1 is full and each shows Free 3/3.
+3. Verify user 4: lands in group 2, shows Free 1/3; Sync Contacts on users 1 to 3 adds nothing new from group 2.
+4. A verified user gets a "Repost verified" push; the next sync adds their group mates.
 
 ## 13. Changelog
 - 2026-09-30: Keys removed from admin and app. Shared `_count_referrals`. Position limit of 3 dropped (verify crash). Home defaults to 0 and /0, and shows an error toast on load failure. Granted `EXECUTE` on `get_home` and `get_sync_contacts` to anon (Home was stuck on placeholders). Legal text rewritten. Created this guide.
@@ -137,3 +139,6 @@ Single-file page. Tabs cover users, pending reposts (verify/reject), settings, n
 - 2026-10-01: Dialog corners made rounder (28dp) with `RoundedDialog.style(dialog)`, which replaces the window background in code after `show()`; the theme-only rounded style did not change the corner size. Used by the sync frequency, Delete My Contacts and sync help dialogs. No database change.
 - 2026-10-01: Repost leaderboard has a Phone number / Username switch in its header (default Username, own row stays "You"). New function `get_repost_leaderboard_phone(p_user_id)` (top 50 by verified reposts, all time, plus the caller's row, banned hidden). SQL in `add_repost_leaderboard_phone.sql` and also sent in chat; run in Supabase > SQL Editor (until then the app falls back to the old username-only function).
 - 2026-10-01: Sync no longer waits for a group to fill. `get_sync_contacts` now returns other group members as soon as they join (still not banned, with a verified repost, not inactive). SQL in `get_sync_contacts_all_members.sql` and also sent in chat; run in Supabase > SQL Editor. No app change.
+- 2026-10-01: Placement moved from signup to first verified repost. `register_or_fetch_user` no longer places users; new trigger `place_on_repost_verified` (on daily_reposts) calls the existing `_place_user_in_group` when a repost becomes verified. The repo copy `auto_number_duplicate_usernames.sql` of `register_or_fetch_user` is out of date (it lacks the `banned_identities` check); the live version is in `place_on_verify.sql`. Pending users hold no slot, Free viewers shows 0/3 until verified, and pending phones sync only admin/anon (+ referrals). Includes a one-time cleanup that removes unverified users from groups. SQL in `place_on_verify.sql` and also sent in chat; run in Supabase > SQL Editor. No app change.
+- 2026-10-01: Repo cleanup, no database change. `incoming/DEPLOY_WORKFLOW.md` and `README.md` corrected to match `deploy.yml` (release build, wrapper folders tolerated, no build.gradle check, no `./gradlew`). Legal text (`LegalContent.kt`) now says users join a group when their first repost is verified. versionCode 38. Old SQL files that were superseded got a "do not re-run" header. `DELETE_BY_HAND.txt` lists dead files to remove (a zip upload cannot delete files).
+- 2026-10-01: `deploy.yml` gained a step that deletes files listed in `DELETE_FILES.txt` at the root of an uploaded zip (the owner pastes the new yml on github.com by hand; workflow files inside zips are ignored). Described in `incoming/DEPLOY_WORKFLOW.md`. No app or database change.

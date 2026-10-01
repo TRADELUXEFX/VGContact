@@ -30,15 +30,15 @@ filename. On each run it:
    under `.github/workflows/`, which is always skipped (GitHub blocks
    the default token from touching that folder, so any workflow file
    inside your zip is silently ignored rather than breaking the deploy).
-2. Refuses to proceed (fails loudly, red X) if the zip didn't actually
-   contain a real update - specifically, if it detects a wrapper folder
-   (e.g. `VGContact-main/app/...` instead of `app/...`), or if
-   `app/build.gradle` wasn't part of the changes. This exists because
-   both of those failure modes used to silently keep building the OLD
-   app while still reporting a green checkmark.
+2. Removes a wrapper folder automatically (e.g. `VGContact-main/app/...`
+   becomes `app/...`), so an extra top-level folder is tolerated.
 3. Deletes the zip(s) and commits the unpacked result directly to `main`.
-4. Immediately builds the APK (`gradle assembleDebug`) from that same
-   commit and publishes it as a GitHub Release.
+   If the push is rejected, the run fails (red X) instead of building old code.
+4. Builds the APK (`gradle assembleRelease`) from that same commit and
+   publishes it as a GitHub Release (`v1.0.<run number>`). It is signed with
+   the release keystore if the `KEYSTORE_BASE64` secret exists, otherwise
+   with the debug key. The workflow also runs on pull requests (build only,
+   no release). A zip with only docs or SQL still triggers a build.
 
 ### 2. `incoming/` folder
 The "drop zone" for deploy zips. Any zip filename works - it does NOT
@@ -63,12 +63,24 @@ from an AI assistant):
 6. Go to the **Actions** tab and wait ~1 minute. A run called **"Deploy"**
    should appear. Green checkmark = the update really landed AND the APK
    built from it. Red X = it did NOT update (check the Annotations for
-   the specific reason - wrapper folder, no real changes detected, etc.)
+   the specific reason - usually a rejected push),
    and the old app was NOT rebuilt or re-released.
 7. Once green, check the Profile screen's "APP VERSION" row in the new
    APK to visually confirm which build you're actually running.
 8. If anything fails, open the failed run and check the log / send a
    screenshot for help debugging.
+
+## Deleting files (needs the updated deploy.yml)
+A zip can only add or overwrite files. To delete files, put a text file named
+`DELETE_FILES.txt` at the root of the zip: one repo-relative path per line
+(e.g. `app/src/main/res/layout/item_file.xml`). Blank lines and lines starting
+with `#` are ignored. The "Delete files listed in DELETE_FILES.txt" step in
+`deploy.yml` removes those files, then removes the list itself. Single files
+only (no folders, no wildcards). Protected and unsafe paths (`.git`, `.github`,
+`incoming`, root and app `build.gradle`, `settings.gradle`, `gradle.properties`,
+anything containing `..`) are skipped with a warning. Missing files are fine.
+The step's log shows what was deleted. Without the updated `deploy.yml`, the list
+file would just sit in the repo root and nothing would be deleted.
 
 ## Important rules to remember
 
@@ -77,8 +89,9 @@ from an AI assistant):
 - Folder structure inside the zip must mirror the repo exactly, starting
   from the repo root (e.g. starts with `app/...`, not wrapped in an extra
   folder).
-- `app/build.gradle`'s versionCode/versionName must actually change for
-  the deploy step to accept the update as real - bump it every time.
+- Bump `versionCode` in `app/build.gradle` whenever the app code changes,
+  or phones will refuse to update over the installed build. It is not
+  checked by the deploy. `versionName` follows the GitHub run number.
 - `.github/workflows/` files inside an uploaded zip are always ignored;
   that file only gets updated by editing it directly on github.com.
 - I do not manually retype or hand-edit file contents on my phone anymore
@@ -90,7 +103,7 @@ from an AI assistant):
 ## Summary for anyone assisting me
 
 > Give me complete, ready-to-use files with their correct repo-relative
-> paths, including a bumped versionCode/versionName in app/build.gradle.
+> paths (bump versionCode in app/build.gradle if app code changed).
 > Package them into a single zip with that folder structure preserved,
 > starting from the repo root (no wrapper folder). I will upload that zip
 > through GitHub's web "Upload files" page into `incoming/` (any
