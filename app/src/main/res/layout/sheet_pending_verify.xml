@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Bottom sheet for pending users (timeline layout). Shown by PendingPrompt in a
+     BottomSheetDialog. The Post button shares the image + caption + link directly. -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/pending_popup_background"
+    android:background="@drawable/pending_sheet_background"
     android:overScrollMode="never"
     android:scrollbars="none">
 
@@ -11,174 +13,267 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
-        android:paddingTop="28dp"
-        android:paddingBottom="12dp">
+        android:paddingStart="22dp"
+        android:paddingEnd="22dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="20dp">
 
-        <FrameLayout
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:background="@drawable/pending_sheet_icon_background">
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_repost"
-                app:tint="@color/warning_amber"
-                android:contentDescription="@null" />
-        </FrameLayout>
-
-        <TextView
-            android:fontFamily="@font/poppins_bold"
-            android:includeFontPadding="false"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:gravity="center"
-            android:text="Unlock 500+ status viewers"
-            android:textSize="20sp"
-            android:textColor="@color/vg_dark" />
-
-        <TextView
-            android:fontFamily="@font/poppins"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="center"
-            android:text="Your account is pending. Verify it in 3 simple steps."
-            android:textSize="14sp"
-            android:textColor="@color/text_secondary" />
+        <View
+            android:layout_width="40dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/pending_sheet_handle" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:orientation="vertical"
-            android:background="@drawable/pending_step_card"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="14dp"
-            android:paddingBottom="14dp">
+            android:orientation="horizontal">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:layout_weight="1"
+                android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:background="@drawable/pending_step_number"
-                    android:fontFamily="@font/poppins_bold"
-                    android:gravity="center"
-                    android:includeFontPadding="false"
-                    android:text="1"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="12dp"
+                    android:background="@drawable/pending_free_pill"
                     android:fontFamily="@font/poppins_bold"
                     android:includeFontPadding="false"
-                    android:text="Post on your WhatsApp status"
-                    android:textColor="@color/vg_dark"
-                    android:textSize="14sp" />
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                    android:letterSpacing="0.04"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp"
+                    android:text="@string/pending_free_pill"
+                    android:textColor="@color/vg_green_dark"
+                    android:textSize="10sp" />
 
                 <TextView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:background="@drawable/pending_step_number"
-                    android:fontFamily="@font/poppins_bold"
-                    android:gravity="center"
-                    android:includeFontPadding="false"
-                    android:text="2"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="8dp"
                     android:fontFamily="@font/poppins_bold"
                     android:includeFontPadding="false"
-                    android:text="We verify it within 24 hours"
+                    android:lineSpacingExtra="1dp"
+                    android:id="@+id/pendingTitle"
                     android:textColor="@color/vg_dark"
-                    android:textSize="14sp" />
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="0dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                    android:textSize="24sp" />
 
                 <TextView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:background="@drawable/pending_step_number"
-                    android:fontFamily="@font/poppins_bold"
-                    android:gravity="center"
-                    android:includeFontPadding="false"
-                    android:text="3"
-                    android:textColor="@color/white"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="12dp"
-                    android:fontFamily="@font/poppins_bold"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/poppins"
                     android:includeFontPadding="false"
-                    android:text="Claim 500+ status viewers"
-                    android:textColor="@color/vg_dark"
-                    android:textSize="14sp" />
+                    android:text="@string/pending_subtitle"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp" />
             </LinearLayout>
+
+            <ImageView
+                android:id="@+id/pendingSheetLaterBtn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:contentDescription="@string/pending_close"
+                android:focusable="true"
+                android:padding="10dp"
+                android:src="@drawable/ic_close_small"
+                app:tint="@color/text_muted" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/pendingSheetChip"
-            android:fontFamily="@font/poppins_bold"
-            android:includeFontPadding="false"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/pending_chip_background"
-            android:gravity="center"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:text="Repost logged. Verification pending"
-            android:textColor="@color/vg_dark"
-            android:textSize="13sp"
-            android:visibility="gone" />
+            android:layout_marginTop="22dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/pending_step_number"
+                        android:fontFamily="@font/poppins_bold"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="1"
+                        android:textColor="@color/white"
+                        android:textSize="13sp" />
+                <View
+                    android:layout_width="2dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:background="@color/card_border" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="14dp"
+                    android:orientation="vertical"
+                    android:paddingBottom="18dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/poppins_bold"
+                        android:includeFontPadding="false"
+                        android:text="@string/pending_step1_title"
+                        android:textColor="@color/vg_dark"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:fontFamily="@font/poppins"
+                        android:includeFontPadding="false"
+                        android:lineSpacingExtra="2dp"
+                        android:text="@string/pending_step1_desc"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12.5sp" />
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/pending_step_number"
+                        android:fontFamily="@font/poppins_bold"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="2"
+                        android:textColor="@color/white"
+                        android:textSize="13sp" />
+                <View
+                    android:layout_width="2dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:background="@color/card_border" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="14dp"
+                    android:orientation="vertical"
+                    android:paddingBottom="18dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/poppins_bold"
+                        android:includeFontPadding="false"
+                        android:id="@+id/pendingStep2Title"
+                        android:textColor="@color/vg_dark"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:fontFamily="@font/poppins"
+                        android:includeFontPadding="false"
+                        android:lineSpacingExtra="2dp"
+                        android:text="@string/pending_step2_desc"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12.5sp" />
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="30dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/pending_step_number"
+                        android:fontFamily="@font/poppins_bold"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="3"
+                        android:textColor="@color/white"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="14dp"
+                    android:orientation="vertical"
+                    android:paddingBottom="0dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/poppins_bold"
+                        android:includeFontPadding="false"
+                        android:text="@string/pending_step3_title"
+                        android:textColor="@color/vg_dark"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:fontFamily="@font/poppins"
+                        android:includeFontPadding="false"
+                        android:lineSpacingExtra="2dp"
+                        android:id="@+id/pendingStep3Desc"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12.5sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/pendingSheetVerifyBtn"
             android:fontFamily="@font/poppins_bold"
             android:includeFontPadding="false"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="18dp"
-            android:text="Post on my status"
+            android:layout_height="54dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/pending_btn_post"
             android:textAllCaps="false"
             android:textSize="16sp"
-            android:letterSpacing="0.02"
             android:textColor="@color/white"
             android:backgroundTint="@color/vg_green"
             app:icon="@drawable/ic_repost"
@@ -186,44 +281,49 @@
             app:iconGravity="textStart"
             app:cornerRadius="16dp" />
 
-        <TextView
-            android:fontFamily="@font/poppins"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:text="Don't want to post?"
-            android:textSize="13sp"
-            android:textColor="@color/text_secondary" />
-
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/pendingSheetPayBtn"
+            android:id="@+id/pendingSheetProofBtn"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:fontFamily="@font/poppins_bold"
             android:includeFontPadding="false"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="8dp"
-            android:text="Pay ₦1,500 to verify"
+            android:layout_height="48dp"
+            android:layout_marginTop="10dp"
             android:textAllCaps="false"
-            android:textSize="16sp"
+            android:textSize="13.5sp"
             android:textColor="@color/vg_green_dark"
             app:strokeColor="@color/vg_green"
             app:strokeWidth="1.5dp"
             app:cornerRadius="16dp" />
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="@color/gray_light" />
+
         <TextView
-            android:id="@+id/pendingSheetLaterBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:fontFamily="@font/poppins"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:id="@+id/pendingCantReach"
+            android:textColor="@color/text_secondary"
+            android:textSize="12.5sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/pendingSheetPayBtn"
             android:fontFamily="@font/poppins_bold"
             android:includeFontPadding="false"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:padding="12dp"
-            android:text="Not now"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:textAllCaps="false"
             android:textSize="14sp"
-            android:textColor="@color/text_secondary"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:focusable="true" />
+            android:textColor="@color/white"
+            android:backgroundTint="@color/vg_dark"
+            app:cornerRadius="16dp" />
     </LinearLayout>
 </ScrollView>

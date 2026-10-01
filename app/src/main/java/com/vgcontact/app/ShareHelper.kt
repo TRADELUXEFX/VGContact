@@ -12,7 +12,6 @@ import android.graphics.RectF
 import android.graphics.Typeface
 import android.text.TextPaint
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.content.res.ResourcesCompat
@@ -21,30 +20,23 @@ import java.io.FileOutputStream
 
 /**
  * What a user posts to their WhatsApp status for verification (Repost screen and the
- * pending sheet). They choose:
- *  - text + link, or
- *  - image + link (the image is drawn here with the user's own number).
+ * pending sheet): always image + caption with link (the image is drawn here with the
+ * user's own number). There is no text-only option and no menu.
  * The link is always ReferralActivity.LINK_BASE + the user's phone number.
  * Video + link comes later.
  */
 object ShareHelper {
 
-    /** Shows a small "Share as" menu. */
+    /**
+     * Posts the image + caption + link straight away (no "Share as" menu: the app only
+     * uses image + caption with link). [onShared] runs once the share sheet opens.
+     */
     fun showMenu(activity: Activity, phone: String, onShared: () -> Unit = {}) {
         if (phone.isBlank()) {
             Toast.makeText(activity, "Number unavailable", Toast.LENGTH_SHORT).show()
             return
         }
-        val items = arrayOf("Text + link", "Image + link")
-        AlertDialog.Builder(activity)
-            .setTitle("What do you want to post?")
-            .setItems(items) { _, which ->
-                when (which) {
-                    0 -> if (shareText(activity, phone)) onShared()
-                    1 -> if (shareImage(activity, phone)) onShared()
-                }
-            }
-            .show().also { RoundedDialog.style(it) }
+        if (shareImage(activity, phone)) onShared()
     }
 
     private fun link(phone: String) = ReferralActivity.LINK_BASE + phone

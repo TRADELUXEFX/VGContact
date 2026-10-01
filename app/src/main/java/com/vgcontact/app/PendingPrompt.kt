@@ -3,10 +3,8 @@ package com.vgcontact.app
 import android.app.Activity
 import android.content.Context
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.app.Dialog
-import android.view.ViewGroup
-import android.view.Window
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
@@ -16,7 +14,7 @@ import android.widget.Toast
 import kotlin.concurrent.thread
 
 /**
- * Gate for pending (unverified) users.
+ * Gate for pending (unverified) users. Shown as a bottom sheet (BottomSheetDialog).
  *
  *  - First open: the popup shows once per install ([show]).
  *  - After "Not now": Home shows the slim strip and dims the viewers card.
@@ -32,7 +30,6 @@ object PendingPrompt {
     private const val PREFS = "vg_pending_prompt"
     private const val KEY_SHOWN = "sheet_shown"
     private const val KEY_PENDING = "is_pending"
-    private const val PAY_AMOUNT = "₦1,500"
 
     fun wasShown(context: Context): Boolean =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_SHOWN, false)
@@ -66,7 +63,7 @@ object PendingPrompt {
         if (alreadyLogged) return
         val userId = SessionManager(context).getUserId()
         if (userId.isNullOrBlank()) {
-            Toast.makeText(context, "Couldn't verify your account. Please restart the app.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.pending_toast_no_account), Toast.LENGTH_SHORT).show()
             return
         }
         val app = context.applicationContext
@@ -75,9 +72,9 @@ object PendingPrompt {
             SupabaseClient.submitDailyRepost(userId) { success, message ->
                 main.post {
                     if (success) {
-                        Toast.makeText(app, "Repost logged. Verification pending.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(app, app.getString(R.string.pending_toast_logged), Toast.LENGTH_SHORT).show()
                     } else if (message != "ALREADY_REPOSTED_TODAY") {
-                        Toast.makeText(app, "Couldn't log your repost. Try again.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(app, app.getString(R.string.pending_toast_log_failed), Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -104,15 +101,31 @@ object PendingPrompt {
         if (visible || activity.isFinishing || activity.isDestroyed) return
         visible = true
         markShown(activity)
-        // A centered popup (not a bottom sheet): rounded white card with a dimmed background.
-        val dialog = Dialog(activity)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        // Bottom sheet: slides up from the bottom, dimmed background, easy to reach with a thumb.
+        val dialog = BottomSheetDialog(activity)
         val view = LayoutInflater.from(activity).inflate(R.layout.sheet_pending_verify, null)
         dialog.setContentView(view)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        // The layout paints its own rounded top, so the sheet container must be transparent.
+        (view.parent as? View)?.setBackgroundColor(Color.TRANSPARENT)
+        dialog.behavior.skipCollapsed = true
+        dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
 
-        val chip = view.findViewById<TextView>(R.id.pendingSheetChip)
         val verifyBtn = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.pendingSheetVerifyBtn)
+
+        // Numbers come from app_settings (cached, with fallbacks); the support number comes
+        // from SupportContact. Nothing is typed into the layout.
+        PendingConfig.refresh(activity)
+        val viewers = PendingConfig.viewers(activity)
+        val minViews = PendingConfig.minViews(activity)
+        val payAmount = PendingConfig.payAmount(activity)
+        val hours = PendingConfig.verifyHours(activity)
+        view.findViewById<TextView>(R.id.pendingTitle).text = activity.getString(R.string.pending_title, viewers)
+        view.findViewById<TextView>(R.id.pendingStep2Title).text = activity.getString(R.string.pending_step2_title, minViews)
+        view.findViewById<TextView>(R.id.pendingStep3Desc).text =
+            activity.getString(R.string.pending_step3_desc, SupportContact.displayNumber(), hours)
+        view.findViewById<TextView>(R.id.pendingCantReach).text = activity.getString(R.string.pending_cant_reach, minViews)
+        view.findViewById<TextView>(R.id.pendingSheetProofBtn).text = activity.getString(R.string.pending_btn_proof, minViews)
+        view.findViewById<TextView>(R.id.pendingSheetPayBtn).text = activity.getString(R.string.pending_btn_pay, payAmount)
 
         // If today's repost is already logged, say so and don't log a second one.
         var alreadyLogged = false
@@ -123,8 +136,7 @@ object PendingPrompt {
                     if (ok && status == "pending") {
                         activity.runOnUiThread {
                             alreadyLogged = true
-                            chip.visibility = View.VISIBLE
-                            verifyBtn.text = "Post again"
+                            verifyBtn.text = activity.getString(R.string.pending_btn_post_again)
                         }
                     }
                 }
@@ -137,23 +149,28 @@ object PendingPrompt {
             dialog.dismiss()
             repostNow(activity, alreadyLogged)
         }
+        // Step 3: after 30+ views the user sends a screenshot to support on WhatsApp.
+        view.findViewById<View>(R.id.pendingSheetProofBtn).setOnClickListener {
+            dialog.dismiss()
+            val username = SessionManager(activity).getUsername()
+            SupportContact.openSupport(
+                activity,
+                activity.getString(R.string.pending_msg_proof, minViews) +
+                    if (username.isNullOrBlank()) "" else activity.getString(R.string.pending_msg_username, username)
+            )
+        }
         // Skip the post: pay for verification by chatting with support on WhatsApp.
         view.findViewById<View>(R.id.pendingSheetPayBtn).setOnClickListener {
             dialog.dismiss()
             val username = SessionManager(activity).getUsername()
             SupportContact.openSupport(
                 activity,
-                "Hi VGContact, I want to pay $PAY_AMOUNT to get verified." +
-                    if (username.isNullOrBlank()) "" else " My username is $username."
+                activity.getString(R.string.pending_msg_pay, payAmount) +
+                    if (username.isNullOrBlank()) "" else activity.getString(R.string.pending_msg_username, username)
             )
         }
         view.findViewById<View>(R.id.pendingSheetLaterBtn).setOnClickListener { dialog.dismiss() }
 
-        dialog.setOnShowListener {
-            // Popup is 90% of the screen width, centered.
-            val w = (activity.resources.displayMetrics.widthPixels * 0.9).toInt()
-            dialog.window?.setLayout(w, ViewGroup.LayoutParams.WRAP_CONTENT)
-        }
         dialog.setOnDismissListener {
             visible = false
             if (!verifyTapped) onLater()

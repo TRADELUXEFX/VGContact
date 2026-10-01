@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fallbacks, used until the live values from app_settings have been fetched
+         (and when offline). Change the live values in the app_settings table. -->
+    <string name="pending_default_viewers">500+</string>
+    <string name="pending_default_min_views">30</string>
+    <string name="pending_default_pay_amount">₦1,500</string>
+    <string name="pending_default_verify_hours">24</string>
+
+    <!-- Pending bottom sheet. %1$s style values are filled in by PendingPrompt. -->
+    <string name="pending_free_pill">FREE</string>
+    <string name="pending_title">Unlock %1$s status viewers</string>
+    <string name="pending_subtitle">Follow these 3 steps to get verified</string>
+    <string name="pending_close">Close</string>
+    <string name="pending_step1_title">Post our status</string>
+    <string name="pending_step1_desc">Tap below. We open WhatsApp with the image ready.</string>
+    <string name="pending_step2_title">Get %1$s+ views</string>
+    <string name="pending_step2_desc">Give it a few hours.</string>
+    <string name="pending_step3_title">Send us a screenshot</string>
+    <string name="pending_step3_desc">Send it to our WhatsApp %1$s. We verify within %2$s hours.</string>
+    <string name="pending_btn_post">Post on my status</string>
+    <string name="pending_btn_post_again">Post again</string>
+    <string name="pending_btn_proof">Already have %1$s+ views? Send proof</string>
+    <string name="pending_cant_reach">Can\'t reach %1$s views?</string>
+    <string name="pending_btn_pay">Pay %1$s to verify</string>
+
+    <!-- Messages and toasts -->
+    <string name="pending_msg_proof">Hi VGContact, here is my proof: my status has %1$s+ views. Screenshot attached.</string>
+    <string name="pending_msg_pay">Hi VGContact, I want to pay %1$s to get verified.</string>
+    <string name="pending_msg_username"> My username is %1$s.</string>
+    <string name="pending_toast_no_account">Couldn\'t verify your account. Please restart the app.</string>
+    <string name="pending_toast_logged">Repost logged. Verification pending.</string>
+    <string name="pending_toast_log_failed">Couldn\'t log your repost. Try again.</string>
+</resources>
