@@ -89,7 +89,6 @@ class HomeActivity : AppCompatActivity() {
         BottomNavHelper.setup(this, BottomNavHelper.Tab.HOME)
         contactUsFab = FloatingContactHelper.attach(this)
 
-        findViewById<View>(R.id.home_content_scroll).post { showHomeTourIfNeeded() }
     }
 
     // Referral link row in the green header card: the link is LINK_BASE + the user's phone
@@ -112,7 +111,39 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun showHomeTourIfNeeded() {
+    // Guards against starting the sheet/tour twice (loadHome runs on every resume).
+    private var onboardingActive = false
+
+    // Called once the account status is known.
+    // Pending users: only the one-time "Repost to get seen" sheet, never the coach mark tour.
+    // Verified users: the tour runs from their second Home open (never on the very first one).
+    private fun startOnboarding(pending: Boolean) {
+        if (onboardingActive || isFinishing || isDestroyed) return
+
+        val tips = getSharedPreferences("vg_tips", MODE_PRIVATE)
+        val seenHomeBefore = tips.getBoolean("home_seen_before", false)
+        if (!seenHomeBefore) tips.edit().putBoolean("home_seen_before", true).apply()
+
+        if (pending) {
+            if (PendingPrompt.wasShown(this)) return
+            onboardingActive = true
+            PendingPrompt.show(
+                this,
+                onRepost = {
+                    onboardingActive = false
+                    startActivity(Intent(this, RepostActivity::class.java))
+                },
+                onLater = { onboardingActive = false }
+            )
+            return
+        }
+
+        if (CoachMarkOverlay.isTourDone(this) || !seenHomeBefore) return
+        onboardingActive = true
+        findViewById<View>(R.id.home_content_scroll).post { showHomeTour() }
+    }
+
+    private fun showHomeTour() {
         if (CoachMarkOverlay.isTourDone(this)) return
 
         val scroller = findViewById<NestedScrollView>(R.id.home_content_scroll)
@@ -176,6 +207,7 @@ class HomeActivity : AppCompatActivity() {
                 runOnUiThread {
                     if (ok && home != null) {
                         showHome(home)
+                        startOnboarding(home.status == "pending")
                     } else {
                         Toast.makeText(
                             this,
