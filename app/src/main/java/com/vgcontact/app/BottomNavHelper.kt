@@ -61,7 +61,10 @@ object BottomNavHelper {
             }
 
             row.setOnClickListener {
-                if (tab != selected) navigateTo(activity, tab)
+                if (tab == selected) return@setOnClickListener
+                // Pending users can only go Home; everything else brings the verify sheet back.
+                if (tab != Tab.HOME && PendingPrompt.showGate(activity)) return@setOnClickListener
+                navigateTo(activity, tab)
             }
         }
     }

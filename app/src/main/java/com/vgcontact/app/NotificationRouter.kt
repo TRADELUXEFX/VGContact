@@ -71,6 +71,11 @@ object NotificationRouter {
     }
 
     fun run(context: Context, action: String?, target: String?): Boolean {
+        // Pending users are locked out of Repost/WhatsApp-repost actions: show the verify sheet.
+        if ((action == ACTION_WHATSAPP_REPOST || action == ACTION_REPOST) && PendingPrompt.isPending(context)) {
+            if (context is android.app.Activity) PendingPrompt.showGate(context)
+            return true
+        }
         return when (action) {
             ACTION_WHATSAPP_REPOST -> {
                 openAdminWhatsApp(context)

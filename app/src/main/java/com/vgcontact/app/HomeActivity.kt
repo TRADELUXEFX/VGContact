@@ -60,26 +60,33 @@ class HomeActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.headerUsernameText).text =
             sessionManager.getUsername() ?: "VGContact User"
         findViewById<ImageView>(R.id.headerProfileIcon).setOnClickListener {
+            if (PendingPrompt.showGate(this)) return@setOnClickListener
             startActivity(Intent(this, ProfileActivity::class.java))
         }
         findViewById<ImageView>(R.id.headerBellIcon).setOnClickListener {
+            if (PendingPrompt.showGate(this)) return@setOnClickListener
             startActivity(Intent(this, NotificationsActivity::class.java))
         }
 
         findViewById<LinearLayout>(R.id.permissionBanner).setOnClickListener { fixPermissions() }
-        // Pending users: the banner opens the Repost screen, where the admin WhatsApp button is.
+        // Pending users: the strip brings the verify sheet back.
         findViewById<LinearLayout>(R.id.pendingBanner).setOnClickListener {
-            startActivity(Intent(this, RepostActivity::class.java))
+            PendingPrompt.showGate(this)
         }
 
         syncBtn = findViewById(R.id.syncContactsBtn)
-        syncBtn.setOnClickListener { startSync() }
+        syncBtn.setOnClickListener {
+            if (PendingPrompt.showGate(this)) return@setOnClickListener
+            startSync()
+        }
 
         findViewById<Button>(R.id.buyViewersBtn).setOnClickListener {
+            if (PendingPrompt.showGate(this)) return@setOnClickListener
             SupportContact.openBuyViewers(this)
         }
 
         findViewById<Button>(R.id.join_community_btn).setOnClickListener {
+            if (PendingPrompt.showGate(this)) return@setOnClickListener
             CommunityLink.open(this)
         }
         CommunityLink.refresh(this)
@@ -115,7 +122,7 @@ class HomeActivity : AppCompatActivity() {
     private var onboardingActive = false
 
     // Called once the account status is known.
-    // Pending users: only the one-time "Repost to get seen" sheet, never the coach mark tour.
+    // Pending users: only the one-time "Verify your account" sheet, never the coach mark tour.
     // Verified users: the tour runs from their second Home open (never on the very first one).
     private fun startOnboarding(pending: Boolean) {
         if (onboardingActive || isFinishing || isDestroyed) return
@@ -127,14 +134,7 @@ class HomeActivity : AppCompatActivity() {
         if (pending) {
             if (PendingPrompt.wasShown(this)) return
             onboardingActive = true
-            PendingPrompt.show(
-                this,
-                onRepost = {
-                    onboardingActive = false
-                    startActivity(Intent(this, RepostActivity::class.java))
-                },
-                onLater = { onboardingActive = false }
-            )
+            PendingPrompt.show(this, onLater = { onboardingActive = false })
             return
         }
 
@@ -224,8 +224,12 @@ class HomeActivity : AppCompatActivity() {
         findViewById<View>(R.id.home_limits_loading).visibility = View.GONE
         findViewById<View>(R.id.home_limits_block).visibility = View.VISIBLE
         findViewById<TextView>(R.id.statusBadgeText).text = h.status.uppercase()
-        findViewById<View>(R.id.pendingBanner).visibility =
-            if (h.status == "pending") View.VISIBLE else View.GONE
+        val pending = h.status == "pending"
+        PendingPrompt.setPending(this, pending)
+        findViewById<View>(R.id.pendingBanner).visibility = if (pending) View.VISIBLE else View.GONE
+        // Locked look: the viewers card is dimmed until the account is verified.
+        findViewById<View>(R.id.home_contacts_card).alpha = if (pending) 0.45f else 1f
+        syncBtn.alpha = if (pending) 0.6f else 1f
 
         findViewById<TextView>(R.id.freeViewersCurrentText).text = h.freeCurrent.toString()
         findViewById<TextView>(R.id.freeViewersMaxText).text = "/${h.freeMax}"

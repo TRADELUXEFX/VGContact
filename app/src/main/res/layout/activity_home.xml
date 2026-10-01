@@ -247,7 +247,7 @@
                     android:layout_weight="1"
                     android:layout_marginStart="12dp"
                     android:layout_marginEnd="12dp"
-                    android:text="Repost to get visibility"
+                    android:text="Verify your account to unlock the app"
                     android:textSize="13sp"
                     android:textColor="@color/white" />
 
@@ -256,7 +256,7 @@
                     android:includeFontPadding="false"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="CLAIM"
+                    android:text="VERIFY"
                     android:textSize="13sp"
                     android:textColor="@color/white" />
             </LinearLayout>
