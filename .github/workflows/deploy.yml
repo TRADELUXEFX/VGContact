@@ -6,6 +6,7 @@ name: Deploy
 #   3. Tap "Add file" -> "Upload files".
 #   4. Upload ANY zip file, any name (deploy.zip, update1.zip, whatever).
 #   5. Commit directly to main.
+#   (To delete files, add a DELETE_FILES.txt to the zip - see the step below.)
 #   6. This workflow runs: if there's a zip in incoming/, it extracts it
 #      (an extra wrapper folder inside the zip is removed automatically),
 #      commits the result, and deletes the zip. Either way (zip or plain
@@ -103,6 +104,51 @@ jobs:
             cp -a "$stage"/. .
             rm -f "$z"
           done
+
+      # Deleting files: put a text file named DELETE_FILES.txt at the root of the zip.
+      # One path per line, relative to the repo root (for example
+      # app/src/main/res/layout/item_file.xml). Blank lines and lines starting with #
+      # are ignored. Only single files are deleted (no folders, no wildcards).
+      # Paths that are unsafe or protected (.git, .github, incoming, root and app
+      # build.gradle, settings.gradle, gradle.properties, anything with "..") are
+      # skipped with a warning. The list file is removed afterwards so it never runs twice.
+      - name: Delete files listed in DELETE_FILES.txt
+        if: steps.extract.outputs.found == 'true'
+        run: |
+          set -e
+          list="DELETE_FILES.txt"
+          if [ ! -f "$list" ]; then
+            echo "No $list in the zip - nothing to delete."
+            exit 0
+          fi
+          deleted=0
+          skipped=0
+          while IFS= read -r line || [ -n "$line" ]; do
+            p=$(printf '%s' "$line" | tr -d '\r' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+            case "$p" in
+              ''|'#'*) continue ;;
+            esac
+            p="${p#./}"
+            case "$p" in
+              /*|*..*|.git|.git/*|.github|.github/*|incoming|incoming/*|build.gradle|app/build.gradle|settings.gradle|gradle.properties|DELETE_FILES.txt)
+                echo "::warning::Skipped (protected or unsafe path): $p"
+                skipped=$((skipped + 1))
+                continue
+                ;;
+            esac
+            if [ -f "$p" ]; then
+              rm -f -- "$p"
+              echo "Deleted: $p"
+              deleted=$((deleted + 1))
+            elif [ -e "$p" ]; then
+              echo "::warning::Skipped (not a regular file): $p"
+              skipped=$((skipped + 1))
+            else
+              echo "Not found (already gone): $p"
+            fi
+          done < "$list"
+          rm -f "$list"
+          echo "Deleted $deleted file(s), skipped $skipped."
 
       - name: Commit unpacked files
         if: steps.extract.outputs.found == 'true'
