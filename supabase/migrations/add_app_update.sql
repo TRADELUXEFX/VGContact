@@ -1,31 +1,28 @@
--- App update pop-up + download page. Run once in Supabase -> SQL Editor
--- (needs add_app_settings.sql first). Safe to run again, and it upgrades an earlier version.
---
--- How it works: the admin page's "Updates" tab saves these values into app_settings. The app asks
--- get_app_update() on every Home open, and your download page asks it too. If a newer build is
--- published, the app shows an "Update available" pop-up whose button opens your download page.
---
---   update_build      newest build number (the number in "v1.0.<number>", same as the GitHub
---                     run number / release name). 0 = no update published.
---   update_min_build  builds BELOW this must update to keep using the app (forced pop-up that
---                     can't be closed). 0 = nobody is forced.
---   update_apk_url    direct link to the new APK (the Download button on the download page)
---   update_url        your download page (what "Update now" opens). Empty = open the APK link
---   update_notes      optional "What's new" text shown in the pop-up and on the download page
+-- App update pop-up + download page, the VGKontact way:
+--   every build is logged automatically (unpublished), and you PICK which one to publish
+--   from the admin page's Updates tab. Nothing to type.
+-- Run once in Supabase -> SQL Editor (needs add_app_settings.sql first).
+-- Safe to run again, and it replaces the earlier version of this file.
 
-insert into app_settings (key, value) values
-  ('update_build',     '0'),
-  ('update_min_build', '0'),
-  ('update_apk_url',   ''),
-  ('update_url',       ''),
-  ('update_notes',     '')
-on conflict (key) do nothing;
+-- 1. One row per build. The GitHub build adds the row itself (see deploy.yml step
+--    "Log build for the update pop-up"). approved = true means "this is the update users get".
+create table if not exists app_releases (
+  version_code  int primary key,                 -- the GitHub run number, e.g. 954
+  version_name  text not null,                   -- e.g. 1.0.954
+  download_url  text not null,                   -- direct link to the APK
+  changelog     text not null default '',        -- "What's new" shown to users
+  approved      boolean not null default false,
+  force_update  boolean not null default false,  -- users below this build can't use the app
+  created_at    timestamptz not null default now(),
+  published_at  timestamptz
+);
+alter table app_releases enable row level security;   -- no policies: only the functions below can read it
 
--- The return columns changed since the first version, so the old function must be dropped first.
+-- 2. Used by the app and the download page. Returns one row.
+--    The latest published build is the update. A forced build makes every older build update.
+--    "Update now" opens update_url (your download page, set once in the Updates tab), or the APK
+--    link itself when no page link is set. Nothing is reported unless a link exists.
 drop function if exists get_app_update(int);
-
--- Read-only check for the app and the download page. Returns one row.
--- Nothing is reported as available unless there is a link to open.
 create function get_app_update(p_current_build int)
 returns table (
   update_available boolean,
@@ -41,17 +38,13 @@ set search_path = public
 as $$
   with s as (
     select
-      coalesce(max(case when key = 'update_build'     and trim(value) ~ '^[0-9]+$' then trim(value)::int end), 0) as latest,
-      coalesce(max(case when key = 'update_min_build' and trim(value) ~ '^[0-9]+$' then trim(value)::int end), 0) as minb,
-      coalesce(max(case when key = 'update_apk_url' then trim(value) end), '') as apk,
-      coalesce(max(case when key = 'update_url'     then trim(value) end), '') as page,
-      coalesce(max(case when key = 'update_notes'   then trim(value) end), '') as notes
-    from app_settings
-    where key in ('update_build', 'update_min_build', 'update_apk_url', 'update_url', 'update_notes')
+      coalesce((select max(r.version_code) from app_releases r where r.approved), 0) as latest,
+      coalesce((select max(r.version_code) from app_releases r where r.approved and r.force_update), 0) as minb,
+      coalesce((select r.download_url from app_releases r where r.approved order by r.version_code desc limit 1), '') as apk,
+      coalesce((select r.changelog from app_releases r where r.approved order by r.version_code desc limit 1), '') as notes,
+      coalesce((select trim(a.value) from app_settings a where a.key = 'update_url'), '') as page
   ),
-  l as (
-    select *, coalesce(nullif(page, ''), apk) as link from s
-  )
+  l as (select *, coalesce(nullif(page, ''), apk) as link from s)
   select
     (latest > p_current_build and link <> ''),
     (minb   > p_current_build and link <> ''),
@@ -61,6 +54,53 @@ as $$
     notes
   from l;
 $$;
-
 revoke all on function get_app_update(int) from public;
 grant execute on function get_app_update(int) to anon, authenticated;
+
+-- 3. Admin page: list the builds (newest first).
+create or replace function admin_list_releases()
+returns table (
+  version_code int, version_name text, download_url text, changelog text,
+  approved boolean, force_update boolean, created_at timestamptz, published_at timestamptz
+)
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not _is_admin() then raise exception 'not admin'; end if;
+  return query
+    select r.version_code, r.version_name, r.download_url, r.changelog,
+           r.approved, r.force_update, r.created_at, r.published_at
+    from app_releases r
+    order by r.version_code desc
+    limit 30;
+end $$;
+revoke all on function admin_list_releases() from public;
+grant execute on function admin_list_releases() to authenticated;
+
+-- 4. Admin page: publish or unpublish a build you picked.
+create or replace function admin_set_release(
+  p_version_code int, p_approved boolean, p_force boolean, p_changelog text
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not _is_admin() then raise exception 'not admin'; end if;
+  update app_releases
+     set approved     = p_approved,
+         force_update = case when p_approved then coalesce(p_force, false) else false end,
+         changelog    = coalesce(p_changelog, changelog),
+         published_at = case when p_approved then now() else published_at end
+   where version_code = p_version_code;
+  if not found then raise exception 'release not found'; end if;
+end $$;
+revoke all on function admin_set_release(int, boolean, boolean, text) from public;
+grant execute on function admin_set_release(int, boolean, boolean, text) to authenticated;
+
+-- 5. The download page link ("Update now" opens it). Set it once in the Updates tab.
+insert into app_settings (key, value) values ('update_url', '')
+on conflict (key) do nothing;
