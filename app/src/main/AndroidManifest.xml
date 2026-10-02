@@ -98,6 +98,12 @@
             android:exported="false"
             android:screenOrientation="portrait" />
 
+        <!-- Pay to verify: reached from the pending sheet's Pay button -->
+        <activity
+            android:name=".PayVerifyActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
         <!-- Terms & Conditions / Privacy Policy: reached from the floating help button -->
         <activity
             android:name=".LegalActivity"

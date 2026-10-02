@@ -199,15 +199,10 @@ object PendingPrompt {
                     if (username.isNullOrBlank()) "" else activity.getString(R.string.pending_msg_username, username)
             )
         }
-        // Skip the post: pay for verification by chatting with support on WhatsApp.
+        // Skip the post: pay for verification on the Pay to verify screen (bank details + narration).
         view.findViewById<View>(R.id.pendingSheetPayBtn).setOnClickListener {
             dialog.dismiss()
-            val username = SessionManager(activity).getUsername()
-            SupportContact.openSupport(
-                activity,
-                activity.getString(R.string.pending_msg_pay, payAmount) +
-                    if (username.isNullOrBlank()) "" else activity.getString(R.string.pending_msg_username, username)
-            )
+            PayVerifyActivity.open(activity)
         }
         view.findViewById<View>(R.id.pendingSheetLaterBtn).setOnClickListener { dialog.dismiss() }
 

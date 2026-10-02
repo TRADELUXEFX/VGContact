@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Pay to verify screen (PayVerifyActivity). The amount comes from PendingConfig.payAmount;
+         bank name, account name and account number come from app_settings (see PendingConfig). -->
+    <!-- Empty on purpose: never ship a fake account number. Real values live in app_settings. -->
+    <string name="pay_default_empty"></string>
+
+    <string name="pay_title">Pay to verify</string>
+    <string name="pay_subtitle">Skip posting and proof.</string>
+    <string name="pay_back">Back</string>
+
+    <string name="pay_amount_label">Amount to send</string>
+    <string name="pay_one_time">One-time</string>
+    <string name="pay_send_to">Send to this account</string>
+    <string name="pay_bank">Bank</string>
+    <string name="pay_account_name">Account name</string>
+    <string name="pay_account_number">Account number</string>
+    <string name="pay_copy">Copy</string>
+    <string name="pay_copied">Copied</string>
+    <string name="pay_details_missing">Account details aren\'t available yet. Chat with support to pay.</string>
+
+    <string name="pay_btn_proof">Send proof</string>
+    <string name="pay_note">After you pay, send your receipt to the admin on WhatsApp. We verify within %1$s hours.</string>
+    <string name="pay_msg_proof">Hello admin, I\'ve paid %1$s to get verified. Here is my payment proof. Screenshot attached.</string>
+    <string name="pay_msg_username"> My username is %1$s.</string>
+</resources>
