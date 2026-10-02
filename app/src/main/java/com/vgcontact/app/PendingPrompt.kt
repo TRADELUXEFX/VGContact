@@ -132,7 +132,21 @@ object PendingPrompt {
         val view = LayoutInflater.from(activity).inflate(R.layout.sheet_pending_verify, null)
         dialog.setContentView(view)
         // The layout paints its own rounded top, so the sheet container must be transparent.
-        (view.parent as? View)?.setBackgroundColor(Color.TRANSPARENT)
+        // BottomSheetBehavior puts its own white shape on the container when the sheet is first
+        // laid out (after this line), which showed as white wedges in the header's rounded
+        // corners. So clear it again once the sheet is shown and after the first layout.
+        val clearSheetBackground = {
+            (view.parent as? View)?.apply {
+                background = null
+                setBackgroundColor(Color.TRANSPARENT)
+            }
+            Unit
+        }
+        clearSheetBackground()
+        dialog.setOnShowListener {
+            clearSheetBackground()
+            view.post { clearSheetBackground() }
+        }
         dialog.behavior.skipCollapsed = true
         dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
 

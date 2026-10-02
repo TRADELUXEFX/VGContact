@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Solid strip under the pending sheet's cards (same "lifted" idea as the Post button's
+         darker green strip, in a soft green-grey so it suits white cards). -->
+    <color name="pending_card_lift">#C6DECD</color>
+</resources>
