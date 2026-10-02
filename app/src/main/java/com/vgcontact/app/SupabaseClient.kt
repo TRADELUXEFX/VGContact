@@ -141,8 +141,13 @@ object SupabaseClient {
     // queue two pending rows.
     //
     // message is one of: "OK", "ALREADY_REPOSTED_TODAY", or a raw error.
-    fun submitDailyRepost(userId: String, callback: (Boolean, String) -> Unit) {
-        val arr = rpc("submit_daily_repost", JSONObject().apply { put("p_user_id", userId) })
+    // kind = "verify" (pending sheet, first task) or "repost" (Repost screen, verified users).
+    // Extra messages: ALREADY_VERIFIED, NOT_VERIFIED, REPOST_LIMIT_REACHED.
+    fun submitDailyRepost(userId: String, kind: String = "repost", callback: (Boolean, String) -> Unit) {
+        val arr = rpc("submit_daily_repost", JSONObject().apply {
+            put("p_user_id", userId)
+            put("p_kind", kind)
+        })
         when {
             arr == null -> callback(false, if (!isConfigured()) "NOT_CONFIGURED" else "REQUEST_FAILED")
             arr.length() == 0 -> callback(false, "EMPTY_RESPONSE")
@@ -158,6 +163,16 @@ object SupabaseClient {
     // button. The server decides what "today" is (UTC).
     fun fetchTodayRepostStatus(userId: String, callback: (Boolean, String?) -> Unit) {
         val arr = rpc("get_today_repost_status", JSONObject().apply { put("p_user_id", userId) })
+        if (arr == null) {
+            callback(false, null)
+            return
+        }
+        callback(true, if (arr.length() > 0) arr.getJSONObject(0).optString("status") else null)
+    }
+
+    // Today's verification (first task) status: null, "pending", "verified" or "rejected".
+    fun fetchTodayVerifyStatus(userId: String, callback: (Boolean, String?) -> Unit) {
+        val arr = rpc("get_today_verify_status", JSONObject().apply { put("p_user_id", userId) })
         if (arr == null) {
             callback(false, null)
             return

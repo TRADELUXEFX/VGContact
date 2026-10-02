@@ -32,6 +32,7 @@ class HomeActivity : AppCompatActivity() {
     private var contactUsFab: View? = null
     private var missingPermissions: List<String> = emptyList()
     private var isSyncing = false
+    private var autoSyncing = false
 
     private lateinit var syncBtn: MaterialButton
 
@@ -242,6 +243,32 @@ class HomeActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.extraViewersMaxText).text = "/${h.extraMax}"
 
         findViewById<TextView>(R.id.referralViewersCountText).text = h.referralCount.toString()
+
+        autoSyncIfViewersChanged(h)
+    }
+
+    // Verified (or gained viewers) since the last sync: save the new contacts right
+    // away instead of waiting for the button or the background timer.
+    private fun autoSyncIfViewersChanged(h: SupabaseClient.HomeData) {
+        if (h.status == "pending" || isSyncing || autoSyncing) return
+        if (!ContactSync.hasPermission(this) || SyncPrefs.isPaused(this)) return
+        val userId = sessionManager.getUserId()
+        if (userId.isNullOrBlank()) return
+        val snapshot = "${h.status}:${h.freeCurrent}:${h.extraCurrent}:${h.referralCount}"
+        if (SyncPrefs.getViewerSnapshot(this) == snapshot) return
+        autoSyncing = true
+        Thread {
+            val result = ContactSync.run(this, userId)
+            runOnUiThread {
+                autoSyncing = false
+                if (result.error == null) {
+                    SyncPrefs.setViewerSnapshot(this, snapshot)
+                    if (result.added > 0) {
+                        Toast.makeText(this, "${result.added} new contacts saved", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }.start()
     }
 
     private fun refreshUnreadBadge() {

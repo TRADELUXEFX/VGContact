@@ -21,6 +21,25 @@ object SyncPrefs {
             .edit().putBoolean(KEY_PAUSED, paused).apply()
     }
 
+    // What the Home numbers looked like at the last successful sync ("verified:free:extra:referrals").
+    // Home compares it with the server numbers and syncs by itself when they differ,
+    // so a newly verified user (or one who just gained viewers) gets the contacts
+    // without tapping Sync Contacts.
+    private const val KEY_VIEWER_SNAPSHOT = "viewer_snapshot"
+
+    fun getViewerSnapshot(context: Context): String =
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE).getString(KEY_VIEWER_SNAPSHOT, "") ?: ""
+
+    fun setViewerSnapshot(context: Context, snapshot: String) {
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .edit().putString(KEY_VIEWER_SNAPSHOT, snapshot).apply()
+    }
+
+    fun clearViewerSnapshot(context: Context) {
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .edit().remove(KEY_VIEWER_SNAPSHOT).apply()
+    }
+
     // How often the background sync runs (hours). Only 1, 6, 12 or 24.
     private const val KEY_INTERVAL = "sync_interval_hours"
     val INTERVAL_CHOICES = intArrayOf(1, 6, 12, 24)

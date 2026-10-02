@@ -241,10 +241,14 @@ class RepostActivity : AppCompatActivity() {
             return
         }
 
-        // The user picks what to post (text + link, or image + link). Once the share
-        // sheet opens, today's repost is logged as pending for the admin to verify.
-        val phone = sessionManager.getPhone().orEmpty()
-        ShareHelper.showMenu(this, phone) { logRepost(userId) }
+        // The Repost screen only sends the user to the admin's WhatsApp (the image post is
+        // the separate pending-sheet task). Today's repost is logged once per day, as before.
+        val name = sessionManager.getUsername()
+        SupportContact.openSupport(
+            this,
+            "Hi VGContact admin, I reposted today." + if (name.isNullOrBlank()) "" else " My username is $name."
+        )
+        logRepost(userId)
     }
 
     private fun logRepost(userId: String) {
@@ -280,7 +284,9 @@ class RepostActivity : AppCompatActivity() {
                         repostedToday = false
                         showRepostReady()
                         statusCard.visibility = android.view.View.GONE
-                        Toast.makeText(this, "Couldn't log your repost. Try again.", Toast.LENGTH_SHORT).show()
+                        val msg = if (message == "NOT_VERIFIED") "Get verified first: post your invite on your status and send us the screenshot."
+                                  else "Couldn't log your repost. Try again."
+                        Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
                     }
                 }
             }

@@ -77,7 +77,7 @@ object PendingPrompt {
         val app = context.applicationContext
         val main = Handler(Looper.getMainLooper())
         thread {
-            SupabaseClient.submitDailyRepost(userId) { success, message ->
+            SupabaseClient.submitDailyRepost(userId, "verify") { success, message ->
                 main.post {
                     if (success) {
                         Toast.makeText(app, app.getString(R.string.pending_toast_logged), Toast.LENGTH_SHORT).show()
@@ -172,7 +172,7 @@ object PendingPrompt {
         val userId = SessionManager(activity).getUserId()
         if (!userId.isNullOrBlank()) {
             thread {
-                SupabaseClient.fetchTodayRepostStatus(userId) { ok, status ->
+                SupabaseClient.fetchTodayVerifyStatus(userId) { ok, status ->
                     if (ok && status == "pending") {
                         activity.runOnUiThread {
                             alreadyLogged = true
