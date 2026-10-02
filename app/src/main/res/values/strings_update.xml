@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App update pop-up (AppUpdatePrompt). Published from the admin page's Updates tab. -->
+    <string name="update_pill">NEW VERSION</string>
+    <string name="update_title">Update available</string>
+    <string name="update_title_force">Update required</string>
+    <string name="update_subtitle">Version %1$s is ready to install.</string>
+    <string name="update_subtitle_force">Version %1$s or newer is needed to keep using VGContact.</string>
+    <string name="update_whats_new">What\'s new</string>
+    <string name="update_your_version">You\'re on version %1$s</string>
+    <string name="update_btn_now">Update now</string>
+    <string name="update_btn_later">Maybe later</string>
+    <string name="update_close">Close</string>
+    <string name="update_msg_support">Hi VGContact, I need to update my app but couldn\'t open the update link. Can you help me update?</string>
+</resources>

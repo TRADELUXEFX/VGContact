@@ -134,6 +134,7 @@ class HomeActivity : AppCompatActivity() {
         if (pending) {
             if (PendingPrompt.wasShown(this)) return
             onboardingActive = true
+            AppUpdatePrompt.dismissSoft()   // the verify sheet goes first, never two sheets at once
             PendingPrompt.show(this, onLater = { onboardingActive = false })
             return
         }
@@ -314,6 +315,8 @@ class HomeActivity : AppCompatActivity() {
         refreshUnreadBadge()
         updatePermissionBanner()
         BannedHandler.checkWithServer(this)
+        // "New version ready" pop-up. Skipped (soft only) while the pending sheet is up.
+        AppUpdatePrompt.check(this) { !onboardingActive }
     }
 
     // ---------------- "your sync stopped" help ----------------

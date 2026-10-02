@@ -415,6 +415,14 @@ object SupabaseClient {
         callback(if (arr != null && arr.length() > 0) arr.getJSONObject(0).optString("value").ifBlank { null } else null)
     }
 
+    // The newest published build, from get_app_update (see add_app_update.sql).
+    // Returns one row {update_available, force_update, latest_build, download_url, notes},
+    // or null when offline / the SQL hasn't been run yet. Blocking: call from a background thread.
+    fun fetchAppUpdate(currentBuild: Int, callback: (JSONObject?) -> Unit) {
+        val arr = rpc("get_app_update", JSONObject().apply { put("p_current_build", currentBuild) })
+        callback(if (arr != null && arr.length() > 0) arr.getJSONObject(0) else null)
+    }
+
     // Date registered + referred by for accounts that logged in before
     // those were being saved (see SessionManager.saveRegistrationFrom).
     fun fetchUserProfile(userId: String, callback: (Boolean, JSONObject?) -> Unit) {
