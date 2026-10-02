@@ -125,7 +125,7 @@ object PendingPrompt {
             activity.getString(R.string.pending_step3_desc, SupportContact.displayNumber(), hours)
         view.findViewById<TextView>(R.id.pendingCantReach).text = activity.getString(R.string.pending_cant_reach, minViews)
         view.findViewById<TextView>(R.id.pendingSheetProofBtn).text = activity.getString(R.string.pending_btn_proof, minViews)
-        view.findViewById<TextView>(R.id.pendingSheetPayBtn).text = activity.getString(R.string.pending_btn_pay, payAmount)
+        view.findViewById<TextView>(R.id.pendingSheetPayBtn).text = activity.getString(R.string.pending_btn_pay_short, payAmount)
 
         // If today's repost is already logged, say so and don't log a second one.
         var alreadyLogged = false

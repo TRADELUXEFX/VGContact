@@ -23,6 +23,8 @@
     <string name="pending_btn_proof">Already have %1$s+ views? Send proof</string>
     <string name="pending_cant_reach">Can\'t reach %1$s views?</string>
     <string name="pending_btn_pay">Pay %1$s to verify</string>
+    <string name="pending_btn_pay_short">Pay %1$s</string>
+    <string name="pending_pay_skip">Skip posting and proof.</string>
 
     <!-- Messages and toasts -->
     <string name="pending_msg_proof">Hi VGContact, here is my proof: my status has %1$s+ views. Screenshot attached.</string>
