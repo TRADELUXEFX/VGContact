@@ -259,7 +259,7 @@
                         android:textColor="@color/white" />
 
                     <TextView
-                        android:fontFamily="@font/poppins_regular_bundled"
+                        android:fontFamily="@font/poppins"
                         android:includeFontPadding="false"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -325,7 +325,7 @@
                         android:textColor="@color/white" />
 
                     <TextView
-                        android:fontFamily="@font/poppins_regular_bundled"
+                        android:fontFamily="@font/poppins"
                         android:includeFontPadding="false"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
