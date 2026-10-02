@@ -1,5 +1,8 @@
 package com.vgcontact.app
 
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.graphics.Color
@@ -7,8 +10,13 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import android.os.Handler
 import android.os.Looper
+import android.provider.Settings
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.OvershootInterpolator
 import android.widget.TextView
 import android.widget.Toast
 import kotlin.concurrent.thread
@@ -91,6 +99,24 @@ object PendingPrompt {
         return true
     }
 
+    /** False when the phone has animations turned off (Developer options / accessibility). */
+    private fun animationsEnabled(context: Context): Boolean =
+        Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) > 0f
+
+    /** Small "press in" feedback. Returns false so the normal click still fires. */
+    @SuppressLint("ClickableViewAccessibility")
+    private fun pressEffect(v: View) {
+        v.setOnTouchListener { view, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN ->
+                    view.animate().scaleX(0.97f).scaleY(0.97f).setDuration(90).start()
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL ->
+                    view.animate().scaleX(1f).scaleY(1f).setDuration(140).start()
+            }
+            false
+        }
+    }
+
     private var visible = false
 
     /**
@@ -171,10 +197,55 @@ object PendingPrompt {
         }
         view.findViewById<View>(R.id.pendingSheetLaterBtn).setOnClickListener { dialog.dismiss() }
 
+        // Motion: cards rise in one after another, the step icons pop, the Post button pulses.
+        val animate = animationsEnabled(activity)
+        val postWrap = view.findViewById<View>(R.id.pendingPostWrap)
+        val risers = listOf(R.id.pendingStepsCard, R.id.pendingPostWrap, R.id.pendingSheetProofBtn, R.id.pendingFooterCard)
+            .map { view.findViewById<View>(it) }
+        val icons = listOf(R.id.pendingStep1Icon, R.id.pendingStep2Icon, R.id.pendingStep3Icon)
+            .map { view.findViewById<View>(it) }
+        var pulse: ObjectAnimator? = null
+        if (animate) {
+            val rise = 24f * activity.resources.displayMetrics.density
+            risers.forEach { it.alpha = 0f; it.translationY = rise }
+            icons.forEach { it.scaleX = 0f; it.scaleY = 0f }
+        }
+        pressEffect(verifyBtn)
+        pressEffect(view.findViewById(R.id.pendingSheetProofBtn))
+        pressEffect(view.findViewById(R.id.pendingSheetPayBtn))
+
         dialog.setOnDismissListener {
+            pulse?.cancel()
             visible = false
             if (!verifyTapped) onLater()
         }
         dialog.show()
+        if (animate) {
+            risers.forEachIndexed { i, v ->
+                v.animate().alpha(1f).translationY(0f)
+                    .setStartDelay(150L + i * 80L).setDuration(360)
+                    .setInterpolator(DecelerateInterpolator(1.6f)).start()
+            }
+            icons.forEachIndexed { i, v ->
+                v.animate().scaleX(1f).scaleY(1f)
+                    .setStartDelay(380L + i * 120L).setDuration(380)
+                    .setInterpolator(OvershootInterpolator(2.2f)).start()
+            }
+            postWrap.postDelayed({
+                if (dialog.isShowing) {
+                    pulse = ObjectAnimator.ofPropertyValuesHolder(
+                        postWrap,
+                        PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 1.03f),
+                        PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 1.03f)
+                    ).apply {
+                        duration = 900
+                        repeatCount = ObjectAnimator.INFINITE
+                        repeatMode = ObjectAnimator.REVERSE
+                        interpolator = AccelerateDecelerateInterpolator()
+                        start()
+                    }
+                }
+            }, 900)
+        }
     }
 }

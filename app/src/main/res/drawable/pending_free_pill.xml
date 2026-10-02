@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- "FREE" pill on the green header: white with green text. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="@color/vg_green_tint" />
+    <solid android:color="@color/white" />
     <corners android:radius="100dp" />
 </shape>

@@ -1,96 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Bottom sheet for pending users (timeline layout). Shown by PendingPrompt in a
-     BottomSheetDialog. The Post button shares the image + caption + link directly. -->
+<!-- Bottom sheet for pending users. Shown by PendingPrompt in a BottomSheetDialog.
+     Styled like the rest of the app: green gradient header with see-through circles,
+     white rounded cards on the light background, a "lifted" primary button.
+     PendingPrompt animates pendingStepsCard, the three step icons, pendingPostWrap,
+     pendingSheetProofBtn and pendingFooterCard in when the sheet opens. -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/pending_sheet_background"
+    android:background="@drawable/pending_sheet_body_background"
     android:overScrollMode="never"
     android:scrollbars="none">
 
     <LinearLayout
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingStart="22dp"
-        android:paddingEnd="22dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="20dp">
+        android:orientation="vertical">
 
-        <View
-            android:layout_width="40dp"
-            android:layout_height="4dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/pending_sheet_handle" />
-
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:background="@drawable/pending_header_background"
+            android:clipToOutline="true">
+
+            <ImageView
+                android:layout_width="190dp"
+                android:layout_height="190dp"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="-70dp"
+                android:layout_marginEnd="-60dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/pending_header_bubble" />
+
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="bottom|start"
+                android:layout_marginStart="-36dp"
+                android:layout_marginBottom="-40dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/pending_header_bubble" />
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingStart="22dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="18dp"
+                android:paddingBottom="24dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/pending_free_pill"
-                    android:fontFamily="@font/poppins_bold"
-                    android:includeFontPadding="false"
-                    android:letterSpacing="0.04"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp"
-                    android:text="@string/pending_free_pill"
-                    android:textColor="@color/vg_green_dark"
-                    android:textSize="10sp" />
+                <View
+                    android:layout_width="40dp"
+                    android:layout_height="4dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="14dp"
+                    android:background="@drawable/pending_handle_on_green" />
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/pending_free_pill"
+                        android:fontFamily="@font/poppins_bold"
+                        android:includeFontPadding="false"
+                        android:letterSpacing="0.06"
+                        android:paddingStart="12dp"
+                        android:paddingTop="5dp"
+                        android:paddingEnd="12dp"
+                        android:paddingBottom="5dp"
+                        android:text="@string/pending_free_pill"
+                        android:textColor="@color/vg_green_dark"
+                        android:textSize="11sp" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1" />
+
+                    <ImageView
+                        android:id="@+id/pendingSheetLaterBtn"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/notification_circle_background"
+                        android:clickable="true"
+                        android:contentDescription="@string/pending_close"
+                        android:focusable="true"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_close_small"
+                        app:tint="@color/white" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/pendingTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
                     android:fontFamily="@font/poppins_bold"
                     android:includeFontPadding="false"
                     android:lineSpacingExtra="1dp"
-                    android:id="@+id/pendingTitle"
-                    android:textColor="@color/vg_dark"
-                    android:textSize="22sp" />
+                    android:textColor="@color/white"
+                    android:textSize="25sp" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="6dp"
+                    android:alpha="0.9"
                     android:fontFamily="@font/poppins"
                     android:includeFontPadding="false"
                     android:text="@string/pending_subtitle"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="@color/white"
                     android:textSize="13sp" />
             </LinearLayout>
-
-            <ImageView
-                android:id="@+id/pendingSheetLaterBtn"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:contentDescription="@string/pending_close"
-                android:focusable="true"
-                android:padding="10dp"
-                android:src="@drawable/ic_close_small"
-                app:tint="@color/text_muted" />
-        </LinearLayout>
+        </FrameLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="24dp">
+
+            <LinearLayout
+                android:id="@+id/pendingStepsCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_background"
+                android:elevation="2dp"
+                android:orientation="vertical"
+                android:padding="18dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -104,6 +151,7 @@
                     android:orientation="vertical">
 
                     <ImageView
+                        android:id="@+id/pendingStep1Icon"
                         android:layout_width="38dp"
                         android:layout_height="38dp"
                         android:background="@drawable/pending_step_number"
@@ -162,6 +210,7 @@
                     android:orientation="vertical">
 
                     <ImageView
+                        android:id="@+id/pendingStep2Icon"
                         android:layout_width="38dp"
                         android:layout_height="38dp"
                         android:background="@drawable/pending_step_circle_soft"
@@ -220,6 +269,7 @@
                     android:orientation="vertical">
 
                     <ImageView
+                        android:id="@+id/pendingStep3Icon"
                         android:layout_width="38dp"
                         android:layout_height="38dp"
                         android:background="@drawable/pending_step_circle_soft"
@@ -258,95 +308,121 @@
                         android:textSize="12.5sp" />
                 </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/pendingSheetVerifyBtn"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="20dp"
-            android:backgroundTint="@color/vg_green"
-            android:fontFamily="@font/poppins_bold"
-            android:includeFontPadding="false"
-            android:text="@string/pending_btn_post"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="15sp"
-            app:cornerRadius="14dp"
-            app:icon="@drawable/ic_pending_send"
-            app:iconGravity="textStart"
-            app:iconSize="18dp"
-            app:iconTint="@color/white" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/pendingSheetProofBtn"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="match_parent"
-            android:layout_height="46dp"
-            android:layout_marginTop="10dp"
-            android:fontFamily="@font/poppins_bold"
-            android:includeFontPadding="false"
-            android:textAllCaps="false"
-            android:textColor="@color/vg_green_dark"
-            android:textSize="13.5sp"
-            app:cornerRadius="14dp"
-            app:strokeColor="@color/vg_green"
-            app:strokeWidth="1.5dp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:background="@drawable/pending_footer_card"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingStart="14dp"
-            android:paddingTop="10dp"
-            android:paddingEnd="10dp"
-            android:paddingBottom="10dp">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/pendingCantReach"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/poppins_bold"
-                    android:includeFontPadding="false"
-                    android:textColor="@color/vg_dark"
-                    android:textSize="12.5sp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:fontFamily="@font/poppins"
-                    android:includeFontPadding="false"
-                    android:text="@string/pending_pay_skip"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="11.5sp" />
             </LinearLayout>
 
+            <FrameLayout
+                android:id="@+id/pendingPostWrap"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:layout_marginTop="18dp">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:layout_gravity="bottom"
+                    android:background="@drawable/btn_primary_shadow" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/pendingSheetVerifyBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:backgroundTint="@color/vg_green"
+                    android:fontFamily="@font/poppins_bold"
+                    android:includeFontPadding="false"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:letterSpacing="0.01"
+                    android:stateListAnimator="@null"
+                    android:text="@string/pending_btn_post"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    app:cornerRadius="18dp"
+                    app:icon="@drawable/ic_pending_send"
+                    app:iconGravity="textStart"
+                    app:iconPadding="10dp"
+                    app:iconSize="20dp"
+                    app:iconTint="@color/white" />
+            </FrameLayout>
+
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/pendingSheetPayBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginStart="10dp"
-                android:backgroundTint="@color/vg_dark"
+                android:id="@+id/pendingSheetProofBtn"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="@color/white"
                 android:fontFamily="@font/poppins_bold"
                 android:includeFontPadding="false"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:paddingStart="14dp"
-                android:paddingEnd="14dp"
+                android:letterSpacing="0.01"
                 android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="13sp"
-                app:cornerRadius="10dp" />
+                android:textColor="@color/vg_green_dark"
+                android:textSize="14sp"
+                app:cornerRadius="18dp"
+                app:strokeColor="@color/vg_green"
+                app:strokeWidth="1.5dp" />
+
+            <LinearLayout
+                android:id="@+id/pendingFooterCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/pending_footer_card"
+                android:elevation="2dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingTop="12dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="12dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/pendingCantReach"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/poppins_bold"
+                        android:includeFontPadding="false"
+                        android:textColor="@color/vg_dark"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:fontFamily="@font/poppins"
+                        android:includeFontPadding="false"
+                        android:text="@string/pending_pay_skip"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/pendingSheetPayBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="42dp"
+                    android:layout_marginStart="10dp"
+                    android:backgroundTint="@color/vg_dark"
+                    android:fontFamily="@font/poppins_bold"
+                    android:includeFontPadding="false"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:letterSpacing="0.01"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:stateListAnimator="@null"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="13.5sp"
+                    app:cornerRadius="14dp" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
