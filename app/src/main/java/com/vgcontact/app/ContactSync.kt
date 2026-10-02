@@ -150,6 +150,36 @@ object ContactSync {
         return n
     }
 
+    /** The insert steps for contacts saved as "<name> VGC<n>": 3 steps per contact. */
+    private fun buildInsertOps(items: List<Pair<SupabaseClient.SyncContact, Int>>): ArrayList<ContentProviderOperation> {
+        val ops = ArrayList<ContentProviderOperation>()
+        for ((c, n) in items) {
+            val index = ops.size
+            ops.add(
+                ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
+                    .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+                    .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null)
+                    .build()
+            )
+            ops.add(
+                ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, index)
+                    .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+                    .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, "${c.name} $TAG$n")
+                    .build()
+            )
+            ops.add(
+                ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, index)
+                    .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+                    .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, c.phone)
+                    .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)
+                    .build()
+            )
+        }
+        return ops
+    }
+
     /** Removes every contact this app saved (name ends in VGC<N>). Returns how many were removed. */
     fun deleteAll(context: Context): Int {
         if (!hasPermission(context)) return 0
@@ -157,7 +187,14 @@ object ContactSync {
         return deleteRawContacts(context, scanVgcContacts(context).map { it.rawId })
     }
 
-    fun run(context: Context, userId: String): Result {
+    // Only one sync at a time (permission screen, Home, background worker): two runs at once
+    // could both see a number as missing and save it twice. The second run waits, then finds
+    // the contacts already on the phone.
+    private val runLock = Any()
+
+    fun run(context: Context, userId: String): Result = synchronized(runLock) { runLocked(context, userId) }
+
+    private fun runLocked(context: Context, userId: String): Result {
         if (BanPrefs.isBanned(context)) return Result(0, 0, ERR_BANNED)
         if (SyncPrefs.isPaused(context)) return Result(0, 0, ERR_PAUSED)
         if (!SupabaseClient.isOnline(context)) return Result(0, 0, ERR_NO_INTERNET)
@@ -190,38 +227,28 @@ object ContactSync {
         var added = 0
         var failed = 0
         for (batch in missing.chunked(50)) {
-            val ops = ArrayList<ContentProviderOperation>()
+            // Give each contact its VGC number first, then save the whole batch in one go.
+            val numbered = ArrayList<Pair<SupabaseClient.SyncContact, Int>>()
             for (c in batch) {
-                val index = ops.size
                 val n = lowestFreeNumber(numbersInUse)
                 numbersInUse.add(n)
-                ops.add(
-                    ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
-                        .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
-                        .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null)
-                        .build()
-                )
-                ops.add(
-                    ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
-                        .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, index)
-                        .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
-                        .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, "${c.name} $TAG$n")
-                        .build()
-                )
-                ops.add(
-                    ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
-                        .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, index)
-                        .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
-                        .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, c.phone)
-                        .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)
-                        .build()
-                )
+                numbered.add(c to n)
             }
             try {
-                context.contentResolver.applyBatch(ContactsContract.AUTHORITY, ops)
-                added += batch.size
+                context.contentResolver.applyBatch(ContactsContract.AUTHORITY, buildInsertOps(numbered))
+                added += numbered.size
             } catch (e: Exception) {
-                failed += batch.size
+                // The batch failed: one bad number must not cost the other contacts.
+                // Retry them one by one so only the bad one is lost.
+                for (item in numbered) {
+                    try {
+                        context.contentResolver.applyBatch(ContactsContract.AUTHORITY, buildInsertOps(listOf(item)))
+                        added += 1
+                    } catch (e2: Exception) {
+                        failed += 1
+                        numbersInUse.remove(item.second)
+                    }
+                }
             }
         }
         SyncPrefs.recordAdded(context, added)

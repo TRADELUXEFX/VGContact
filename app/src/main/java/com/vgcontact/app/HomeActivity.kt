@@ -225,6 +225,8 @@ class HomeActivity : AppCompatActivity() {
         }.start()
     }
 
+    private var contactsWereOn: Boolean? = null
+
     private fun showHome(h: SupabaseClient.HomeData) {
         findViewById<View>(R.id.home_limits_loading).visibility = View.GONE
         findViewById<View>(R.id.home_limits_block).visibility = View.VISIBLE
@@ -344,6 +346,10 @@ class HomeActivity : AppCompatActivity() {
         loadHome()
         refreshUnreadBadge()
         updatePermissionBanner()
+        // Contacts were off and are now on (turned on in the phone's Settings): sync right away.
+        val contactsOn = ContactSync.hasPermission(this)
+        if (contactsWereOn == false && contactsOn && !SyncPrefs.isPaused(this)) startSync()
+        contactsWereOn = contactsOn
         BannedHandler.checkWithServer(this)
         // "New version ready" pop-up. Skipped (soft only) while the pending sheet is up.
         // The red banner shows right away from what the phone remembers, then the server confirms.
@@ -456,6 +462,18 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun openBatterySettings() {
+        // First choice: the one-tap system pop-up "Allow VGContact to always run in the
+        // background?" (needs REQUEST_IGNORE_BATTERY_OPTIMIZATIONS in the manifest).
+        // If the phone refuses it, fall back to the battery settings list, then app settings.
+        try {
+            startActivity(
+                Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                    .setData(Uri.parse("package:$packageName"))
+            )
+            return
+        } catch (e: Exception) {
+            // fall through
+        }
         try {
             startActivity(Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
         } catch (e: Exception) {
