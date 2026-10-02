@@ -70,6 +70,9 @@ class HomeActivity : AppCompatActivity() {
 
         findViewById<LinearLayout>(R.id.permissionBanner).setOnClickListener { fixPermissions() }
         // Pending users: the strip brings the verify sheet back.
+        findViewById<LinearLayout>(R.id.updateBanner).setOnClickListener {
+            AppUpdatePrompt.openPending(this)
+        }
         findViewById<LinearLayout>(R.id.pendingBanner).setOnClickListener {
             PendingPrompt.showGate(this)
         }
@@ -316,7 +319,12 @@ class HomeActivity : AppCompatActivity() {
         updatePermissionBanner()
         BannedHandler.checkWithServer(this)
         // "New version ready" pop-up. Skipped (soft only) while the pending sheet is up.
-        AppUpdatePrompt.check(this) { !onboardingActive }
+        // The red banner shows right away from what the phone remembers, then the server confirms.
+        val updateBanner = findViewById<View>(R.id.updateBanner)
+        updateBanner.visibility = if (AppUpdatePrompt.hasPendingUpdate(this)) View.VISIBLE else View.GONE
+        AppUpdatePrompt.check(this, { !onboardingActive }) { show ->
+            updateBanner.visibility = if (show) View.VISIBLE else View.GONE
+        }
     }
 
     // ---------------- "your sync stopped" help ----------------

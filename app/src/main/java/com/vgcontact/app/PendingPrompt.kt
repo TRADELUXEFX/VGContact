@@ -159,7 +159,7 @@ object PendingPrompt {
         val minViews = PendingConfig.minViews(activity)
         val payAmount = PendingConfig.payAmount(activity)
         val hours = PendingConfig.verifyHours(activity)
-        view.findViewById<TextView>(R.id.pendingTitle).text = activity.getString(R.string.pending_title, viewers)
+        view.findViewById<TextView>(R.id.pendingViewers).text = viewers
         view.findViewById<TextView>(R.id.pendingStep2Title).text = activity.getString(R.string.pending_step2_title, minViews)
         view.findViewById<TextView>(R.id.pendingStep3Desc).text =
             activity.getString(R.string.pending_step3_desc, SupportContact.displayNumber(), hours)

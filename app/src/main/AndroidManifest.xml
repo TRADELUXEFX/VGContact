@@ -16,10 +16,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.VGContact">
 
-        <meta-data
-            android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts" />
-
         <!-- Onboarding / Registration Screen. App's launcher activity.
              Uses the dark splash theme ONLY for the moment Android shows
              the launch window; RegisterActivity.onCreate() switches to

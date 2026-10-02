@@ -97,26 +97,40 @@
                 </LinearLayout>
 
                 <TextView
-                    android:id="@+id/pendingTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:fontFamily="@font/poppins_bold_bundled"
-                    android:includeFontPadding="false"
-                    android:lineSpacingExtra="1dp"
-                    android:textColor="@color/white"
-                    android:textSize="25sp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:alpha="0.9"
+                    android:layout_marginTop="16dp"
                     android:fontFamily="@font/poppins_regular_bundled"
                     android:includeFontPadding="false"
                     android:text="@string/pending_subtitle"
                     android:textColor="@color/white"
-                    android:textSize="13sp" />
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/pendingViewers"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:autoSizeMaxTextSize="68sp"
+                    android:autoSizeMinTextSize="36sp"
+                    android:autoSizeStepGranularity="2sp"
+                    android:autoSizeTextType="uniform"
+                    android:fontFamily="@font/poppins_bold_bundled"
+                    android:includeFontPadding="false"
+                    android:letterSpacing="-0.02"
+                    android:maxLines="1"
+                    android:textColor="@color/white"
+                    android:textSize="68sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/poppins_bold_bundled"
+                    android:includeFontPadding="false"
+                    android:text="@string/pending_viewers_label"
+                    android:textColor="@color/white"
+                    android:textSize="30sp" />
             </LinearLayout>
         </FrameLayout>
 

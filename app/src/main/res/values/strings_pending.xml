@@ -9,8 +9,8 @@
 
     <!-- Pending bottom sheet. %1$s style values are filled in by PendingPrompt. -->
     <string name="pending_free_pill">FREE</string>
-    <string name="pending_title">Unlock %1$s status viewers</string>
-    <string name="pending_subtitle">Follow these 3 steps to get verified</string>
+    <string name="pending_viewers_label">status viewers</string>
+    <string name="pending_subtitle">Follow these 3 steps to unlock</string>
     <string name="pending_close">Close</string>
     <string name="pending_step1_title">Post our status</string>
     <string name="pending_step1_desc">Tap below. We open WhatsApp with the image ready.</string>

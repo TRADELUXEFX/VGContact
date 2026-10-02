@@ -12,4 +12,7 @@
     <string name="update_btn_later">Maybe later</string>
     <string name="update_close">Close</string>
     <string name="update_msg_support">Hi VGContact, I need to update my app but couldn\'t open the update link. Can you help me update?</string>
+    <string name="update_banner_title">Update available</string>
+    <string name="update_banner_sub">Install the new version to keep going</string>
+    <string name="update_banner_action">Update</string>
 </resources>

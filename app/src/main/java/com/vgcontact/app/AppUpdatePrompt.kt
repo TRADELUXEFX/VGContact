@@ -35,6 +35,8 @@ object AppUpdatePrompt {
     private const val PREFS = "vg_app_update"
     private const val KEY_LAST_BUILD = "last_shown_build"
     private const val KEY_LAST_DAY = "last_shown_day"
+    private const val KEY_PENDING_BUILD = "pending_build"
+    private const val KEY_PENDING_URL = "pending_url"
 
     private var visible = false
     private var softDialog: BottomSheetDialog? = null
@@ -42,6 +44,33 @@ object AppUpdatePrompt {
     /** Closes a dismissible update sheet if one is open (the pending sheet takes priority). */
     fun dismissSoft() {
         softDialog?.dismiss()
+    }
+
+    /**
+     * True while a newer build is known and this app hasn't been updated yet. Remembered on the
+     * phone, so the red banner shows instantly on Home (even offline) and survives "Maybe later".
+     */
+    fun hasPendingUpdate(context: Context): Boolean {
+        val build = currentBuild()
+        if (build <= 0) return false
+        val pending = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getInt(KEY_PENDING_BUILD, 0)
+        return pending > build
+    }
+
+    /** Opens the download link for the remembered update (used by the red banner). */
+    fun openPending(activity: Activity) {
+        val url = activity.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_PENDING_URL, "") ?: ""
+        openUpdate(activity, url)
+    }
+
+    private fun rememberPending(context: Context, latest: Int, url: String) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .putInt(KEY_PENDING_BUILD, latest).putString(KEY_PENDING_URL, url).apply()
+    }
+
+    private fun clearPending(context: Context) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .remove(KEY_PENDING_BUILD).remove(KEY_PENDING_URL).apply()
     }
 
     /** The build number of the running app (GitHub run number), 0 for local builds. */
@@ -53,7 +82,7 @@ object AppUpdatePrompt {
      * is on screen, so the two never stack; the soft pop-up then simply waits for the next Home
      * open. A forced update is always shown.
      */
-    fun check(activity: Activity, allowSoft: () -> Boolean) {
+    fun check(activity: Activity, allowSoft: () -> Boolean, onBanner: (Boolean) -> Unit = {}) {
         val build = currentBuild()
         if (build <= 0 || visible) return
         thread {
@@ -61,12 +90,19 @@ object AppUpdatePrompt {
                 if (row == null) return@fetchAppUpdate
                 val force = row.optBoolean("force_update", false)
                 val available = row.optBoolean("update_available", false)
-                if (!force && !available) return@fetchAppUpdate
                 val latest = row.optInt("latest_build", 0)
                 val url = row.optString("download_url", "")
                 val notes = row.optString("notes", "")
+                if (!force && !available) {
+                    // Up to date (or the update was unpublished): drop the red banner.
+                    clearPending(activity)
+                    activity.runOnUiThread { if (!activity.isFinishing) onBanner(false) }
+                    return@fetchAppUpdate
+                }
+                rememberPending(activity, latest, url)
                 activity.runOnUiThread {
                     if (activity.isFinishing || activity.isDestroyed) return@runOnUiThread
+                    onBanner(true)
                     if (force) {
                         show(activity, latest, url, notes, force = true)
                     } else if (allowSoft() && shouldShowSoft(activity, latest)) {

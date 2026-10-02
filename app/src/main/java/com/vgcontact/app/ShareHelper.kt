@@ -161,7 +161,7 @@ object ShareHelper {
         }
         c.drawRoundRect(card, 48f, 48f, border)
         val label = paint(38f, gray, regular)
-        val labelText = "Join with my number"
+        val labelText = "My referral number"
         val rowW = 52f + 16f + label.measureText(labelText)
         val left = cx - rowW / 2f
         c.drawCircle(left + 26f, 590f, 26f, fill(tint))
@@ -174,8 +174,8 @@ object ShareHelper {
 
         // Three numbered steps.
         val xs = floatArrayOf(190f, 540f, 890f)
-        val titles = arrayOf("Download", "Enter my number", "Get free")
-        val subs = arrayOf("the app", "when you sign up", "500+ status viewers")
+        val titles = arrayOf("Download", "Enter referral", "Get free")
+        val subs = arrayOf("the app", "number at sign up", "500+ status viewers")
         val rail = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             strokeWidth = 4f
             color = line
