@@ -98,11 +98,6 @@ class PermissionsActivity : AppCompatActivity() {
     private fun nextAfterNotifications(): Step =
         if (batteryRestricted()) Step.BATTERY else Step.DONE
 
-    private fun notificationsGranted(): Boolean =
-        Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
-            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
-            PackageManager.PERMISSION_GRANTED
-
     private fun showStep(step: Step) {
         currentStep = step
         when (step) {
