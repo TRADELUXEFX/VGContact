@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Static (bundled) Poppins: no Google Play services download, so the weights always render. -->
+<!-- No SemiBold file in the project yet: uses Poppins Medium. Replace with Poppins-SemiBold.ttf when available. -->
 <font-family xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <font
-        android:font="@font/poppins_bold_bundled"
+        android:font="@font/poppins_medium_bundled"
         android:fontStyle="normal"
         android:fontWeight="600"
-        app:font="@font/poppins_bold_bundled"
+        app:font="@font/poppins_medium_bundled"
         app:fontStyle="normal"
         app:fontWeight="600" />
 </font-family>

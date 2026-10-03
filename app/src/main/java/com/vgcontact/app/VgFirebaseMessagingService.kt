@@ -94,7 +94,7 @@ class VgFirebaseMessagingService : FirebaseMessagingService() {
         showNotification(
             title,
             body,
-            message.data[NotificationRouter.EXTRA_ACTION],
+            NotificationRouter.resolveAction(title, message.data[NotificationRouter.EXTRA_ACTION]),
             message.data[NotificationRouter.EXTRA_TARGET],
             notificationId
         )

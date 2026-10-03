@@ -10,9 +10,6 @@ import android.view.View
 import android.widget.TextView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import kotlin.concurrent.thread
 
 /**
@@ -22,7 +19,8 @@ import kotlin.concurrent.thread
  * supabase/migrations/add_app_update.sql). On every Home open the app asks get_app_update() with
  * its own build number (the number at the end of versionName, e.g. 954 in v1.0.954).
  *
- *  - A newer build exists: a dismissible sheet, shown at most once a day per build.
+ *  - A newer build exists: a dismissible sheet, shown every time the user opens the app
+ *    (once per open; "Maybe later" hides it until the app is closed and opened again).
  *  - This build is below update_min_build: a sheet that can't be closed (no back, no tap outside,
  *    no Maybe later), shown on every Home open until the user updates.
  *
@@ -33,12 +31,20 @@ import kotlin.concurrent.thread
 object AppUpdatePrompt {
 
     private const val PREFS = "vg_app_update"
-    private const val KEY_LAST_BUILD = "last_shown_build"
-    private const val KEY_LAST_DAY = "last_shown_day"
     private const val KEY_PENDING_BUILD = "pending_build"
     private const val KEY_PENDING_URL = "pending_url"
 
     private var visible = false
+
+    // True once the soft pop-up has been shown since the user last entered the app. It is
+    // reset by VGApp when every screen of the app has been closed, so the pop-up comes back
+    // each time the app is opened again, and "Maybe later" only hides it until then.
+    @Volatile private var shownThisLaunch = false
+
+    /** Called by VGApp when the app was fully closed: the pop-up may show again on the next open. */
+    fun newLaunch() {
+        shownThisLaunch = false
+    }
     private var softDialog: BottomSheetDialog? = null
 
     /** Closes a dismissible update sheet if one is open (the pending sheet takes priority). */
@@ -61,6 +67,56 @@ object AppUpdatePrompt {
     fun openPending(activity: Activity) {
         val url = activity.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_PENDING_URL, "") ?: ""
         openUpdate(activity, url)
+    }
+
+    /**
+     * Opens the update download page from anywhere (a tapped "Update available" notification,
+     * with the app open or closed). Uses the link remembered on the phone; if none is saved yet,
+     * asks the server first. Does nothing but a short message when the app is already up to date.
+     */
+    fun openLatest(context: Context) {
+        val saved = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .getString(KEY_PENDING_URL, "") ?: ""
+        if (hasPendingUpdate(context) && saved.isNotBlank()) {
+            launchUpdate(context, saved)
+            return
+        }
+        val app = context.applicationContext
+        thread {
+            SupabaseClient.fetchAppUpdate(currentBuild()) { row ->
+                val available = row != null &&
+                    (row.optBoolean("update_available", false) || row.optBoolean("force_update", false))
+                val url = row?.optString("download_url", "").orEmpty()
+                android.os.Handler(android.os.Looper.getMainLooper()).post {
+                    when {
+                        available && url.isNotBlank() -> {
+                            rememberPending(app, row!!.optInt("latest_build", 0), url)
+                            launchUpdate(context, url)
+                        }
+                        row == null -> android.widget.Toast.makeText(
+                            app, "Couldn't reach the server. Try again.", android.widget.Toast.LENGTH_LONG
+                        ).show()
+                        else -> android.widget.Toast.makeText(
+                            app, "You already have the latest version", android.widget.Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun launchUpdate(context: Context, url: String) {
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            if (context !is Activity) intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            if (context is Activity) {
+                SupportContact.openSupport(context, context.getString(R.string.update_msg_support))
+            } else {
+                android.widget.Toast.makeText(context, "Couldn't open the update page", android.widget.Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     private fun rememberPending(context: Context, latest: Int, url: String) {
@@ -113,16 +169,12 @@ object AppUpdatePrompt {
         }
     }
 
-    private fun today(): String = SimpleDateFormat("yyyyMMdd", Locale.US).format(Date())
+    @Suppress("UNUSED_PARAMETER")
+    private fun shouldShowSoft(context: Context, latest: Int): Boolean = !shownThisLaunch
 
-    private fun shouldShowSoft(context: Context, latest: Int): Boolean {
-        val p = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        return !(p.getInt(KEY_LAST_BUILD, 0) == latest && p.getString(KEY_LAST_DAY, "") == today())
-    }
-
+    @Suppress("UNUSED_PARAMETER")
     private fun markShown(context: Context, latest: Int) {
-        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
-            .putInt(KEY_LAST_BUILD, latest).putString(KEY_LAST_DAY, today()).apply()
+        shownThisLaunch = true
     }
 
     private fun show(activity: Activity, latest: Int, url: String, notes: String, force: Boolean) {

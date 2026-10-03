@@ -77,9 +77,10 @@ class NotificationsActivity : AppCompatActivity() {
             row.findViewById<TextView>(R.id.notification_time).text = formatRelativeTime(notification.createdAt)
             row.findViewById<View>(R.id.notification_unread_dot).visibility =
                 if (notification.isRead) View.GONE else View.VISIBLE
-            if (!notification.action.isNullOrBlank() && notification.action != NotificationRouter.ACTION_HOME) {
+            val rowAction = NotificationRouter.resolveAction(notification.title, notification.action)
+            if (!rowAction.isNullOrBlank() && rowAction != NotificationRouter.ACTION_HOME) {
                 row.setOnClickListener {
-                    NotificationRouter.run(this, notification.action, notification.target)
+                    NotificationRouter.run(this, rowAction, notification.target)
                 }
             }
             container.addView(row)

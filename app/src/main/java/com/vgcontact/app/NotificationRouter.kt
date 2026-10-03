@@ -29,6 +29,19 @@ object NotificationRouter {
     const val ACTION_DOWNLOADS = "open_downloads"
     const val ACTION_HOME = "open_home"
     const val ACTION_FIX_SYNC = "fix_sync"   // "your sync stopped" nudge from the server
+    const val ACTION_UPDATE = "open_update"  // "Update available": opens the update download page
+
+    /**
+     * The "Update available" notification is sent by the admin page with action open_home.
+     * Treat it as open_update so tapping it (push or Notifications feed) goes straight to
+     * the update page. A notification already carrying a real action is left alone.
+     */
+    fun resolveAction(title: String?, action: String?): String? {
+        val plain = action.isNullOrBlank() || action == ACTION_HOME
+        return if (plain && title?.trim()?.startsWith("Update available", ignoreCase = true) == true) {
+            ACTION_UPDATE
+        } else action
+    }
 
     /** Keys to copy onto an Intent so they survive a hop to another activity. */
     fun putExtras(intent: Intent, action: String?, target: String?, notificationId: String? = null): Intent {
@@ -98,6 +111,10 @@ object NotificationRouter {
                     if (context !is android.app.Activity) home.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     context.startActivity(home)
                 }
+                true
+            }
+            ACTION_UPDATE -> {
+                AppUpdatePrompt.openLatest(context)
                 true
             }
             ACTION_DOWNLOADS -> {

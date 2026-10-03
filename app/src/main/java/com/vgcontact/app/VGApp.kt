@@ -15,6 +15,24 @@ class VGApp : Application() {
         super.onCreate()
         instance = this
         FloatingContactHelper.register(this)
+        // When the last screen of the app is closed (not just turned by a rotation), the
+        // next open counts as a new entry and the update pop-up shows again.
+        registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
+            private var live = 0
+            override fun onActivityCreated(activity: android.app.Activity, savedInstanceState: android.os.Bundle?) { live++ }
+            override fun onActivityDestroyed(activity: android.app.Activity) {
+                live--
+                if (live <= 0) {
+                    live = 0
+                    if (!activity.isChangingConfigurations) AppUpdatePrompt.newLaunch()
+                }
+            }
+            override fun onActivityStarted(activity: android.app.Activity) {}
+            override fun onActivityResumed(activity: android.app.Activity) {}
+            override fun onActivityPaused(activity: android.app.Activity) {}
+            override fun onActivityStopped(activity: android.app.Activity) {}
+            override fun onActivitySaveInstanceState(activity: android.app.Activity, outState: android.os.Bundle) {}
+        })
         createNotificationChannel()
         DailySyncWorker.schedule(this)
     }
