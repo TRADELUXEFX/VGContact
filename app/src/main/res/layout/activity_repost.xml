@@ -295,6 +295,75 @@
 
                 </LinearLayout>
 
+                <!-- Free reposts progress: segments fill as verified reposts
+                     come in (cap set by FREE_REPOST_CAP in RepostActivity). -->
+                <LinearLayout
+                    android:id="@+id/free_repost_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/card_background"
+                    android:padding="16dp"
+                    android:layout_marginBottom="12dp"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="FREE REPOSTS"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.05"
+                            android:textColor="@color/text_muted" />
+
+                        <TextView
+                            android:id="@+id/free_repost_pill"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/free_repost_pill_background"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:paddingTop="4dp"
+                            android:paddingBottom="4dp"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/pending_pill_text" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/free_repost_segments"
+                        android:layout_width="match_parent"
+                        android:layout_height="12dp"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal" />
+
+                    <TextView
+                        android:fontFamily="@font/poppins_bold"
+                        android:includeFontPadding="false"
+                        android:id="@+id/free_repost_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:textSize="26sp"
+                        android:textColor="@color/vg_dark" />
+
+                    <TextView
+                        android:id="@+id/free_repost_msg"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:textSize="13sp"
+                        android:textColor="@color/text_secondary" />
+
+                </LinearLayout>
+
                 <!-- Streak card -->
                 <LinearLayout
                     android:layout_width="match_parent"

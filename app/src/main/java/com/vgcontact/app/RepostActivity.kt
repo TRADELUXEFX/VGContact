@@ -38,6 +38,8 @@ class RepostActivity : AppCompatActivity() {
     companion object {
         private const val PREF_TODAYS_TASK_DISMISSED = "todays_task_dismissed"
         private const val BOARD_PAGE_SIZE = 10
+        // Matches the server setting free_repost_cap. Change both together.
+        private const val FREE_REPOST_CAP = 3
     }
 
     private lateinit var sessionManager: SessionManager
@@ -127,9 +129,71 @@ class RepostActivity : AppCompatActivity() {
         buyViewersBtn.setOnClickListener { openBuyViewers() }
 
         refreshTodayStatus()
+        refreshFreeReposts()
 
         setupBottomNav()
         FloatingContactHelper.attach(this)
+    }
+
+    // ---------------- free reposts progress ----------------
+
+    private fun refreshFreeReposts() {
+        val userId = sessionManager.getUserId()
+        if (userId.isNullOrBlank()) return
+        thread {
+            SupabaseClient.fetchHome(userId) { success, home ->
+                if (!success || home == null) return@fetchHome
+                runOnUiThread { bindFreeReposts(home.verifiedReposts) }
+            }
+        }
+    }
+
+    private fun bindFreeReposts(verified: Int) {
+        val done = verified.coerceIn(0, FREE_REPOST_CAP)
+        val left = FREE_REPOST_CAP - done
+        val density = resources.displayMetrics.density
+
+        val segments = findViewById<LinearLayout>(R.id.free_repost_segments)
+        segments.removeAllViews()
+        for (i in 0 until FREE_REPOST_CAP) {
+            val color = when {
+                i < done -> R.color.vg_green
+                i == done -> R.color.card_border   // the next one to fill
+                else -> R.color.gray_light
+            }
+            val seg = View(this).apply {
+                background = android.graphics.drawable.GradientDrawable().apply {
+                    cornerRadius = 99 * density
+                    setColor(ContextCompat.getColor(this@RepostActivity, color))
+                }
+            }
+            segments.addView(seg, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f).apply {
+                if (i > 0) marginStart = (6 * density).toInt()
+            })
+        }
+
+        val pill = findViewById<TextView>(R.id.free_repost_pill)
+        pill.text = if (left == 0) "Complete" else "$left to go"
+
+        val count = findViewById<TextView>(R.id.free_repost_count)
+        count.text = android.text.SpannableString("$done of $FREE_REPOST_CAP done").apply {
+            val start = done.toString().length
+            setSpan(
+                android.text.style.RelativeSizeSpan(0.55f), start, length,
+                android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            setSpan(
+                android.text.style.ForegroundColorSpan(ContextCompat.getColor(this@RepostActivity, R.color.text_muted)),
+                start, length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        findViewById<TextView>(R.id.free_repost_msg).text = when {
+            left == 0 -> "All $FREE_REPOST_CAP free reposts done. Keep reposting to climb the board."
+            left == 1 -> "One more verified repost brings you more viewers."
+            else -> "$left more verified reposts bring you more viewers."
+        }
+        findViewById<View>(R.id.free_repost_card).visibility = View.VISIBLE
     }
 
     private fun dismissTodaysTask() {
@@ -153,6 +217,7 @@ class RepostActivity : AppCompatActivity() {
         // Covers the case where verification landed while the user was
         // away from this screen (e.g. reopening the app the next day).
         refreshTodayStatus()
+        refreshFreeReposts()
         if (onBoardTab) loadBoard()
     }
 
