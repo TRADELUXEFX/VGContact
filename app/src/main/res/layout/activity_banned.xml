@@ -58,6 +58,14 @@
                 android:paddingTop="24dp"
                 android:paddingBottom="16dp">
 
+                <ImageView
+                    android:layout_width="200dp"
+                    android:layout_height="160dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="16dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ill_banned" />
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

@@ -193,6 +193,7 @@ class ReferralActivity : AppCompatActivity() {
         listBox.removeAllViews()
         pagerScroll.visibility = View.GONE
         listMessage.visibility = View.GONE; listSpinner.visibility = View.VISIBLE
+        listMessage.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
         if (stack.isEmpty()) totalPill.visibility = View.INVISIBLE
         if (userId.isBlank()) {
             listSpinner.visibility = View.GONE
@@ -243,7 +244,9 @@ class ReferralActivity : AppCompatActivity() {
         if (filtered.isEmpty()) {
             listSpinner.visibility = View.GONE
             listMessage.visibility = View.VISIBLE
-            listMessage.text = if (all.isEmpty()) "No referrals yet." else "No matches."
+            listMessage.text = if (all.isEmpty()) "No referrals yet.\nShare your link to invite people." else "No matches."
+            listMessage.compoundDrawablePadding = 12
+            listMessage.setCompoundDrawablesWithIntrinsicBounds(0, if (all.isEmpty()) R.drawable.ill_referrals_empty else 0, 0, 0)
             pagerScroll.visibility = View.GONE
             return
         }

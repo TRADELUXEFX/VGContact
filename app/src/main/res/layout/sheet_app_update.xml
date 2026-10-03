@@ -129,6 +129,15 @@
             android:paddingEnd="16dp"
             android:paddingBottom="32dp">
 
+            <ImageView
+                android:layout_width="160dp"
+                android:layout_height="128dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="8dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ill_update" />
+
+
             <LinearLayout
                 android:id="@+id/updateNotesCard"
                 android:layout_width="match_parent"
