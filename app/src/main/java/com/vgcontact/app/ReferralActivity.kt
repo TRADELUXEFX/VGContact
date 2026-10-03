@@ -273,10 +273,18 @@ class ReferralActivity : AppCompatActivity() {
             setPadding(0, dp(14), 0, dp(14))
         }
 
+        val pendingColor = ContextCompat.getColor(this, R.color.pending_pill_text)
         val avatar = ImageView(this).apply {
-            setImageResource(R.drawable.ic_profile_person)
-            setColorFilter(ContextCompat.getColor(this@ReferralActivity, R.color.vg_green))
-            background = ContextCompat.getDrawable(this@ReferralActivity, R.drawable.referral_avatar_background)
+            if (item.isPending) {
+                // Not verified yet: dashed amber ring with a clock, row slightly faded.
+                setImageResource(R.drawable.ic_clock_small)
+                setColorFilter(pendingColor)
+                background = ContextCompat.getDrawable(this@ReferralActivity, R.drawable.pending_avatar_background)
+            } else {
+                setImageResource(R.drawable.ic_profile_person)
+                setColorFilter(ContextCompat.getColor(this@ReferralActivity, R.color.vg_green))
+                background = ContextCompat.getDrawable(this@ReferralActivity, R.drawable.referral_avatar_background)
+            }
             setPadding(dp(7), dp(7), dp(7), dp(7))
             layoutParams = LinearLayout.LayoutParams(dp(34), dp(34))
         }
@@ -315,21 +323,26 @@ class ReferralActivity : AppCompatActivity() {
                 background = ContextCompat.getDrawable(this@ReferralActivity, R.drawable.freq_summary_pill_background)
                 setPadding(dp(12), dp(6), dp(12), dp(6))
             }
+            if (item.isPending) {
+                // Not verified yet: the pill just says "Pending" (amber) instead of the invite count.
+                pill.background = ContextCompat.getDrawable(this, R.drawable.pending_pill_background)
+            }
             pill.addView(TextView(this).apply {
-                text = if (count > 0) "$count invited" else "no invites yet"
+                text = if (item.isPending) "Pending" else if (count > 0) "$count invited" else "no invites yet"
                 textSize = 12f
                 setTextColor(
-                    ContextCompat.getColor(
+                    if (item.isPending) pendingColor
+                    else ContextCompat.getColor(
                         this@ReferralActivity,
                         if (count > 0) R.color.vg_green else R.color.text_muted
                     )
                 )
-                if (count > 0) setTypeface(typeface, android.graphics.Typeface.BOLD)
+                if (item.isPending || count > 0) setTypeface(typeface, android.graphics.Typeface.BOLD)
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
                 )
             })
-            if (count > 0) {
+            if (count > 0 && !item.isPending) {
                 pill.addView(ImageView(this).apply {
                     setImageResource(R.drawable.ic_chevron_right)
                     setColorFilter(ContextCompat.getColor(this@ReferralActivity, R.color.vg_green))
@@ -348,6 +361,14 @@ class ReferralActivity : AppCompatActivity() {
             line.addView(nudgeIcon(item))
         }
 
+        if (item.isPending) {
+            // Tapping a pending person explains what "Pending" means (works at every level).
+            row.alpha = 0.85f
+            row.isClickable = true
+            row.isFocusable = true
+            row.setOnClickListener { showPendingInfo(item) }
+        }
+
         row.addView(line)
         if (divider) {
             row.addView(View(this).apply {
@@ -356,6 +377,26 @@ class ReferralActivity : AppCompatActivity() {
             })
         }
         return row
+    }
+
+    // Explains the amber "Pending" mark. Two buttons only: Got it (closes) and Message (WhatsApp).
+    private fun showPendingInfo(item: SupabaseClient.MyReferral) {
+        val name = if (showNumber) {
+            if (item.phone.isNotBlank()) formatPhone(item.phone) else item.username
+        } else {
+            if (item.username.isNotBlank()) item.username else formatPhone(item.phone)
+        }
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this, R.style.VGRoundedAlertDialog)
+            .setTitle("Pending verification")
+            .setMessage(
+                "$name joined with your code but hasn't finished verification yet.\n\n" +
+                "Until an admin approves their first task, they aren't placed in a group. " +
+                "This changes to normal by itself once they're verified.\n\n" +
+                "Tap Message to remind them to complete it."
+            )
+            .setPositiveButton("Got it", null)
+            .setNeutralButton("Message") { _, _ -> openWhatsApp(item.phone) }
+            .show().also { RoundedDialog.style(it) }
     }
 
     // Round message button, shown outside the invite pill (same style as the

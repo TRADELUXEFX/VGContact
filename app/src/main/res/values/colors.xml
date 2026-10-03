@@ -55,4 +55,6 @@
     <!-- Warning -->
     <color name="warning_red">#D9534F</color>
 
+    <color name="pending_pill_bg">#FDF1DA</color>
+    <color name="pending_pill_text">#8A5A00</color>
 </resources>

@@ -237,7 +237,10 @@ object SupabaseClient {
         val username: String,
         val phone: String,
         val createdAt: String,
-        val invitedCount: Int
+        val invitedCount: Int,
+        // True while the person has not been verified yet (still waiting for approval).
+        // False when verified, or when the server could not tell (older server).
+        val isPending: Boolean = false
     )
 
     // The people one user referred. targetUserId = null gives the caller's own
@@ -262,6 +265,24 @@ object SupabaseClient {
                     invitedCount = r.optInt("invited_count", 0)
                 )
             )
+        }
+        // Who is still pending (not verified yet). Optional: if the server function is
+        // missing or fails, nobody is marked pending and the list looks as before.
+        try {
+            val status = rpc("get_my_referrals_status", params)
+            if (status != null) {
+                val pending = HashSet<String>()
+                for (i in 0 until status.length()) {
+                    val r = status.getJSONObject(i)
+                    if (!r.optBoolean("is_verified", true)) pending.add(r.optString("user_id"))
+                }
+                if (pending.isNotEmpty()) {
+                    for (i in out.indices) {
+                        if (out[i].userId in pending) out[i] = out[i].copy(isPending = true)
+                    }
+                }
+            }
+        } catch (_: Exception) {
         }
         return out
     }
