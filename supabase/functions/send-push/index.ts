@@ -183,7 +183,12 @@ Deno.serve(async (req) => {
           body: JSON.stringify({
             message: {
               token,
-              notification: { title: notif.title, body: notif.body },
+              // DATA-ONLY on purpose (no `notification` block). With a
+              // `notification` block Android draws the push itself while the app
+              // is closed and never starts our code, so nothing could sync the
+              // contacts. As data-only, VgFirebaseMessagingService.onMessageReceived
+              // runs every time (app open, background or closed), draws the
+              // notification itself and, when `sync` = "1", starts the contact sync.
               // Explicit high priority so Android delivers immediately,
               // including while the phone is in Doze mode.
               android: { priority: "HIGH" },
@@ -192,6 +197,12 @@ Deno.serve(async (req) => {
               // HomeActivity (background/killed - Firebase puts them in the
               // launch intent extras) and routes via NotificationRouter.
               data: {
+                title: String(notif.title ?? "VGContact"),
+                body: String(notif.body ?? ""),
+                // "Account verified" / "Repost verified": the user's contacts are
+                // ready, so the phone must sync now instead of waiting for the
+                // next scheduled run.
+                sync: notif.user_id && /verified/i.test(String(notif.title ?? "")) ? "1" : "0",
                 notification_id: String(notif.id),
                 action: notif.action ?? "open_home",
                 target: notif.target ?? "",

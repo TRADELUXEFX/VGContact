@@ -77,13 +77,18 @@ class VgFirebaseMessagingService : FirebaseMessagingService() {
             ?: message.data["body"]
             ?: ""
 
-        // onMessageReceived only runs when the app is in the foreground (for
-        // pushes with a "notification" payload). Background pushes are drawn
-        // by Android itself, so they are counted when tapped instead.
+        // Pushes are data-only (see send-push), so this runs whether the app is
+        // open, in the background or closed, and we draw the notification below.
         val notificationId = message.data[NotificationRouter.EXTRA_NOTIFICATION_ID]
         val userId = SessionManager(this).getUserId()
         if (!notificationId.isNullOrBlank() && !userId.isNullOrBlank()) {
             SupabaseClient.recordNotificationDelivered(userId, notificationId)
+        }
+
+        // "You are verified, your contacts are being added": start the contact sync
+        // now, in the background, without the user having to open the app.
+        if (message.data["sync"] == "1") {
+            DailySyncWorker.syncNow(applicationContext)
         }
 
         showNotification(

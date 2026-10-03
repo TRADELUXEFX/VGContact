@@ -112,6 +112,23 @@ class DailySyncWorker(context: Context, params: WorkerParameters) : CoroutineWor
         private const val WORK_NAME = "vgcontact_daily_contact_sync"
         private const val RETRY_WORK_NAME = "vgcontact_contact_sync_retry"
 
+        private const val PUSH_WORK_NAME = "vgcontact_push_contact_sync"
+
+        /**
+         * Runs one sync as soon as there is a connection. Called when a push says the
+         * user was just verified, so the contacts land on the phone without opening
+         * the app. REPLACE: several pushes in a row make one pending job, not a pile.
+         */
+        fun syncNow(context: Context) {
+            val request = OneTimeWorkRequestBuilder<DailySyncWorker>()
+                .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+                .setBackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS)
+                .build()
+            WorkManager.getInstance(context.applicationContext).enqueueUniqueWork(
+                PUSH_WORK_NAME, ExistingWorkPolicy.REPLACE, request
+            )
+        }
+
         /** Safe to call on every app start: an existing schedule is kept. */
         fun schedule(context: Context) = enqueue(context, ExistingPeriodicWorkPolicy.KEEP)
 
