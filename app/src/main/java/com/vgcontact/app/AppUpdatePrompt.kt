@@ -190,6 +190,33 @@ object AppUpdatePrompt {
         dialog.show()
     }
 
+    /** Handle app update from HomeActivity's bundle (called during initialization). */
+    fun handleUpdate(activity: Activity, updateRow: org.json.JSONObject?, allowSoft: () -> Boolean, onBanner: (Boolean) -> Unit) {
+        if (updateRow == null) {
+            onBanner(false)
+            return
+        }
+        val force = updateRow.optBoolean("force_update", false)
+        val available = updateRow.optBoolean("update_available", false)
+        val latest = updateRow.optInt("latest_build", 0)
+        val url = updateRow.optString("download_url", "")
+        val notes = updateRow.optString("notes", "")
+
+        if (!force && !available) {
+            clearPending(activity)
+            onBanner(false)
+            return
+        }
+
+        rememberPending(activity, latest, url)
+        onBanner(true)
+        if (force) {
+            show(activity, latest, url, notes, force = true)
+        } else if (allowSoft() && shouldShowSoft(activity, latest)) {
+            show(activity, latest, url, notes, force = false)
+        }
+    }
+
     private fun openUpdate(activity: Activity, url: String) {
         try {
             activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))

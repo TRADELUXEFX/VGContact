@@ -78,6 +78,13 @@ object BannedHandler {
         }.start()
     }
 
+    /** Called from HomeActivity when a ban is detected during initialization. */
+    fun handleBanned(a: Activity, reason: String?) {
+        val app = a.applicationContext
+        if (reason != null) BanPrefs.set(app, SessionManager(app).getPhone(), reason)
+        showFrom(a)
+    }
+
     fun closed() { showing = false }
 
     fun androidId(c: Context): String =

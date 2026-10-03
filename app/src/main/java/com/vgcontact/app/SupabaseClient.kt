@@ -459,6 +459,40 @@ object SupabaseClient {
     }
 
     // The newest published build, from get_app_update (see add_app_update.sql).
+    fun fetchAppUpdate(build: Int, callback: (JSONObject?) -> Unit) {
+        val arr = rpc("get_app_update", JSONObject().apply { put("p_current_build", build) })
+        callback(if (arr != null && arr.length() > 0) arr.getJSONObject(0) else null)
+    }
+
+    // Account status + viewers via get_home. Blocking - call from a background thread.
+    fun fetchHome(userId: String, callback: (Boolean, HomeData?) -> Unit) {
+        val arr = rpc("get_home", JSONObject().apply { put("p_user_id", userId) })
+        if (arr == null || arr.length() == 0) {
+            callback(false, null)
+            return
+        }
+        val it = arr.getJSONObject(0)
+        callback(true, HomeData(
+            status = it.optString("status", "pending"),
+            freeCurrent = it.optInt("free_current", 0),
+            freeMax = it.optInt("free_max", 0),
+            extraCurrent = it.optInt("extra_current", 0),
+            extraMax = it.optInt("extra_max", 0),
+            referralCount = it.optInt("referral_count", 0),
+            verifiedReposts = it.optInt("verified_reposts", 0)
+        ))
+    }
+
+    // Today's repost status: null, "pending", "verified" or "rejected".
+    fun fetchTodayRepostStatus(userId: String, callback: (Boolean, String?) -> Unit) {
+        val arr = rpc("get_today_repost_status", JSONObject().apply { put("p_user_id", userId) })
+        if (arr == null) {
+            callback(false, null)
+            return
+        }
+        callback(true, if (arr.length() > 0) arr.getJSONObject(0).optString("status").ifBlank { null } else null)
+    }
+
     // Date registered + referred by for accounts that logged in before
     // those were being saved (see SessionManager.saveRegistrationFrom).
     fun fetchUserProfile(userId: String, callback: (Boolean, JSONObject?) -> Unit) {
