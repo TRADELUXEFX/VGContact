@@ -232,6 +232,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="Contact customer care"
+                android:fontFamily="@font/poppins_bold"
+                android:includeFontPadding="false"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textAllCaps="false"

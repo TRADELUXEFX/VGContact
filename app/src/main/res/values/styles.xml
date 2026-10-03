@@ -11,6 +11,13 @@
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:fontFamily">@font/poppins</item>
         <item name="fontFamily">@font/poppins</item>
+        <item name="textAppearanceButton">@style/TextAppearance.VG.Button</item>
+    </style>
+
+    <!-- Buttons: bold Poppins (Material buttons ignore the theme font). -->
+    <style name="TextAppearance.VG.Button" parent="TextAppearance.MaterialComponents.Button">
+        <item name="android:fontFamily">@font/poppins_bold</item>
+        <item name="fontFamily">@font/poppins_bold</item>
     </style>
 
     <!-- Splash theme. Applied ONLY to the launcher activity in the

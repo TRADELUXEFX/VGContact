@@ -68,6 +68,10 @@ object SyncPrefs {
         e.apply()
     }
 
+    // When the last successful sync of any kind finished (ms since 1970). 0 = none yet.
+    fun getLastSyncAt(context: Context): Long =
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE).getLong(KEY_LAST_SYNC, 0L)
+
     // When the last AUTOMATIC (background) sync succeeded. Only DailySyncWorker sets
     // it. The Sync button and syncs while the app is open never touch it, because
     // those work even when the phone blocks background running.

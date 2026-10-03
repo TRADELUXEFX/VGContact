@@ -53,6 +53,15 @@ class SessionManager(private val context: Context) {
         return prefs.getString("referred_by", null)?.ifBlank { null }
     }
 
+    // Phone number of the person who referred this user (null = not known yet).
+    fun saveReferrerPhone(phone: String) {
+        prefs.edit().putString("referrer_phone", phone).apply()
+    }
+
+    fun getReferrerPhone(): String? {
+        return prefs.getString("referrer_phone", null)?.ifBlank { null }
+    }
+
     fun logout() {
         prefs.edit().clear().apply()
         SyncPrefs.clear(context)

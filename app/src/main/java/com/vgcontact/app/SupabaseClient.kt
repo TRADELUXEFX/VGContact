@@ -493,6 +493,16 @@ object SupabaseClient {
         callback(true, if (arr.length() > 0) arr.getJSONObject(0).optString("status").ifBlank { null } else null)
     }
 
+    // Phone number of the account that referred this user (null = none or failed).
+    // Server function get_my_referrer (supabase/migrations/add_get_my_referrer.sql).
+    fun fetchMyReferrerPhone(userId: String): String? {
+        if (userId.isBlank()) return null
+        val arr = rpc("get_my_referrer", JSONObject().apply { put("p_user_id", userId) })
+        if (arr == null || arr.length() == 0) return null
+        val o = arr.getJSONObject(0)
+        return if (o.isNull("phone")) null else o.optString("phone", "").ifBlank { null }
+    }
+
     // Date registered + referred by for accounts that logged in before
     // those were being saved (see SessionManager.saveRegistrationFrom).
     fun fetchUserProfile(userId: String, callback: (Boolean, JSONObject?) -> Unit) {

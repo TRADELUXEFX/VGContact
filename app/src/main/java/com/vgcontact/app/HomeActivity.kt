@@ -353,9 +353,46 @@ class HomeActivity : AppCompatActivity() {
                     else -> "${SyncPrefs.getTodayAdded(this)} contacts added today"
                 }
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+                refreshLastSync()
                 loadHome()
             }
         }.start()
+    }
+
+    // ---------------- last sync pill ----------------
+
+    // "Synced 2 hours ago" (green), "Last sync 3 days ago" (amber, older than 2 days),
+    // "Not synced yet" or "Syncing paused" (grey). Time is the last successful sync of
+    // any kind (button, opening the app, or the background sync).
+    private fun refreshLastSync() {
+        val pill = findViewById<TextView>(R.id.lastSyncPill) ?: return
+        val last = SyncPrefs.getLastSyncAt(this)
+        val ageMs = System.currentTimeMillis() - last
+        val mins = ageMs / 60000L
+        val hours = mins / 60L
+        val days = hours / 24L
+        val ago = when {
+            mins < 1L -> "just now"
+            mins < 60L -> "$mins min ago"
+            hours < 24L -> if (hours == 1L) "1 hour ago" else "$hours hours ago"
+            days == 1L -> "yesterday"
+            else -> "$days days ago"
+        }
+        val text: String
+        val bg: String
+        val fg: String
+        when {
+            SyncPrefs.isPaused(this) -> { text = "Syncing paused"; bg = "#EEF1EF"; fg = "#5F6B64" }
+            last == 0L -> { text = "Not synced yet"; bg = "#EEF1EF"; fg = "#5F6B64" }
+            hours >= 48L -> { text = "Last sync $ago"; bg = "#FFF1D6"; fg = "#8A5A00" }
+            else -> { text = "Synced $ago"; bg = "#E1F5EB"; fg = "#158245" }
+        }
+        pill.text = text
+        pill.setTextColor(android.graphics.Color.parseColor(fg))
+        pill.compoundDrawableTintList =
+            android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor(fg))
+        pill.backgroundTintList =
+            android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor(bg))
     }
 
     // ---------------- lifecycle ----------------
@@ -367,6 +404,7 @@ class HomeActivity : AppCompatActivity() {
             return
         }
         loadHome()
+        refreshLastSync()
         updatePermissionBanner()
         // Contacts were off and are now on (turned on in the phone's Settings): sync right away.
         val contactsOn = ContactSync.hasPermission(this)

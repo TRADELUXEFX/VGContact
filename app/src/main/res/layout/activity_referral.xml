@@ -34,7 +34,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Refer and earn"
-                android:textSize="22sp"
+                android:textSize="24sp"
                 android:textColor="@color/white"
                 android:textAlignment="center" />
 
@@ -85,7 +85,7 @@
             android:layout_marginTop="16dp"
             android:drawableStart="@drawable/ic_search"
             android:drawablePadding="10dp"
-            android:hint="Search by username or phone..."
+            android:hint="Search by username or phone number..."
             android:inputType="text"
             android:maxLines="1"
             android:paddingStart="14dp"
@@ -425,6 +425,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:paddingBottom="8dp">
                         <LinearLayout
                             android:layout_width="0dp"

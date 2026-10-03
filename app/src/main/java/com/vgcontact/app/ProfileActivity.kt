@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -41,6 +42,13 @@ class ProfileActivity : AppCompatActivity() {
         showRegistrationInfo(createdText, referredByText)
 
         appVersionText.text = BuildInfo.displayVersion()
+
+        // Copy phone number
+        findViewById<LinearLayout>(R.id.profilePhoneCopyIcon).setOnClickListener {
+            val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+            clipboard.setPrimaryClip(ClipData.newPlainText("phone", sessionManager.getPhone().orEmpty()))
+            Toast.makeText(this, "Phone number copied", Toast.LENGTH_SHORT).show()
+        }
 
         // Copy username
         findViewById<LinearLayout>(R.id.profileUsernameCopyIcon).setOnClickListener {
@@ -188,11 +196,32 @@ class ProfileActivity : AppCompatActivity() {
     // login. Accounts that logged in before that existed have nothing saved:
     // fetch once, save, and refresh the two rows.
     private fun showRegistrationInfo(createdText: TextView, referredByText: TextView) {
+        val phoneBox = findViewById<View>(R.id.profileReferrerPhoneBox)
+        val phoneText = findViewById<TextView>(R.id.profile_referrer_phone)
         fun render() {
             createdText.text = formatRegistered(sessionManager.getCreatedAt())
             referredByText.text = sessionManager.getReferredBy() ?: "None"
+            val rp = sessionManager.getReferrerPhone()
+            if (sessionManager.getReferredBy() != null && rp != null) {
+                phoneText.text = formatPhone(rp)
+                phoneBox.visibility = View.VISIBLE
+            } else {
+                phoneBox.visibility = View.GONE
+            }
         }
         render()
+
+        // Who referred this user is saved as a username; fetch their phone number once.
+        if (sessionManager.getReferredBy() != null && sessionManager.getReferrerPhone() == null) {
+            val uid = sessionManager.getUserId().orEmpty()
+            Thread {
+                val phone = SupabaseClient.fetchMyReferrerPhone(uid)
+                if (phone != null) {
+                    sessionManager.saveReferrerPhone(phone)
+                    runOnUiThread { if (!isFinishing && !isDestroyed) render() }
+                }
+            }.start()
+        }
 
         val userId = sessionManager.getUserId().orEmpty()
         if (sessionManager.getCreatedAt() == null && userId.isNotBlank()) {
@@ -205,6 +234,12 @@ class ProfileActivity : AppCompatActivity() {
                 }
             }.start()
         }
+    }
+
+    // 08108709620 -> 0810 870 9620 (other lengths are shown as they are).
+    private fun formatPhone(raw: String): String {
+        val d = raw.filter { it.isDigit() }
+        return if (d.length == 11) "${d.substring(0, 4)} ${d.substring(4, 7)} ${d.substring(7)}" else raw
     }
 
     // Server time is UTC ("2026-09-16T10:23:45.123+00:00"); show it as a

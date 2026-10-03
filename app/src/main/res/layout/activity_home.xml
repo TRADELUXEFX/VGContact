@@ -424,16 +424,44 @@
                     android:padding="18dp"
                     android:visibility="gone">
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/home_contacts_label"
-                        android:textSize="11sp"
-                        android:textStyle="bold"
-                        android:textAllCaps="true"
-                        android:letterSpacing="0.05"
-                        android:textColor="@color/text_muted"
-                        android:gravity="center" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/home_contacts_label"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:textAllCaps="true"
+                            android:letterSpacing="0.05"
+                            android:textColor="@color/text_muted"
+                            android:gravity="start" />
+
+                        <!-- Last sync status: sync icon + time. Text, colors and
+                             state are set in HomeActivity.refreshLastSync(). -->
+                        <TextView
+                            android:id="@+id/lastSyncPill"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/last_sync_pill_background"
+                            android:drawableStart="@drawable/ic_sync_small"
+                            android:drawablePadding="5dp"
+                            android:gravity="center_vertical"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:paddingTop="4dp"
+                            android:paddingBottom="4dp"
+                            android:fontFamily="@font/poppins_semibold"
+                            android:includeFontPadding="false"
+                            android:textSize="11sp"
+                            android:maxLines="1"
+                            android:text="Not synced yet" />
+                    </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -632,6 +660,9 @@
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 app:strokeColor="@color/vg_green_dark"
                 android:textColor="@color/vg_green_dark"
+                app:icon="@drawable/ic_pending_whatsapp"
+                app:iconTint="@color/vg_green_dark"
+                app:iconGravity="textStart"
                 app:cornerRadius="16dp" />
         </LinearLayout>
     </LinearLayout>
