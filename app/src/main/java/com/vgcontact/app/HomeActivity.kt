@@ -365,19 +365,21 @@ class HomeActivity : AppCompatActivity() {
     /** Opened by the server's stalled-sync push (action fix_sync). */
     fun showSyncHelp() {
         if (isFinishing) return
-        val builder = com.google.android.material.dialog.MaterialAlertDialogBuilder(this, R.style.VGRoundedAlertDialog)
-            .setTitle("Your contact sync stopped")
-            .setNegativeButton("Close", null)
-
+        val close = VgDialog.Action("Close")
+        val title = "Your contact sync stopped"
         when {
-            SyncPrefs.isPaused(this) -> builder
-                .setMessage("Syncing is paused, so new viewers are not being saved to your phone. Open Profile and tap Resume Syncing.")
-                .setPositiveButton("Open Profile") { _, _ ->
+            SyncPrefs.isPaused(this) -> VgDialog.show(
+                this, VgDialog.Tone.WARNING, title,
+                "Syncing is paused, so new viewers are not being saved to your phone. Open Profile and tap Resume Syncing.",
+                primary = VgDialog.Action("Open Profile") {
                     startActivity(Intent(this, ProfileActivity::class.java))
-                }
-            !ContactSync.hasPermission(this) -> builder
-                .setMessage("Contacts permission is off, so nothing can be saved to your phone.")
-                .setPositiveButton("Turn on") { _, _ ->
+                },
+                secondary = close
+            )
+            !ContactSync.hasPermission(this) -> VgDialog.show(
+                this, VgDialog.Tone.WARNING, title,
+                "Contacts permission is off, so nothing can be saved to your phone.",
+                primary = VgDialog.Action("Turn on") {
                     androidx.core.app.ActivityCompat.requestPermissions(
                         this,
                         arrayOf(
@@ -386,19 +388,23 @@ class HomeActivity : AppCompatActivity() {
                         ),
                         CONTACTS_REQUEST_CODE
                     )
-                }
-            else -> builder
-                .setMessage("Your phone may be stopping VGContact in the background. Allow it to keep running. This warning goes away after the next automatic sync works.")
-                .setPositiveButton("Fix now") { _, _ ->
+                },
+                secondary = close
+            )
+            else -> VgDialog.show(
+                this, VgDialog.Tone.WARNING, title,
+                "Your phone may be stopping VGContact in the background. Allow it to keep running. This warning goes away after the next automatic sync works.",
+                primary = VgDialog.Action("Fix now") {
                     when {
                         OemAutostart.isKnownOem() -> OemAutostart.openSettings(this)
                         isBatteryRestricted() -> openBatterySettings()
                         else -> openAppSettings()
                     }
-                }
-                .setNeutralButton("Sync now") { _, _ -> startSync() }
+                },
+                secondary = close,
+                extra = VgDialog.Action("Sync now") { startSync() }
+            )
         }
-        RoundedDialog.style(builder.show())
     }
 
     // ---------------- notification permission banner ----------------

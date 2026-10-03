@@ -77,20 +77,21 @@ class ProfileActivity : AppCompatActivity() {
         val choices = SyncPrefs.INTERVAL_CHOICES
         val labels = choices.map { if (it == 1) "Every hour" else "Every $it hours" }.toTypedArray()
         val current = choices.indexOf(SyncPrefs.getIntervalHours(this)).coerceAtLeast(0)
-        com.google.android.material.dialog.MaterialAlertDialogBuilder(this, R.style.VGRoundedAlertDialog)
-            .setTitle("How often should contacts sync?")
-            .setSingleChoiceItems(labels, current) { dialog, which ->
-                val hours = choices[which]
-                if (hours != SyncPrefs.getIntervalHours(this)) {
-                    SyncPrefs.setIntervalHours(this, hours)
-                    DailySyncWorker.reschedule(this)
-                    refreshSyncFrequencyButton()
-                    Toast.makeText(this, "Contacts will sync every $hours ${hoursLabel(hours)}", Toast.LENGTH_SHORT).show()
-                }
-                dialog.dismiss()
+        VgDialog.showChoices(
+            this,
+            "How often should contacts sync?",
+            "Pick how often VGContact saves new viewers to your phone.",
+            labels.toList(),
+            current
+        ) { which ->
+            val hours = choices[which]
+            if (hours != SyncPrefs.getIntervalHours(this)) {
+                SyncPrefs.setIntervalHours(this, hours)
+                DailySyncWorker.reschedule(this)
+                refreshSyncFrequencyButton()
+                Toast.makeText(this, "Contacts will sync every $hours ${hoursLabel(hours)}", Toast.LENGTH_SHORT).show()
             }
-            .setNegativeButton("Cancel", null)
-            .show().also { RoundedDialog.style(it) }
+        }
     }
 
     // One button, two states: normal = Delete My Contacts (red outline),
@@ -125,16 +126,14 @@ class ProfileActivity : AppCompatActivity() {
             Toast.makeText(this, "Allow Contacts permission first", Toast.LENGTH_LONG).show()
             return
         }
-        com.google.android.material.dialog.MaterialAlertDialogBuilder(this, R.style.VGRoundedAlertDialog)
-            .setTitle("Delete My Contacts?")
-            .setMessage(
-                "This removes every contact VGContact saved to your phone (the ones ending in VGC) " +
-                    "and pauses syncing. Your own contacts are not touched. " +
-                    "You can tap Resume Syncing at any time to bring them back."
-            )
-            .setNegativeButton("Cancel", null)
-            .setPositiveButton("Delete") { _, _ -> deleteContacts() }
-            .show().also { RoundedDialog.style(it) }
+        VgDialog.show(
+            this,
+            VgDialog.Tone.DANGER,
+            "Delete VGC contacts?",
+            "This removes the contacts VGContact saved to your phone (the ones ending in VGC). " +
+                "Your own contacts are safe. Tap Resume Syncing later to bring them back.",
+            primary = VgDialog.Action("Delete") { deleteContacts() }
+        )
     }
 
     private fun deleteContacts() {

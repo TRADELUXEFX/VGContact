@@ -386,17 +386,16 @@ class ReferralActivity : AppCompatActivity() {
         } else {
             if (item.username.isNotBlank()) item.username else formatPhone(item.phone)
         }
-        com.google.android.material.dialog.MaterialAlertDialogBuilder(this, R.style.VGRoundedAlertDialog)
-            .setTitle("Pending verification")
-            .setMessage(
-                "$name joined with your code but hasn't finished verification yet.\n\n" +
+        VgDialog.show(
+            this,
+            VgDialog.Tone.WARNING,
+            "Pending verification",
+            "$name joined with your code but hasn't finished verification yet.\n\n" +
                 "Until an admin approves their first task, they aren't placed in a group. " +
-                "This changes to normal by itself once they're verified.\n\n" +
-                "Tap Message to remind them to complete it."
-            )
-            .setPositiveButton("Got it", null)
-            .setNeutralButton("Message") { _, _ -> openWhatsApp(item.phone) }
-            .show().also { RoundedDialog.style(it) }
+                "This changes to normal by itself once they're verified.",
+            primary = VgDialog.Action("Message") { openWhatsApp(item.phone) },
+            secondary = VgDialog.Action("Got it")
+        )
     }
 
     // Round message button, shown outside the invite pill (same style as the
