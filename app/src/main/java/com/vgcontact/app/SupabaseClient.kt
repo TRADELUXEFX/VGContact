@@ -158,18 +158,6 @@ object SupabaseClient {
         }
     }
 
-    // Whether today's daily repost has already been submitted (regardless
-    // of verified/pending/rejected) - used to grey out the Repost Today
-    // button. The server decides what "today" is (UTC).
-    fun fetchTodayRepostStatus(userId: String, callback: (Boolean, String?) -> Unit) {
-        val arr = rpc("get_today_repost_status", JSONObject().apply { put("p_user_id", userId) })
-        if (arr == null) {
-            callback(false, null)
-            return
-        }
-        callback(true, if (arr.length() > 0) arr.getJSONObject(0).optString("status") else null)
-    }
-
     // Today's verification (first task) status: null, "pending", "verified" or "rejected".
     fun fetchTodayVerifyStatus(userId: String, callback: (Boolean, String?) -> Unit) {
         val arr = rpc("get_today_verify_status", JSONObject().apply { put("p_user_id", userId) })
@@ -195,24 +183,58 @@ object SupabaseClient {
         val verifiedReposts: Int
     )
 
-    fun fetchHome(userId: String, callback: (Boolean, HomeData?) -> Unit) {
-        val arr = rpc("get_home", JSONObject().apply { put("p_user_id", userId) })
-        if (arr == null || arr.length() == 0) {
-            callback(false, null)
-            return
+    // Everything Home and Repost need, in ONE call (get_app_bundle):
+    // account status + viewers, unread dot, ban, app update, community link, today's repost.
+    // Blocking: call from a background thread. Null = failed (see lastError).
+    data class AppBundle(
+        val home: HomeData?,
+        val hasUnread: Boolean,
+        val banned: Boolean,
+        val banReason: String?,
+        val update: JSONObject?,
+        val communityLink: String?,
+        val todayRepostStatus: String?,
+        // Pending-sheet / pay-screen numbers (app_settings) and today's verify status,
+        // so opening the verify sheet needs no extra calls.
+        val settings: JSONObject? = null,
+        val todayVerifyStatus: String? = null
+    )
+
+    fun fetchBundle(context: Context): AppBundle? {
+        val sm = SessionManager(context)
+        val userId = sm.getUserId()
+        if (userId.isNullOrBlank()) return null
+        val params = JSONObject().apply {
+            put("p_user_id", userId)
+            put("p_phone", sm.getPhone() ?: JSONObject.NULL)
+            put("p_android_id", BannedHandler.androidId(context))
+            put("p_current_build", AppUpdatePrompt.currentBuild())
         }
-        val r = arr.getJSONObject(0)
-        callback(
-            true,
-            HomeData(
-                status = r.optString("status", "pending"),
-                freeCurrent = r.optInt("free_current", 0),
-                freeMax = r.optInt("free_max", 0),
-                extraCurrent = r.optInt("extra_current", 0),
-                extraMax = r.optInt("extra_max", 0),
-                referralCount = r.optInt("referral_count", 0),
-                verifiedReposts = r.optInt("verified_reposts", 0)
-            )
+        val arr = rpc("get_app_bundle", params)
+        if (arr == null || arr.length() == 0) return null
+        val b = arr.getJSONObject(0).optJSONObject("bundle") ?: return null
+        val h = b.optJSONObject("home")
+        fun text(key: String): String? = if (b.isNull(key)) null else b.optString(key).ifBlank { null }
+        return AppBundle(
+            home = h?.let {
+                HomeData(
+                    status = it.optString("status", "pending"),
+                    freeCurrent = it.optInt("free_current", 0),
+                    freeMax = it.optInt("free_max", 0),
+                    extraCurrent = it.optInt("extra_current", 0),
+                    extraMax = it.optInt("extra_max", 0),
+                    referralCount = it.optInt("referral_count", 0),
+                    verifiedReposts = it.optInt("verified_reposts", 0)
+                )
+            },
+            hasUnread = b.optBoolean("has_unread", false),
+            banned = b.optBoolean("banned", false),
+            banReason = text("ban_reason"),
+            update = b.optJSONObject("update"),
+            communityLink = text("community_link"),
+            todayRepostStatus = text("today_repost_status"),
+            settings = b.optJSONObject("settings"),
+            todayVerifyStatus = text("today_verify_status")
         )
     }
 
@@ -252,7 +274,8 @@ object SupabaseClient {
             put("p_user_id", userId)
             put("p_target_user_id", if (targetUserId.isNullOrBlank()) JSONObject.NULL else targetUserId)
         }
-        val arr = rpc("get_my_referrals", params) ?: return null
+        // ONE call (get_my_referrals_full): the list and each person's verified flag together.
+        val arr = rpc("get_my_referrals_full", params) ?: return null
         val out = mutableListOf<MyReferral>()
         for (i in 0 until arr.length()) {
             val r = arr.getJSONObject(i)
@@ -262,27 +285,10 @@ object SupabaseClient {
                     username = r.optString("username"),
                     phone = r.optString("phone"),
                     createdAt = r.optString("created_at"),
-                    invitedCount = r.optInt("invited_count", 0)
+                    invitedCount = r.optInt("invited_count", 0),
+                    isPending = !r.optBoolean("is_verified", true)
                 )
             )
-        }
-        // Who is still pending (not verified yet). Optional: if the server function is
-        // missing or fails, nobody is marked pending and the list looks as before.
-        try {
-            val status = rpc("get_my_referrals_status", params)
-            if (status != null) {
-                val pending = HashSet<String>()
-                for (i in 0 until status.length()) {
-                    val r = status.getJSONObject(i)
-                    if (!r.optBoolean("is_verified", true)) pending.add(r.optString("user_id"))
-                }
-                if (pending.isNotEmpty()) {
-                    for (i in out.indices) {
-                        if (out[i].userId in pending) out[i] = out[i].copy(isPending = true)
-                    }
-                }
-            }
-        } catch (_: Exception) {
         }
         return out
     }
@@ -357,7 +363,8 @@ object SupabaseClient {
     // fetch_notifications RPC (SECURITY DEFINER - direct table reads are
     // blocked by RLS, see notifications_schema.sql).
     fun fetchNotifications(userId: String, callback: (Boolean, List<AppNotification>) -> Unit) {
-        val arr = rpc("fetch_notifications", JSONObject().apply { put("p_user_id", userId) })
+        // ONE call: returns the list, then marks everything read on the server.
+        val arr = rpc("open_notifications", JSONObject().apply { put("p_user_id", userId) })
         if (arr == null) {
             callback(false, emptyList())
             return
@@ -452,13 +459,6 @@ object SupabaseClient {
     }
 
     // The newest published build, from get_app_update (see add_app_update.sql).
-    // Returns one row {update_available, force_update, latest_build, download_url, notes},
-    // or null when offline / the SQL hasn't been run yet. Blocking: call from a background thread.
-    fun fetchAppUpdate(currentBuild: Int, callback: (JSONObject?) -> Unit) {
-        val arr = rpc("get_app_update", JSONObject().apply { put("p_current_build", currentBuild) })
-        callback(if (arr != null && arr.length() > 0) arr.getJSONObject(0) else null)
-    }
-
     // Date registered + referred by for accounts that logged in before
     // those were being saved (see SessionManager.saveRegistrationFrom).
     fun fetchUserProfile(userId: String, callback: (Boolean, JSONObject?) -> Unit) {

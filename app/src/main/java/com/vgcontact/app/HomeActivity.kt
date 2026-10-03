@@ -93,13 +93,30 @@ class HomeActivity : AppCompatActivity() {
             if (PendingPrompt.showGate(this)) return@setOnClickListener
             CommunityLink.open(this)
         }
-        CommunityLink.refresh(this)
 
         setupReferralLink()
+        applyCachedStatus()
 
         BottomNavHelper.setup(this, BottomNavHelper.Tab.HOME)
         contactUsFab = FloatingContactHelper.attach(this)
 
+    }
+
+    // Shows the last known account status straight away, so a verified user never
+    // sees PENDING flash while Home reloads. With nothing saved yet, the badge
+    // stays hidden until the first load answers.
+    private fun applyCachedStatus() {
+        val badgeText = findViewById<TextView>(R.id.statusBadgeText)
+        val status = PendingPrompt.cachedStatus(this)
+        if (status == null) {
+            (badgeText.parent as View).visibility = View.INVISIBLE
+            return
+        }
+        badgeText.text = status.uppercase()
+        val pending = status == "pending"
+        findViewById<View>(R.id.pendingBanner).visibility = if (pending) View.VISIBLE else View.GONE
+        findViewById<View>(R.id.home_contacts_card).alpha = if (pending) 0.45f else 1f
+        syncBtn.alpha = if (pending) 0.6f else 1f
     }
 
     // Referral link row in the green header card: the link is LINK_BASE + the user's phone
@@ -200,6 +217,8 @@ class HomeActivity : AppCompatActivity() {
 
     // ---------------- data ----------------
 
+    // ONE server call (get_app_bundle) fills the whole screen: status + viewers, bell dot,
+    // ban check, app update and community link.
     private fun loadHome() {
         val userId = sessionManager.getUserId()
         if (userId.isNullOrBlank()) {
@@ -207,19 +226,34 @@ class HomeActivity : AppCompatActivity() {
             return
         }
         Thread {
-            SupabaseClient.fetchHome(userId) { ok, home ->
-                val err = SupabaseClient.lastError
-                runOnUiThread {
-                    if (ok && home != null) {
-                        showHome(home)
-                        startOnboarding(home.status == "pending")
-                    } else {
-                        Toast.makeText(
-                            this,
-                            "Couldn't load your viewers: " + (err ?: "no account found for this login. Log out and log in again."),
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
+            val bundle = SupabaseClient.fetchBundle(applicationContext)
+            val err = SupabaseClient.lastError
+            runOnUiThread {
+                if (isFinishing || isDestroyed) return@runOnUiThread
+                if (bundle != null && bundle.banned) {
+                    BannedHandler.handleBanned(this, bundle.banReason)
+                    return@runOnUiThread
+                }
+                if (bundle == null || bundle.home == null) {
+                    Toast.makeText(
+                        this,
+                        "Couldn't load your viewers: " + (err ?: "no account found for this login. Log out and log in again."),
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return@runOnUiThread
+                }
+                // Save the sheet numbers + verify status first: the verify sheet reads them.
+                PendingConfig.save(this, bundle.settings)
+                PendingPrompt.saveVerifyStatus(this, bundle.todayVerifyStatus)
+                showHome(bundle.home)
+                startOnboarding(bundle.home.status == "pending")
+                findViewById<View>(R.id.headerBellUnreadDot).visibility =
+                    if (bundle.hasUnread) View.VISIBLE else View.GONE
+                CommunityLink.save(this, bundle.communityLink)
+                // After startOnboarding, so the soft update pop-up yields to the verify sheet.
+                val updateBanner = findViewById<View>(R.id.updateBanner)
+                AppUpdatePrompt.handleUpdate(this, bundle.update, { !onboardingActive }) { show ->
+                    updateBanner.visibility = if (show) View.VISIBLE else View.GONE
                 }
             }
         }.start()
@@ -230,7 +264,10 @@ class HomeActivity : AppCompatActivity() {
     private fun showHome(h: SupabaseClient.HomeData) {
         findViewById<View>(R.id.home_limits_loading).visibility = View.GONE
         findViewById<View>(R.id.home_limits_block).visibility = View.VISIBLE
-        findViewById<TextView>(R.id.statusBadgeText).text = h.status.uppercase()
+        val statusBadge = findViewById<TextView>(R.id.statusBadgeText)
+        statusBadge.text = h.status.uppercase()
+        (statusBadge.parent as View).visibility = View.VISIBLE
+        PendingPrompt.saveStatus(this, h.status)
         val pending = h.status == "pending"
         PendingPrompt.setPending(this, pending)
         findViewById<View>(R.id.pendingBanner).visibility = if (pending) View.VISIBLE else View.GONE
@@ -268,20 +305,6 @@ class HomeActivity : AppCompatActivity() {
                     if (result.added > 0) {
                         Toast.makeText(this, "${result.added} new contacts saved", Toast.LENGTH_LONG).show()
                     }
-                }
-            }
-        }.start()
-    }
-
-    private fun refreshUnreadBadge() {
-        val userId = sessionManager.getUserId()
-        if (userId.isNullOrBlank()) return
-        val dot = findViewById<View>(R.id.headerBellUnreadDot)
-        Thread {
-            SupabaseClient.fetchNotifications(userId) { success, notifications ->
-                runOnUiThread {
-                    if (success) dot.visibility =
-                        if (notifications.any { !it.isRead }) View.VISIBLE else View.GONE
                 }
             }
         }.start()
@@ -344,20 +367,15 @@ class HomeActivity : AppCompatActivity() {
             return
         }
         loadHome()
-        refreshUnreadBadge()
         updatePermissionBanner()
         // Contacts were off and are now on (turned on in the phone's Settings): sync right away.
         val contactsOn = ContactSync.hasPermission(this)
         if (contactsWereOn == false && contactsOn && !SyncPrefs.isPaused(this)) startSync()
         contactsWereOn = contactsOn
-        BannedHandler.checkWithServer(this)
-        // "New version ready" pop-up. Skipped (soft only) while the pending sheet is up.
-        // The red banner shows right away from what the phone remembers, then the server confirms.
-        val updateBanner = findViewById<View>(R.id.updateBanner)
-        updateBanner.visibility = if (AppUpdatePrompt.hasPendingUpdate(this)) View.VISIBLE else View.GONE
-        AppUpdatePrompt.check(this, { !onboardingActive }) { show ->
-            updateBanner.visibility = if (show) View.VISIBLE else View.GONE
-        }
+        // The red update banner shows right away from what the phone remembers; the single
+        // server call in loadHome() then confirms it and may open the update pop-up.
+        findViewById<View>(R.id.updateBanner).visibility =
+            if (AppUpdatePrompt.hasPendingUpdate(this)) View.VISIBLE else View.GONE
     }
 
     // ---------------- "your sync stopped" help ----------------

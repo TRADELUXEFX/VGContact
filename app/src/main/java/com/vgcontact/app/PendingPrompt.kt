@@ -38,6 +38,27 @@ object PendingPrompt {
     private const val PREFS = "vg_pending_prompt"
     private const val KEY_SHOWN = "sheet_shown"
     private const val KEY_PENDING = "is_pending"
+    private const val KEY_STATUS = "last_status"
+    private const val KEY_VERIFY = "verify_status"
+    private const val KEY_VERIFY_DAY = "verify_status_day"
+
+    private fun utcDay(): String =
+        java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+            .apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }
+            .format(java.util.Date())
+
+    /** Today's verify status as last reported by the server (null if none or from another day). */
+    fun cachedVerifyStatus(context: Context): String? {
+        val p = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        return if (p.getString(KEY_VERIFY_DAY, null) == utcDay()) p.getString(KEY_VERIFY, null) else null
+    }
+
+    fun saveVerifyStatus(context: Context, status: String?) {
+        val e = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+        if (status == null) e.remove(KEY_VERIFY).remove(KEY_VERIFY_DAY)
+        else e.putString(KEY_VERIFY, status).putString(KEY_VERIFY_DAY, utcDay())
+        e.apply()
+    }
 
     fun wasShown(context: Context): Boolean =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_SHOWN, false)
@@ -54,6 +75,21 @@ object PendingPrompt {
     fun setPending(context: Context, pending: Boolean) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             .edit().putBoolean(KEY_PENDING, pending).apply()
+    }
+
+    /** Last account status Home loaded ("pending", "verified", ...), or null if never loaded. */
+    fun cachedStatus(context: Context): String? =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_STATUS, null)
+
+    fun saveStatus(context: Context, status: String) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .edit().putString(KEY_STATUS, status).apply()
+    }
+
+    /** Forget the saved status (logout), so the next account never sees the old one. */
+    fun clearStatus(context: Context) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .edit().remove(KEY_STATUS).remove(KEY_PENDING).remove(KEY_VERIFY).remove(KEY_VERIFY_DAY).apply()
     }
 
     /**
@@ -80,6 +116,7 @@ object PendingPrompt {
             SupabaseClient.submitDailyRepost(userId, "verify") { success, message ->
                 main.post {
                     if (success) {
+                        saveVerifyStatus(app, "pending")
                         Toast.makeText(app, app.getString(R.string.pending_toast_logged), Toast.LENGTH_SHORT).show()
                     } else if (message != "ALREADY_REPOSTED_TODAY") {
                         Toast.makeText(app, app.getString(R.string.pending_toast_log_failed), Toast.LENGTH_SHORT).show()
@@ -154,7 +191,6 @@ object PendingPrompt {
 
         // Numbers come from app_settings (cached, with fallbacks); the support number comes
         // from SupportContact. Nothing is typed into the layout.
-        PendingConfig.refresh(activity)
         val viewers = PendingConfig.viewers(activity)
         val minViews = PendingConfig.minViews(activity)
         val payAmount = PendingConfig.payAmount(activity)
@@ -168,19 +204,11 @@ object PendingPrompt {
         view.findViewById<TextView>(R.id.pendingSheetPayBtn).text = activity.getString(R.string.pending_btn_pay_short, payAmount)
 
         // If today's repost is already logged, say so and don't log a second one.
+        // Status comes from Home's single server call (cached), no extra call here.
         var alreadyLogged = false
-        val userId = SessionManager(activity).getUserId()
-        if (!userId.isNullOrBlank()) {
-            thread {
-                SupabaseClient.fetchTodayVerifyStatus(userId) { ok, status ->
-                    if (ok && status == "pending") {
-                        activity.runOnUiThread {
-                            alreadyLogged = true
-                            verifyBtn.text = activity.getString(R.string.pending_btn_post_again)
-                        }
-                    }
-                }
-            }
+        if (cachedVerifyStatus(activity) == "pending") {
+            alreadyLogged = true
+            verifyBtn.text = activity.getString(R.string.pending_btn_post_again)
         }
 
         var verifyTapped = false

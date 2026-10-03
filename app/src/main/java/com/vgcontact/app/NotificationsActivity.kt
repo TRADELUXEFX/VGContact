@@ -42,13 +42,6 @@ class NotificationsActivity : AppCompatActivity() {
                     }
                     render(notifications)
                 }
-
-                // Only mark as read once the list actually loaded, so a
-                // failed fetch doesn't silently clear the unread dot for
-                // notifications the user never got to see.
-                if (success) {
-                    SupabaseClient.markNotificationsRead(userId) { _ -> }
-                }
             }
         }.start()
     }

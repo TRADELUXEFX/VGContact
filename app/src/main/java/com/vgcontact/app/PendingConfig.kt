@@ -1,7 +1,6 @@
 package com.vgcontact.app
 
 import android.content.Context
-import kotlin.concurrent.thread
 
 /**
  * The numbers shown on the pending sheet. Live values are rows in the app_settings table,
@@ -29,19 +28,17 @@ object PendingConfig {
         PAY_ACCOUNT_NUMBER("pay_account_number", R.string.pay_default_empty)
     }
 
-    /** Call when the sheet opens; new values show the next time it opens. */
-    fun refresh(context: Context) {
-        val app = context.applicationContext
-        thread {
-            Item.values().forEach { item ->
-                SupabaseClient.fetchSetting(item.key) { value ->
-                    if (value != null) {
-                        app.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-                            .edit().putString(item.key, value.trim()).apply()
-                    }
-                }
+    /** Home's single server call (get_app_bundle) brings these; saved here, no extra calls. */
+    fun save(context: Context, settings: org.json.JSONObject?) {
+        if (settings == null) return
+        val edit = context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+        Item.values().forEach { item ->
+            if (!settings.isNull(item.key)) {
+                val v = settings.optString(item.key).trim()
+                if (v.isNotEmpty()) edit.putString(item.key, v)
             }
         }
+        edit.apply()
     }
 
     private fun get(context: Context, item: Item): String =

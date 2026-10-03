@@ -43,9 +43,7 @@ class PayVerifyActivity : AppCompatActivity() {
         findViewById<View>(R.id.payProofBtn).setOnClickListener { sendProof() }
         pressEffect(findViewById(R.id.payProofBtn))
 
-        // Bank details are cached by PendingConfig. The pending sheet already refreshed them;
-        // refresh again and re-draw once, in case this is the first run and nothing is cached yet.
-        PendingConfig.refresh(this)
+        // Bank details are cached by PendingConfig (saved from Home's single server call).
         handler.postDelayed({ if (!isFinishing) render() }, 1500)
         render()
     }
