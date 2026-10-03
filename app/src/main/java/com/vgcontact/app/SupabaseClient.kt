@@ -41,8 +41,40 @@ object SupabaseClient {
     var lastError: String? = null
         private set
 
+    // Functions that act for a signed-in user. rpc() adds the account secret to every one of
+    // them, so the screens never have to. Without the right secret the server answers UNAUTHORIZED.
+    private val SECRET_RPCS = setOf(
+        "get_app_bundle", "get_home", "get_today_repost_status", "get_today_verify_status",
+        "get_sync_contacts", "get_my_referrals_full", "get_referral_leaderboard_phone",
+        "get_referral_leaderboard", "get_repost_leaderboard_phone", "get_leaderboard",
+        "open_notifications", "mark_notifications_read", "record_notification_delivered",
+        "record_notification_opened", "report_notifications_enabled", "save_fcm_token",
+        "record_sync", "get_my_profile", "get_my_referrer", "submit_daily_repost"
+    )
+
+    private fun currentSecret(): String =
+        VGApp.instance?.let { SessionManager(it).getSecret() } ?: ""
+
+    // The server no longer accepts this phone's secret (account reset, or an old install):
+    // clear the saved login and send the user to the first screen to sign in again.
+    private fun handleUnauthorized() {
+        val app = VGApp.instance ?: return
+        val sm = SessionManager(app)
+        if (sm.getUserId().isNullOrBlank()) return
+        sm.logout()
+        try {
+            app.startActivity(
+                android.content.Intent(app, RegisterActivity::class.java)
+                    .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            )
+        } catch (e: Exception) {
+            // Started from the background: the next time the app opens it shows sign-in.
+        }
+    }
+
     private fun rpc(name: String, params: JSONObject): org.json.JSONArray? {
         lastError = null
+        if (name in SECRET_RPCS) params.put("p_secret", currentSecret())
         if (!isConfigured()) {
             lastError = "App is missing its server settings (build has no Supabase URL/key)."
             return null
@@ -60,6 +92,7 @@ object SupabaseClient {
                 if (response.isSuccessful) {
                     org.json.JSONArray(if (body.isBlank()) "[]" else body)
                 } else {
+                    if (body.contains("UNAUTHORIZED")) handleUnauthorized()
                     if (body.contains("ACCOUNT_BANNED")) {
                         BannedHandler.trigger(if (params.isNull("p_phone")) null else params.optString("p_phone").ifBlank { null })
                     }
@@ -73,8 +106,9 @@ object SupabaseClient {
         }
     }
 
-    // No password, no Supabase auth session. Identity is the android_id.
-    // register_or_fetch_user (server side) either returns the existing
+    // No password, no Supabase auth session. Sign-up and login return the account's SECRET,
+    // which the app keeps and sends with every later call (see SECRET_RPCS).
+    // register_account (server side, wraps register_or_fetch_user) either returns the existing
     // account for this device or creates one and drops it into a contact
     // group. A duplicate username/phone makes the call fail, which the
     // caller shows as "may already be registered".
@@ -91,7 +125,7 @@ object SupabaseClient {
             put("p_phone", phone)
             put("p_referred_by", if (referredBy.isNullOrBlank()) JSONObject.NULL else referredBy)
         }
-        val arr = rpc("register_or_fetch_user", params)
+        val arr = rpc("register_account", params)
         if (arr != null && arr.length() > 0) callback(true, arr.getJSONObject(0)) else callback(false, null)
     }
 
@@ -108,7 +142,7 @@ object SupabaseClient {
             put("p_phone", phone)
             put("p_android_id", androidId)
         }
-        val arr = rpc("login_by_phone", params)
+        val arr = rpc("login_account", params)
         if (arr == null || arr.length() == 0) {
             callback(false, false, null)
             return

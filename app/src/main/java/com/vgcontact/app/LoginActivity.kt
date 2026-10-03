@@ -80,7 +80,11 @@ class LoginActivity : AppCompatActivity() {
                         setLoading(false)
 
                         when {
+                            found && deviceMatches && user != null && user.optString("secret", "").isBlank() -> {
+                                Toast.makeText(this, "Couldn't log in. Please try again.", Toast.LENGTH_LONG).show()
+                            }
                             found && deviceMatches && user != null -> {
+                                sessionManager.saveSecret(user.optString("secret", ""))
                                 sessionManager.saveUsername(user.optString("username", ""))
                                 sessionManager.savePhone(user.optString("phone", phone))
                                 sessionManager.saveUserId(user.optString("id", "").ifBlank { user.optString("user_id", "").ifBlank { user.optString("uid", "") } })

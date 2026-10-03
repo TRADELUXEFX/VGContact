@@ -23,6 +23,16 @@ class SessionManager(private val context: Context) {
         return prefs.getString("user_id", null)
     }
 
+    // The account's private secret (from register_account / login_account). Every server call
+    // that acts for this user sends it along with the user id; without it the server refuses.
+    fun saveSecret(secret: String) {
+        prefs.edit().putString("secret", secret).apply()
+    }
+
+    fun getSecret(): String? {
+        return prefs.getString("secret", null)?.ifBlank { null }
+    }
+
     fun savePhone(phone: String) {
         prefs.edit().putString("phone", phone).apply()
     }
@@ -68,8 +78,10 @@ class SessionManager(private val context: Context) {
         InactivityWarningWorker.cancel(context)
     }
 
+    // Logged in = a saved username AND a secret. An account saved by an older build has no
+    // secret, so it counts as logged out and the user logs in again once to get one.
     fun isLoggedIn(): Boolean {
-        return getUsername() != null
+        return getUsername() != null && getSecret() != null
     }
 
 }

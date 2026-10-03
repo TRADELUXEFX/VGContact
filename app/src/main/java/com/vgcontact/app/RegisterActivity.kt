@@ -142,6 +142,8 @@ class RegisterActivity : AppCompatActivity() {
                             val msg = when {
                                 err.contains("23505") || err.contains("duplicate", true) ->
                                     "That username or phone is already registered. Try logging in instead."
+                                err.contains("RESERVED_NAME") ->
+                                    "That username isn't allowed. Please choose a different one."
                                 err.startsWith("Network error") ->
                                     "Couldn't reach the server. Check your internet and try again."
                                 err.isNotBlank() ->
@@ -159,6 +161,11 @@ class RegisterActivity : AppCompatActivity() {
 
     // Saves the session and moves on to the permissions screen.
     private fun finishSignIn(user: org.json.JSONObject, typedUsername: String, typedPhone: String) {
+        val secret = user.optString("secret", "")
+        if (secret.isBlank()) {
+            Toast.makeText(this, "Couldn't sign up. Please try again.", Toast.LENGTH_LONG).show()
+            return
+        }
         val finalUsername = user.optString("username", typedUsername)
         if (finalUsername != typedUsername) {
             Toast.makeText(
@@ -167,6 +174,7 @@ class RegisterActivity : AppCompatActivity() {
                 Toast.LENGTH_LONG
             ).show()
         }
+        sessionManager.saveSecret(secret)
         sessionManager.saveUsername(finalUsername)
         sessionManager.savePhone(user.optString("phone", typedPhone))
         sessionManager.saveUserId(user.optString("id", "").ifBlank { user.optString("user_id", "").ifBlank { user.optString("uid", "") } })

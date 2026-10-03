@@ -87,7 +87,12 @@ class DeviceBlockedActivity : AppCompatActivity() {
             Toast.makeText(this, "Couldn't find your account. Please contact customer care.", Toast.LENGTH_LONG).show()
             return
         }
+        if (u.optString("secret", "").isBlank()) {
+            Toast.makeText(this, "Couldn't log in. Please contact customer care.", Toast.LENGTH_LONG).show()
+            return
+        }
         val session = SessionManager(this)
+        session.saveSecret(u.optString("secret", ""))
         session.saveUsername(u.optString("username", ""))
         session.savePhone(u.optString("phone", ""))
         session.saveUserId(u.optString("id", "").ifBlank { u.optString("user_id", "").ifBlank { u.optString("uid", "") } })
