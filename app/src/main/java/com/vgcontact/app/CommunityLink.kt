@@ -31,6 +31,14 @@ object CommunityLink {
         }
     }
 
+    /** Home's single bundle call brings the link; cache it (no extra call). */
+    fun save(context: Context, value: String?) {
+        if (value != null && value.startsWith("http")) {
+            context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                .edit().putString(KEY, value).apply()
+        }
+    }
+
     fun open(activity: Activity) {
         val link = activity.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             .getString(KEY, null) ?: DEFAULT_LINK
