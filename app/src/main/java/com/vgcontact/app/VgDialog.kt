@@ -202,7 +202,9 @@ object VgDialog {
     }
 
     private fun bodyView(activity: Activity, text: String, topMarginDp: Int) = TextView(activity).apply {
-        this.text = text
+        // Each sentence starts on its own line: after a full stop (or ? or !)
+        // followed by a space, drop down instead of running on.
+        this.text = text.replace(Regex("(?<=[.!?]) +(?=\\S)"), "\n")
         textSize = 14f
         typeface = ResourcesCompat.getFont(activity, R.font.poppins)
         setTextColor(ContextCompat.getColor(activity, R.color.text_primary))

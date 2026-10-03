@@ -96,13 +96,16 @@ object CoachMarkOverlay {
 
             fun apply() {
                 positionSpotlight(scrim, step.target, root)
-                tooltip.dockAt(top = !step.dockAtBottom)
                 tooltip.bind(
                     title = step.title,
                     message = step.message,
                     counter = "${index + 1}/${steps.size}",
                     nextLabel = if (index == steps.size - 1) "Got it" else "Next"
                 )
+                // Dock on whichever side leaves the target uncovered. The
+                // old fixed dockAtBottom flag hid buttons that ended up
+                // low on screen (a short page can't scroll them higher).
+                tooltip.dockAt(top = shouldDockAtTop(tooltip, step.target, root, step.dockAtBottom))
                 tooltip.root.visibility = View.VISIBLE
             }
 
@@ -163,6 +166,40 @@ object CoachMarkOverlay {
                 }
             }
             vto.addOnGlobalLayoutListener(listener)
+        }
+    }
+
+    /**
+     * True when the tooltip should sit at the top of the screen. Measures the
+     * tooltip and checks which side the target does not overlap; when both
+     * sides are free it keeps the step's preferred side.
+     */
+    private fun shouldDockAtTop(tooltip: TooltipView, target: View, root: View, preferBottom: Boolean): Boolean {
+        val density = root.resources.displayMetrics.density
+        val t = IntArray(2)
+        target.getLocationInWindow(t)
+        val r = IntArray(2)
+        root.getLocationInWindow(r)
+        val targetTop = t[1] - r[1] - 6 * density
+        val targetBottom = t[1] - r[1] + target.height + 6 * density
+
+        val spec = View.MeasureSpec.makeMeasureSpec(
+            root.width - (32 * density).toInt(), View.MeasureSpec.EXACTLY
+        )
+        tooltip.root.measure(spec, View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
+        val h = tooltip.root.measuredHeight
+
+        val gap = 8 * density
+        val topEdgeOfBottomDock = root.height - 96 * density - h   // tooltip top when docked at bottom
+        val bottomEdgeOfTopDock = 28 * density + h                  // tooltip bottom when docked at top
+        val bottomFree = targetBottom + gap <= topEdgeOfBottomDock
+        val topFree = targetTop - gap >= bottomEdgeOfTopDock
+
+        return when {
+            bottomFree && topFree -> !preferBottom
+            bottomFree -> false
+            topFree -> true
+            else -> (targetTop + targetBottom) / 2 > root.height / 2   // neither fits: go opposite the target
         }
     }
 
