@@ -63,6 +63,11 @@ class SessionManager(private val context: Context) {
         return prefs.getString("referred_by", null)?.ifBlank { null }
     }
 
+    // Forget the saved "referred by" (the server found no such referrer).
+    fun clearReferredBy() {
+        prefs.edit().remove("referred_by").remove("referrer_phone").apply()
+    }
+
     // Phone number of the person who referred this user (null = not known yet).
     fun saveReferrerPhone(phone: String) {
         prefs.edit().putString("referrer_phone", phone).apply()

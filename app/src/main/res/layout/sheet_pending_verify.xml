@@ -63,21 +63,6 @@
                     android:orientation="horizontal">
 
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/pending_free_pill"
-                        android:fontFamily="@font/poppins_bold"
-                        android:includeFontPadding="false"
-                        android:letterSpacing="0.06"
-                        android:paddingStart="12dp"
-                        android:paddingTop="5dp"
-                        android:paddingEnd="12dp"
-                        android:paddingBottom="5dp"
-                        android:text="@string/pending_free_pill"
-                        android:textColor="@color/vg_green_dark"
-                        android:textSize="11sp" />
-
                     <View
                         android:layout_width="0dp"
                         android:layout_height="1dp"
@@ -143,15 +128,6 @@
             android:paddingTop="16dp"
             android:paddingEnd="16dp"
             android:paddingBottom="32dp">
-
-            <ImageView
-                android:layout_width="160dp"
-                android:layout_height="128dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="8dp"
-                android:importantForAccessibility="no"
-                android:src="@drawable/ill_pending" />
-
 
             <LinearLayout
                 android:id="@+id/pendingStepsCard"

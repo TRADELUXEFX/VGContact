@@ -539,6 +539,14 @@ object SupabaseClient {
         return if (o.isNull("phone")) null else o.optString("phone", "").ifBlank { null }
     }
 
+    // Does the account that referred this user really exist? true = yes, false = no such
+    // referrer (the saved "referred by" text is stale), null = the call failed.
+    fun fetchMyReferrerExists(userId: String): Boolean? {
+        if (userId.isBlank()) return null
+        val arr = rpc("get_my_referrer", JSONObject().apply { put("p_user_id", userId) }) ?: return null
+        return arr.length() > 0
+    }
+
     // Date registered + referred by for accounts that logged in before
     // those were being saved (see SessionManager.saveRegistrationFrom).
     fun fetchUserProfile(userId: String, callback: (Boolean, JSONObject?) -> Unit) {

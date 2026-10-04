@@ -219,6 +219,10 @@ class ProfileActivity : AppCompatActivity() {
                 if (phone != null) {
                     sessionManager.saveReferrerPhone(phone)
                     runOnUiThread { if (!isFinishing && !isDestroyed) render() }
+                } else if (SupabaseClient.fetchMyReferrerExists(uid) == false) {
+                    // The server has no such referrer: drop the stale name saved on this phone.
+                    sessionManager.clearReferredBy()
+                    runOnUiThread { if (!isFinishing && !isDestroyed) render() }
                 }
             }.start()
         }

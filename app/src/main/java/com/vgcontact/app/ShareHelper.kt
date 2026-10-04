@@ -39,6 +39,15 @@ object ShareHelper {
         if (shareImage(activity, phone)) onShared()
     }
 
+    private val WHATSAPP_PACKAGES = listOf("com.whatsapp", "com.whatsapp.w4b")
+
+    private fun isInstalled(ctx: Context, pkg: String): Boolean = try {
+        ctx.packageManager.getPackageInfo(pkg, 0)
+        true
+    } catch (e: Exception) {
+        false
+    }
+
     private fun link(phone: String) = ReferralActivity.LINK_BASE + phone
 
     private fun caption(phone: String) = buildString {
@@ -74,6 +83,18 @@ object ShareHelper {
                 putExtra(Intent.EXTRA_STREAM, uri)
                 putExtra(Intent.EXTRA_TEXT, caption(phone))
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            // Open WhatsApp straight away when exactly one WhatsApp (normal or Business) is
+            // installed; otherwise (both, or none) show the normal "Post to" menu.
+            val whatsapps = WHATSAPP_PACKAGES.filter { isInstalled(activity, it) }
+            if (whatsapps.size == 1) {
+                intent.setPackage(whatsapps[0])
+                try {
+                    activity.startActivity(intent)
+                    return true
+                } catch (e: Exception) {
+                    intent.setPackage(null)
+                }
             }
             activity.startActivity(Intent.createChooser(intent, "Post to"))
             true

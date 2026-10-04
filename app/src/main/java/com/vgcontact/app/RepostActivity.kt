@@ -368,10 +368,13 @@ class RepostActivity : AppCompatActivity() {
         repostTodayBtn.iconTint = white
     }
 
-    // Not posted yet: solid RED button, white text, no icon.
+    // Not posted yet: solid RED button, white text, white send icon next to the text.
     private fun showRepostReady() {
         repostTodayBtn.text = "REPOST TODAY"
-        repostTodayBtn.icon = null
+        repostTodayBtn.setIconResource(R.drawable.ic_pending_send)
+        repostTodayBtn.iconGravity = com.google.android.material.button.MaterialButton.ICON_GRAVITY_TEXT_START
+        repostTodayBtn.iconPadding = (8 * resources.displayMetrics.density).toInt()
+        repostTodayBtn.iconSize = (20 * resources.displayMetrics.density).toInt()
         paintRepostButton(R.color.vg_red)
     }
 
@@ -469,6 +472,13 @@ class RepostActivity : AppCompatActivity() {
     // Leaderboard
     // ------------------------------------------------------------------
 
+    // Text under the leaderboard, with the trophy illustration above it when the board is simply empty.
+    private fun setBoardMessage(text: String, illustration: Boolean) {
+        boardMessage.text = text
+        boardMessage.compoundDrawablePadding = (12 * resources.displayMetrics.density).toInt()
+        boardMessage.setCompoundDrawablesWithIntrinsicBounds(0, if (illustration) R.drawable.ill_leaderboard_empty else 0, 0, 0)
+    }
+
     private fun loadBoard() {
         val userId = sessionManager.getUserId().orEmpty()
         val requestId = ++boardRequest
@@ -480,7 +490,7 @@ class RepostActivity : AppCompatActivity() {
         if (userId.isBlank()) {
             boardSpinner.visibility = View.GONE
             boardMessage.visibility = View.VISIBLE
-            boardMessage.text = "No reposts yet. Be the first on the board."
+            setBoardMessage("No reposts yet. Be the first on the board.", true)
             return
         }
         thread {
@@ -491,9 +501,9 @@ class RepostActivity : AppCompatActivity() {
                     if (board.isEmpty()) {
                         boardSpinner.visibility = View.GONE
                         boardMessage.visibility = View.VISIBLE
-                        boardMessage.text = if (!SupabaseClient.isOnline(this))
+                        setBoardMessage(if (!SupabaseClient.isOnline(this))
                             "No internet connection. Check your connection and try again."
-                        else "Couldn't load the leaderboard. Please try again."
+                        else "Couldn't load the leaderboard. Please try again.", false)
                     }
                     return@runOnUiThread
                 }
@@ -510,7 +520,7 @@ class RepostActivity : AppCompatActivity() {
             boardPagerScroll.visibility = View.GONE
             boardSpinner.visibility = View.GONE
             boardMessage.visibility = View.VISIBLE
-            boardMessage.text = "No reposts yet. Be the first on the board."
+            setBoardMessage("No reposts yet. Be the first on the board.", true)
             return
         }
         boardSpinner.visibility = View.GONE

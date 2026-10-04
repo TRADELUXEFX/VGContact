@@ -14,6 +14,9 @@ SQL Editor. Running an old file again can put an old version of a function back 
 | File | What it did |
 | --- | --- |
 | `add_user_secret.sql` | Account secret: `users.secret`, `_auth_ok`, `_name_reserved`, `register_account`, `login_account`, and a `p_secret` version of every app function. Old no-secret versions are locked. |
+| `drop_unknown_referral.sql` | Trigger `_users_set_referrer` saves `referred_by` as NULL when no account matches the typed referral; clears existing unmatched values. |
+| `add_system_contacts_admin.sql` | Admin-only functions the admin page uses to manage `system_contacts` (list, add, update, delete). |
+| `add_system_contacts.sql` | Table `system_contacts` (extra numbers saved on every phone with a plain name, no VGC tag) and the wrapper `get_sync_contacts(uuid, text)` that sends them. |
 | `add_referrer_id.sql` | `users.referrer_id` filled by triggers; referral functions use it. |
 | `add_system_contact_flag.sql` | `get_sync_contacts(uuid, text)` returns `is_system` for the admin and status numbers. |
 | `add_push_caller_check.sql` | `push_caller_ok` for the `send-push` caller check. |

@@ -459,6 +459,13 @@ class ReferralActivity : AppCompatActivity() {
 
     // --------------------------------------------------------- leaderboard
 
+    // Text under the leaderboard, with the trophy illustration above it when the board is simply empty.
+    private fun setBoardMessage(text: String, illustration: Boolean) {
+        boardMessage.text = text
+        boardMessage.compoundDrawablePadding = (12 * resources.displayMetrics.density).toInt()
+        boardMessage.setCompoundDrawablesWithIntrinsicBounds(0, if (illustration) R.drawable.ill_leaderboard_empty else 0, 0, 0)
+    }
+
     private fun loadBoard() {
         val userId = sessionManager.getUserId().orEmpty()
         boardBox.removeAllViews()
@@ -467,7 +474,7 @@ class ReferralActivity : AppCompatActivity() {
         if (userId.isBlank()) {
             boardSpinner.visibility = View.GONE
             boardMessage.visibility = View.VISIBLE
-            boardMessage.text = "No referrals yet."
+            setBoardMessage("No referrals yet.", true)
             return
         }
         Thread {
@@ -477,9 +484,9 @@ class ReferralActivity : AppCompatActivity() {
                 if (result == null) {
                     boardSpinner.visibility = View.GONE
                     boardMessage.visibility = View.VISIBLE
-                    boardMessage.text = if (!SupabaseClient.isOnline(this))
+                    setBoardMessage(if (!SupabaseClient.isOnline(this))
                         "No internet connection. Check your connection and try again."
-                    else "Couldn't load the leaderboard. Please try again."
+                    else "Couldn't load the leaderboard. Please try again.", false)
                     return@runOnUiThread
                 }
                 boardLoaded = true
@@ -508,7 +515,7 @@ class ReferralActivity : AppCompatActivity() {
         if (boardFiltered.isEmpty()) {
             boardSpinner.visibility = View.GONE
             boardMessage.visibility = View.VISIBLE
-            boardMessage.text = if (board.isEmpty()) "No referrals yet." else "No matches."
+            setBoardMessage(if (board.isEmpty()) "No referrals yet." else "No matches.", board.isEmpty())
             boardPagerScroll.visibility = View.GONE
             return
         }
