@@ -10,6 +10,12 @@
 // one push was accepted by FCM. The in-app feed already shows broadcasts
 // once to everyone (see fetch_notifications).
 //
+// Who may call this function: ONLY the database trigger. The trigger sends the key kept in the
+// vault (service_role_key); every other caller (for example someone using the public app key) gets 401.
+// Run supabase/migrations/add_push_caller_check.sql BEFORE deploying this version.
+// Broadcasts are read from the users table in pages of 1000 (a single query returns at most 1000
+// rows, which used to cut a broadcast off silently) and sent in groups of 100 at a time.
+//
 // ---------------------------------------------------------------------
 // ONE-TIME SETUP
 //
@@ -43,10 +49,53 @@ const FIREBASE_PROJECT_ID = Deno.env.get("FIREBASE_PROJECT_ID")!;
 const FIREBASE_CLIENT_EMAIL = Deno.env.get("FIREBASE_CLIENT_EMAIL")!;
 const FIREBASE_PRIVATE_KEY = Deno.env.get("FIREBASE_PRIVATE_KEY")!.replace(/\\n/g, "\n");
 
+const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  SERVICE_ROLE_KEY,
 );
+
+const USERS_PAGE = 1000; // users read per query (the server returns at most 1000 anyway)
+const SEND_GROUP = 100; // pushes sent at the same moment
+
+// Compare two strings without stopping at the first difference (so timing leaks nothing).
+function safeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
+// Only our own database trigger may call this function. The trigger sends the key stored in
+// the vault as "service_role_key". We accept the call when the key is either this function's own
+// service-role key, or exactly the vault key (checked by push_caller_ok in the database). Anyone
+// holding only the public app key is refused.
+async function callerIsOurDatabase(req: Request): Promise<boolean> {
+  const auth = req.headers.get("Authorization") ?? "";
+  if (!auth.startsWith("Bearer ")) return false;
+  const token = auth.slice(7);
+  if (safeEqual(token, SERVICE_ROLE_KEY)) return true;
+  const { data, error } = await supabase.rpc("push_caller_ok", { p_token: token });
+  return !error && data === true;
+}
+
+// Every device token in the users table, de-duplicated, read page by page.
+async function loadBroadcastTokens(): Promise<string[]> {
+  const seen = new Set<string>();
+  for (let from = 0; ; from += USERS_PAGE) {
+    const { data, error } = await supabase
+      .from("users")
+      .select("fcm_token")
+      .not("fcm_token", "is", null)
+      .order("id")
+      .range(from, from + USERS_PAGE - 1);
+    if (error) throw new Error(`failed to load users: ${JSON.stringify(error)}`);
+    for (const u of data ?? []) if (u.fcm_token) seen.add(u.fcm_token as string);
+    if (!data || data.length < USERS_PAGE) break;
+  }
+  return [...seen];
+}
 
 // --- Minting a short-lived Google OAuth access token from the service
 // account key, so we can call FCM's HTTP v1 send endpoint. This is the
@@ -112,6 +161,9 @@ async function getAccessToken(): Promise<string> {
 }
 
 Deno.serve(async (req) => {
+  if (!(await callerIsOurDatabase(req))) {
+    return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401 });
+  }
   try {
     const { notification_id } = await req.json();
     if (!notification_id) {
@@ -152,16 +204,8 @@ Deno.serve(async (req) => {
       }
       tokens = [user.fcm_token];
     } else {
-      const { data: users, error: usersError } = await supabase
-        .from("users")
-        .select("fcm_token")
-        .not("fcm_token", "is", null);
-
-      if (usersError) {
-        return new Response(JSON.stringify({ error: "failed to load users", detail: usersError }), { status: 500 });
-      }
-      // De-duplicate in case two accounts share a token.
-      tokens = [...new Set((users ?? []).map((u) => u.fcm_token as string).filter(Boolean))];
+      // De-duplicated in case two accounts share a token.
+      tokens = await loadBroadcastTokens();
 
       if (tokens.length === 0) {
         return new Response(JSON.stringify({ skipped: "broadcast: no users have an fcm_token" }), { status: 200 });
@@ -172,7 +216,7 @@ Deno.serve(async (req) => {
     const accessToken = await getAccessToken();
     const fcmUrl = `https://fcm.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/messages:send`;
 
-    const results = await Promise.all(tokens.map(async (token) => {
+    const sendOne = async (token: string) => {
       try {
         const res = await fetch(fcmUrl, {
           method: "POST",
@@ -224,7 +268,19 @@ Deno.serve(async (req) => {
       } catch (e) {
         return { ok: false, detail: String(e), dead: false, token };
       }
-    }));
+    };
+
+    // Send in groups of SEND_GROUP so a big broadcast never opens thousands of
+    // connections at once. Dead tokens are cleared after each group.
+    const results: { ok: boolean; detail: unknown; dead: boolean; token: string }[] = [];
+    for (let i = 0; i < tokens.length; i += SEND_GROUP) {
+      const group = await Promise.all(tokens.slice(i, i + SEND_GROUP).map(sendOne));
+      results.push(...group);
+      const deadInGroup = group.filter((r) => r.dead).map((r) => r.token);
+      if (deadInGroup.length > 0) {
+        await supabase.from("users").update({ fcm_token: null }).in("fcm_token", deadInGroup);
+      }
+    }
 
     const sent = results.filter((r) => r.ok).length;
     const failed = results.length - sent;
@@ -234,15 +290,6 @@ Deno.serve(async (req) => {
       .from("notifications")
       .update({ fcm_sent: sent, fcm_failed: failed })
       .eq("id", notif.id);
-
-    // Clear dead tokens so the next push (and the reach numbers) ignore them.
-    const deadTokens = results.filter((r) => r.dead).map((r) => r.token);
-    if (deadTokens.length > 0) {
-      await supabase
-        .from("users")
-        .update({ fcm_token: null })
-        .in("fcm_token", deadTokens);
-    }
 
     if (sent === 0) {
       // Common cause: fcm_token is stale (app uninstalled, token expired)
