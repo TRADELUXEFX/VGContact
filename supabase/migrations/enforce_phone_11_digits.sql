@@ -1,3 +1,10 @@
+-- ############################################################################
+-- OUTDATED - DO NOT RE-RUN. Kept only as history of what was once run.
+-- The live database was changed after this file (account secret, referrer_id, Nigerian time
+-- and more). Running it again can put an old version of a function back and bring old bugs
+-- back. For the real current code see supabase/README.md and export_live_definitions.sql.
+-- ############################################################################
+
 -- VGContact: phone numbers must be EXACTLY 11 digits, starting with 0
 -- (example: 09110321143). Enforced in the app AND here in the database.
 -- Safe to run more than once. Paste into the Supabase SQL Editor.

@@ -1,3 +1,10 @@
+-- ############################################################################
+-- OUTDATED - DO NOT RE-RUN. Kept only as history of what was once run.
+-- The live database was changed after this file (account secret, referrer_id, Nigerian time
+-- and more). Running it again can put an old version of a function back and bring old bugs
+-- back. For the real current code see supabase/README.md and export_live_definitions.sql.
+-- ############################################################################
+
 -- Run in Supabase > SQL Editor BEFORE installing this build. Safe to run more than once.
 -- Profile > Referred by: returns the username and phone number of the account that
 -- referred the caller. users.referred_by holds either that person's username or

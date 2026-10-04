@@ -1,3 +1,10 @@
+-- ############################################################################
+-- OUTDATED - DO NOT RE-RUN. Kept only as history of what was once run.
+-- The live database was changed after this file (account secret, referrer_id, Nigerian time
+-- and more). Running it again can put an old version of a function back and bring old bugs
+-- back. For the real current code see supabase/README.md and export_live_definitions.sql.
+-- ############################################################################
+
 -- VGContact: switch the Android ID requirement ON / OFF from the database.
 -- Paste the whole file into the Supabase SQL Editor and run it.
 -- Safe to run more than once. No app update needed.

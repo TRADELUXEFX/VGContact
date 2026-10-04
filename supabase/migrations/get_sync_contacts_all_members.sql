@@ -1,3 +1,10 @@
+-- ############################################################################
+-- OUTDATED - DO NOT RE-RUN. Kept only as history of what was once run.
+-- The live database was changed after this file (account secret, referrer_id, Nigerian time
+-- and more). Running it again can put an old version of a function back and bring old bugs
+-- back. For the real current code see supabase/README.md and export_live_definitions.sql.
+-- ############################################################################
+
 -- VGContact: group members sync as soon as they join (the group no longer has to be full).
 -- Run in Supabase > SQL Editor. Safe to run more than once. Needs add_inactivity.sql to exist already.
 -- Only change from the live get_sync_contacts: the "group is full or you were added" condition

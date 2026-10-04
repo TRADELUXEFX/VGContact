@@ -1,3 +1,10 @@
+-- ############################################################################
+-- OUTDATED - DO NOT RE-RUN. Kept only as history of what was once run.
+-- The live database was changed after this file (account secret, referrer_id, Nigerian time
+-- and more). Running it again can put an old version of a function back and bring old bugs
+-- back. For the real current code see supabase/README.md and export_live_definitions.sql.
+-- ############################################################################
+
 -- VGContact: inactivity tracking (part 1 of 2). Paste into the Supabase SQL Editor and run.
 -- Safe to run more than once. If the editor errors, run each statement on its own. The app starts calling record_sync as soon as this exists.
 --

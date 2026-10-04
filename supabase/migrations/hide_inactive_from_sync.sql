@@ -1,3 +1,10 @@
+-- ############################################################################
+-- OUTDATED - DO NOT RE-RUN. Kept only as history of what was once run.
+-- The live database was changed after this file (account secret, referrer_id, Nigerian time
+-- and more). Running it again can put an old version of a function back and bring old bugs
+-- back. For the real current code see supabase/README.md and export_live_definitions.sql.
+-- ############################################################################
+
 -- VGContact: inactivity (part 2 of 2). Run AFTER add_inactivity.sql (this function breaks without it). Safe to run more than once.
 -- Users with no successful sync for 30+ days (app_settings 'inactive_after_days') are left out of
 -- other people's sync lists: group members and referral contacts. They return on their next sync.
