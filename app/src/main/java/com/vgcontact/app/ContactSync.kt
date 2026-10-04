@@ -13,10 +13,13 @@ import androidx.core.content.ContextCompat
  * contact this user should have (admin number, anonymous number, and the
  * members of every group they belong to), already named.
  *
- * Naming: every contact this app saves is named "<name> VGC<N>" (for
- * example "Chidera VGC3"). N is the lowest number not already used on the
- * phone. The VGC<N> ending is how the app recognises its own contacts by
- * reading the phone itself, so nothing is lost if app data is cleared.
+ * Naming: every group member / referral contact this app saves is named
+ * "<name> VGC<N>" (for example "Chidera VGC3"). N is the lowest number not
+ * already used on the phone. The VGC<N> ending is how the app recognises its
+ * own contacts by reading the phone itself, so nothing is lost if app data is
+ * cleared. The two SYSTEM contacts (admin number and status number, flagged
+ * is_system by the server) are saved with their plain name and NO tag, so
+ * they are never removed by "Delete My Contacts" or by a sync clean-up.
  *
  * A sync does three things:
  *  1. Removes VGC contacts whose number is no longer in the server list
@@ -165,7 +168,10 @@ object ContactSync {
                 ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
                     .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, index)
                     .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
-                    .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, "${c.name} $TAG$n")
+                    .withValue(
+                        ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME,
+                        if (c.isSystem) c.name else "${c.name} $TAG$n"
+                    )
                     .build()
             )
             ops.add(
@@ -213,7 +219,12 @@ object ContactSync {
 
         // 1. Remove VGC contacts that dropped out of the server list.
         val existing = scanVgcContacts(context)
-        val stale = existing.filter { row -> row.keys.none { it in wantedKeys } }
+        // Also treated as stale: a TAGGED copy of the admin/status number saved by an older build.
+        // It is removed here and saved again below with the plain name.
+        val systemKeys = wanted.filter { it.isSystem }.map { key(it.phone) }.filter { it.isNotEmpty() }.toSet()
+        val stale = existing.filter { row ->
+            row.keys.none { it in wantedKeys } || row.keys.any { it in systemKeys }
+        }
         val removed = deleteRawContacts(context, stale.map { it.rawId })
         val staleIds = stale.map { it.rawId }.toSet()
         val numbersInUse = existing.filter { it.rawId !in staleIds }.map { it.number }.toMutableSet()
@@ -230,9 +241,13 @@ object ContactSync {
             // Give each contact its VGC number first, then save the whole batch in one go.
             val numbered = ArrayList<Pair<SupabaseClient.SyncContact, Int>>()
             for (c in batch) {
-                val n = lowestFreeNumber(numbersInUse)
-                numbersInUse.add(n)
-                numbered.add(c to n)
+                if (c.isSystem) {
+                    numbered.add(c to 0) // plain name, no number used
+                } else {
+                    val n = lowestFreeNumber(numbersInUse)
+                    numbersInUse.add(n)
+                    numbered.add(c to n)
+                }
             }
             try {
                 context.contentResolver.applyBatch(ContactsContract.AUTHORITY, buildInsertOps(numbered))
@@ -246,7 +261,7 @@ object ContactSync {
                         added += 1
                     } catch (e2: Exception) {
                         failed += 1
-                        numbersInUse.remove(item.second)
+                        if (item.second > 0) numbersInUse.remove(item.second)
                     }
                 }
             }

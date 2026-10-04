@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    A single notification row: unread dot, title, body, relative time.
+    A single notification row: unread dot, title, body, relative time. Unread rows also get a tinted background (set in NotificationsActivity).
     The dot is only visible while the item is unread (all items get
     marked read as soon as the screen opens, so this reflects state
     at load time, not live).

@@ -77,6 +77,13 @@ class NotificationsActivity : AppCompatActivity() {
             row.findViewById<TextView>(R.id.notification_time).text = formatRelativeTime(notification.createdAt)
             row.findViewById<View>(R.id.notification_unread_dot).visibility =
                 if (notification.isRead) View.GONE else View.VISIBLE
+            // Unread rows get a different colour (light green with a green border), read rows
+            // stay a plain white card. Padding is kept because setting a background can reset it.
+            val l = row.paddingLeft; val t = row.paddingTop; val r = row.paddingRight; val b = row.paddingBottom
+            row.setBackgroundResource(
+                if (notification.isRead) R.drawable.card_background else R.drawable.notification_unread_background
+            )
+            row.setPadding(l, t, r, b)
             val rowAction = NotificationRouter.resolveAction(notification.title, notification.action)
             if (!rowAction.isNullOrBlank() && rowAction != NotificationRouter.ACTION_HOME) {
                 row.setOnClickListener {

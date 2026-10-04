@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Background of an UNREAD notification row: light green fill and a green border, so it stands
+     out from read rows (plain white card_background). Same corner radius as card_background. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/vg_green_tint" />
+    <corners android:radius="20dp" />
+    <stroke android:width="1.5dp" android:color="@color/vg_green" />
+</shape>

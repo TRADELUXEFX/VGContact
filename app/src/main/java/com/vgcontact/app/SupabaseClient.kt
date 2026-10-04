@@ -272,7 +272,9 @@ object SupabaseClient {
         )
     }
 
-    data class SyncContact(val phone: String, val name: String)
+    // isSystem = the admin number and the status number. They are saved with their plain
+    // name (no VGC<N> ending); only group members and the referral chain get the tag.
+    data class SyncContact(val phone: String, val name: String, val isSystem: Boolean = false)
 
     // Every contact this user should have on the phone, already named by
     // the server. Blocking - call from a background thread. Null = failed.
@@ -281,7 +283,7 @@ object SupabaseClient {
         val out = mutableListOf<SyncContact>()
         for (i in 0 until arr.length()) {
             val r = arr.getJSONObject(i)
-            out.add(SyncContact(r.optString("phone"), r.optString("display_name")))
+            out.add(SyncContact(r.optString("phone"), r.optString("display_name"), r.optBoolean("is_system", false)))
         }
         return out
     }
