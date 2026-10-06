@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android wakes this adapter for the "VGContact" account. It runs the normal contact sync and
+     uploads nothing. The authority is the phone's contacts one so it is scheduled with contact syncs. -->
+<sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
+    android:contentAuthority="com.android.contacts"
+    android:accountType="com.vgcontact.app.account"
+    android:userVisible="true"
+    android:supportsUploading="false"
+    android:allowParallelSyncs="false"
+    android:isAlwaysSyncable="true" />

@@ -17,8 +17,9 @@ import androidx.work.WorkerParameters
 import java.util.concurrent.TimeUnit
 
 /**
- * Reminds the user to open the app before the server drops them from other
- * people's contact lists (see add_inactivity.sql).
+ * Reminds the user to open the app so new viewers get saved on the phone. (It used to warn that
+ * they would be dropped from other people's lists. Since 2026-10-03 only banned users are left
+ * out, so the text no longer says that.)
  *
  * A one-off timer is restarted every time contacts sync successfully (button,
  * first run or background, via [reschedule]). Only syncing counts, not opening
@@ -46,10 +47,10 @@ class InactivityWarningWorker(context: Context, params: WorkerParameters) : Coro
             val pending = PendingIntent.getActivity(
                 context, NOTIFICATION_ID, open, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
-            val message = "Your contacts haven't synced in 5 days. Open the app and sync now so you don't lose your viewers."
+            val message = "Your contacts haven't synced in 5 days. Open the app to save any new viewers to your phone."
             val n = NotificationCompat.Builder(context, VgFirebaseMessagingService.CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification)
-                .setContentTitle("Don't lose your viewers")
+                .setContentTitle("New viewers may be waiting")
                 .setContentText(message)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(message))
                 .setAutoCancel(true)

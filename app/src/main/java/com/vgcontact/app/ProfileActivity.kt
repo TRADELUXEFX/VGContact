@@ -96,6 +96,7 @@ class ProfileActivity : AppCompatActivity() {
             if (hours != SyncPrefs.getIntervalHours(this)) {
                 SyncPrefs.setIntervalHours(this, hours)
                 DailySyncWorker.reschedule(this)
+                SyncAdapterSetup.refreshInterval(this)
                 refreshSyncFrequencyButton()
                 Toast.makeText(this, "Contacts will sync every $hours ${hoursLabel(hours)}", Toast.LENGTH_SHORT).show()
             }

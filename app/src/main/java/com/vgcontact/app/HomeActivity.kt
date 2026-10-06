@@ -33,6 +33,9 @@ class HomeActivity : AppCompatActivity() {
     private var missingPermissions: List<String> = emptyList()
     private var isSyncing = false
     private var autoSyncing = false
+    // True once a sync has started during this open (set false again in onResume). Keeps the
+    // sync-on-every-open from running a second time right after the Sync button's own sync.
+    private var syncedThisOpen = false
 
     private lateinit var syncBtn: MaterialButton
 
@@ -80,6 +83,12 @@ class HomeActivity : AppCompatActivity() {
 
         syncBtn = findViewById(R.id.syncContactsBtn)
         syncBtn.setOnClickListener {
+            if (PendingPrompt.showGate(this)) return@setOnClickListener
+            startSync()
+        }
+
+        // "N contacts waiting": one tap runs the sync (it also resumes syncing if it was paused).
+        findViewById<View>(R.id.waitingBanner).setOnClickListener {
             if (PendingPrompt.showGate(this)) return@setOnClickListener
             startSync()
         }
@@ -256,6 +265,11 @@ class HomeActivity : AppCompatActivity() {
                     updateBanner.visibility = if (show) View.VISIBLE else View.GONE
                 }
             }
+            // Keep the phone's "VGContact" sync account in line with the admin switch
+            // (extra background trigger, see VgSyncAdapter.kt). Network call, so still on this thread.
+            if (bundle != null && bundle.home != null && !bundle.banned) {
+                SyncAdapterSetup.refreshFromServer(applicationContext)
+            }
         }.start()
     }
 
@@ -283,29 +297,62 @@ class HomeActivity : AppCompatActivity() {
 
         findViewById<TextView>(R.id.referralViewersCountText).text = h.referralCount.toString()
 
-        autoSyncIfViewersChanged(h)
+        syncOnOpen(h)
     }
 
-    // Verified (or gained viewers) since the last sync: save the new contacts right
-    // away instead of waiting for the button or the background timer.
-    private fun autoSyncIfViewersChanged(h: SupabaseClient.HomeData) {
-        if (h.status == "pending" || isSyncing || autoSyncing) return
-        if (!ContactSync.hasPermission(this) || SyncPrefs.isPaused(this)) return
+    // Sync on EVERY open (every time Home comes to the front), not only when the numbers
+    // changed. The numbers do not move when someone joins a Room or group, so waiting for
+    // them to change missed those. The sync itself is cheap: one list fetch and a local
+    // compare, and it only writes contacts that are missing. Pending (unverified) users are
+    // skipped, as before. When syncing cannot run (paused, or no contacts permission) the
+    // "N contacts waiting" banner is shown instead.
+    private fun syncOnOpen(h: SupabaseClient.HomeData) {
+        val banner = findViewById<View>(R.id.waitingBanner)
+        if (h.status == "pending") { banner.visibility = View.GONE; return }
+        if (isSyncing || autoSyncing || syncedThisOpen) return
         val userId = sessionManager.getUserId()
         if (userId.isNullOrBlank()) return
-        val snapshot = "${h.status}:${h.freeCurrent}:${h.extraCurrent}:${h.referralCount}"
-        if (SyncPrefs.getViewerSnapshot(this) == snapshot) return
+        if (SyncPrefs.isPaused(this) || !ContactSync.hasPermission(this)) {
+            refreshWaitingBanner(userId)
+            return
+        }
+        syncedThisOpen = true
         autoSyncing = true
         Thread {
             val result = ContactSync.run(this, userId)
             runOnUiThread {
                 autoSyncing = false
+                if (isFinishing || isDestroyed) return@runOnUiThread
                 if (result.error == null) {
-                    SyncPrefs.setViewerSnapshot(this, snapshot)
+                    banner.visibility = View.GONE
+                    refreshLastSync()
                     if (result.added > 0) {
                         Toast.makeText(this, "${result.added} new contacts saved", Toast.LENGTH_LONG).show()
                     }
                 }
+            }
+        }.start()
+    }
+
+    // Counts what is on the server list but not on the phone (read only, not a sync) and
+    // shows or hides the banner. Needs the contacts READ permission to look at the phone.
+    private fun refreshWaitingBanner(userId: String) {
+        val banner = findViewById<View>(R.id.waitingBanner)
+        if (!ContactSync.hasReadPermission(this)) { banner.visibility = View.GONE; return }
+        Thread {
+            val n = ContactSync.countWaiting(applicationContext, userId)
+            runOnUiThread {
+                if (isFinishing || isDestroyed) return@runOnUiThread
+                if (n == null || n <= 0) {
+                    banner.visibility = View.GONE
+                    return@runOnUiThread
+                }
+                findViewById<TextView>(R.id.waitingBannerTitle).text =
+                    if (n == 1) "1 contact waiting" else "$n contacts waiting"
+                findViewById<TextView>(R.id.waitingBannerText).text =
+                    if (SyncPrefs.isPaused(this)) "Syncing is paused. Tap to save them"
+                    else "Tap to save them to your phone"
+                banner.visibility = View.VISIBLE
             }
         }.start()
     }
@@ -332,6 +379,7 @@ class HomeActivity : AppCompatActivity() {
         if (SyncPrefs.isPaused(this)) SyncPrefs.setPaused(this, false)
 
         isSyncing = true
+        syncedThisOpen = true
         syncBtn.isEnabled = false
         val original = syncBtn.text
         syncBtn.text = "Syncing..."
@@ -353,6 +401,7 @@ class HomeActivity : AppCompatActivity() {
                     else -> "${SyncPrefs.getTodayAdded(this)} contacts added today"
                 }
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+                if (result.error == null) findViewById<View>(R.id.waitingBanner).visibility = View.GONE
                 refreshLastSync()
                 loadHome()
             }
@@ -403,6 +452,7 @@ class HomeActivity : AppCompatActivity() {
             BannedHandler.showFrom(this)
             return
         }
+        syncedThisOpen = false
         loadHome()
         refreshLastSync()
         updatePermissionBanner()

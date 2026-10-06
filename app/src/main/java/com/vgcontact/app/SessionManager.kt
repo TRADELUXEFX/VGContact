@@ -81,6 +81,7 @@ class SessionManager(private val context: Context) {
         prefs.edit().clear().apply()
         SyncPrefs.clear(context)
         InactivityWarningWorker.cancel(context)
+        SyncAdapterSetup.disable(context)
     }
 
     // Logged in = a saved username AND a secret. An account saved by an older build has no

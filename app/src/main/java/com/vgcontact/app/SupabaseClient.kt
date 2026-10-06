@@ -49,7 +49,7 @@ object SupabaseClient {
         "get_referral_leaderboard", "get_repost_leaderboard_phone", "get_leaderboard",
         "open_notifications", "mark_notifications_read", "record_notification_delivered",
         "record_notification_opened", "report_notifications_enabled", "save_fcm_token",
-        "record_sync", "get_my_profile", "get_my_referrer", "submit_daily_repost"
+        "record_sync", "report_sync_device", "get_sync_adapter_enabled", "get_my_profile", "get_my_referrer", "submit_daily_repost"
     )
 
     private fun currentSecret(): String =
@@ -441,11 +441,34 @@ object SupabaseClient {
     // "I just synced": stamps users.last_synced_at so the server knows this
     // user is active (see add_inactivity.sql). Fire-and-forget; also restarts
     // the local 5-day inactivity reminder. Called from ContactSync.run only.
-    fun recordSync(context: android.content.Context, userId: String) {
+    //
+    // Then tells the server which phone this is (brand, model, Android and app version) and
+    // whether the sync was automatic (background = true). The admin "not synced" list and the
+    // brand table read this (see add_sync_visibility.sql). If that SQL has not been run yet the
+    // second call just fails quietly.
+    fun recordSync(context: android.content.Context, userId: String, background: Boolean = false, source: String? = null) {
         InactivityWarningWorker.reschedule(context)
         kotlin.concurrent.thread {
             rpc("record_sync", JSONObject().apply { put("p_user_id", userId) })
+            rpc("report_sync_device", JSONObject().apply {
+                put("p_user_id", userId)
+                put("p_brand", android.os.Build.MANUFACTURER ?: "")
+                put("p_model", android.os.Build.MODEL ?: "")
+                put("p_sdk", android.os.Build.VERSION.SDK_INT)
+                put("p_app_version", BuildConfig.VERSION_CODE)
+                put("p_background", background)
+                if (source != null) put("p_source", source)
+            })
         }
+    }
+
+    // The admin switch `sync_adapter_enabled` (SQL: add_sync_adapter.sql). Null = could not ask
+    // (offline, or the SQL has not been run yet), so callers keep what the phone remembered.
+    // Blocking - call from a background thread.
+    fun fetchSyncAdapterEnabled(userId: String): Boolean? {
+        val arr = rpc("get_sync_adapter_enabled", JSONObject().apply { put("p_user_id", userId) }) ?: return null
+        if (arr.length() == 0) return null
+        return arr.getJSONObject(0).optBoolean("enabled", false)
     }
 
     // ---- Delivery tracking (see add_notification_tracking.sql) ----------

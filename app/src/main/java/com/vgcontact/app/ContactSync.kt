@@ -186,6 +186,25 @@ object ContactSync {
         return ops
     }
 
+    fun hasReadPermission(context: Context): Boolean =
+        ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
+
+    /**
+     * How many contacts from the server list are not on the phone yet. Only reads, never saves,
+     * and does not count as a sync. Null = could not tell (no read permission, offline, server
+     * failed). Call from a background thread.
+     */
+    fun countWaiting(context: Context, userId: String): Int? {
+        if (!hasReadPermission(context)) return null
+        if (!SupabaseClient.isOnline(context)) return null
+        val wanted = SupabaseClient.fetchSyncContacts(userId) ?: return null
+        if (wanted.none { it.phone.isNotBlank() }) return null
+        val onPhone = numbersOnPhone(context)
+        return wanted.filter {
+            !it.isSystem && it.phone.isNotBlank() && it.name.isNotBlank() && key(it.phone) !in onPhone
+        }.distinctBy { key(it.phone) }.size
+    }
+
     /** Removes every contact this app saved (name ends in VGC<N>). Returns how many were removed. */
     fun deleteAll(context: Context): Int {
         if (!hasPermission(context)) return 0
@@ -198,16 +217,20 @@ object ContactSync {
     // the contacts already on the phone.
     private val runLock = Any()
 
-    fun run(context: Context, userId: String): Result = synchronized(runLock) { runLocked(context, userId) }
+    // background = true when the automatic job (DailySyncWorker) runs it, so the server can tell
+    // which phones really let background sync run.
+    // source tells the server which trigger started it ("worker" or "adapter"; null = opened app / button).
+    fun run(context: Context, userId: String, background: Boolean = false, source: String? = null): Result =
+        synchronized(runLock) { runLocked(context, userId, background, source) }
 
-    private fun runLocked(context: Context, userId: String): Result {
+    private fun runLocked(context: Context, userId: String, background: Boolean, source: String?): Result {
         if (BanPrefs.isBanned(context)) return Result(0, 0, ERR_BANNED)
         if (SyncPrefs.isPaused(context)) return Result(0, 0, ERR_PAUSED)
         if (!SupabaseClient.isOnline(context)) return Result(0, 0, ERR_NO_INTERNET)
         val wanted = SupabaseClient.fetchSyncContacts(userId) ?: return Result(0, 0, ERR_FETCH)
         // The server answered: this counts as a sync. Stamps last_synced_at and restarts
         // the 5-day inactivity reminder (app opens alone do not count).
-        SupabaseClient.recordSync(context, userId)
+        SupabaseClient.recordSync(context, userId, background, source)
         SyncPrefs.recordSyncSuccess(context)
 
         // Safety: the list always holds at least the admin number, so an empty

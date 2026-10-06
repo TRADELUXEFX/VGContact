@@ -393,6 +393,72 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/waitingBanner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:minHeight="68dp"
+                android:padding="14dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/pending_banner_background"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/banner_icon_circle"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_people"
+                    app:tint="@color/white"
+                    android:contentDescription="@null" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/waitingBannerTitle"
+                        android:fontFamily="@font/poppins_bold"
+                        android:includeFontPadding="false"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/white" />
+
+                    <TextView
+                        android:id="@+id/waitingBannerText"
+                        android:fontFamily="@font/poppins"
+                        android:includeFontPadding="false"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:textSize="12sp"
+                        android:textColor="#E6FFFFFF" />
+                </LinearLayout>
+
+                <TextView
+                    android:fontFamily="@font/poppins_bold"
+                    android:includeFontPadding="false"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/banner_pill_white"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:text="SAVE"
+                    android:textSize="13sp"
+                    android:textColor="#8A5A00" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/home_contacts_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

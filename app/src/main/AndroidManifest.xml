@@ -8,6 +8,9 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <!-- Sync adapter: the "VGContact" account that Android's own scheduler uses to wake the sync. -->
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
 
     <!-- Android 11+ only lets the app see these packages if listed here (ShareHelper checks whether WhatsApp is installed). -->
     <queries>
@@ -133,6 +136,30 @@
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
+        </service>
+
+        <!-- Sync adapter (extra trigger for the contact sync, admin switch sync_adapter_enabled).
+             The account service only lets the "VGContact" account exist; the sync service is what
+             Android wakes. See VgSyncAdapter.kt. -->
+        <service
+            android:name=".VgAccountService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
+        <service
+            android:name=".VgSyncService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/syncadapter" />
         </service>
 
         <!-- Lets other apps (WhatsApp) read the invite image from our cache. -->

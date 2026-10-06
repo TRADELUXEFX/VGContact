@@ -116,6 +116,8 @@ class BannedActivity : AppCompatActivity() {
     // tag are never touched. Syncing itself is blocked while banned, and
     // starts again by itself if the ban is lifted.
     private fun removeSavedContacts() {
+        // The "VGContact" sync account is not needed while banned; Home brings it back after a ban is lifted.
+        SyncAdapterSetup.disable(applicationContext)
         if (!ContactSync.hasPermission(this)) return
         val app = applicationContext
         Thread { try { ContactSync.deleteAll(app) } catch (_: Throwable) { } }.start()

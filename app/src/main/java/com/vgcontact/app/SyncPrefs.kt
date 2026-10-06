@@ -103,6 +103,27 @@ object SyncPrefs {
         return hours * 60L * 60L * 1000L
     }
 
+    // Sync adapter (see VgSyncAdapter.kt). The admin switch `sync_adapter_enabled` as the phone last
+    // saw it, and the sync interval (hours) the adapter's periodic sync was last set to (0 = none).
+    private const val KEY_ADAPTER_ON = "adapter_enabled"
+    private const val KEY_ADAPTER_PERIOD = "adapter_period_hours"
+
+    fun getAdapterEnabled(context: Context): Boolean =
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE).getBoolean(KEY_ADAPTER_ON, false)
+
+    fun setAdapterEnabled(context: Context, on: Boolean) {
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .edit().putBoolean(KEY_ADAPTER_ON, on).apply()
+    }
+
+    fun getAdapterPeriodHours(context: Context): Int =
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE).getInt(KEY_ADAPTER_PERIOD, 0)
+
+    fun setAdapterPeriodHours(context: Context, hours: Int) {
+        context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+            .edit().putInt(KEY_ADAPTER_PERIOD, hours).apply()
+    }
+
     // Running total of contacts added today (resets by itself on a new day).
     private const val KEY_DAY = "added_day"
     private const val KEY_DAY_COUNT = "added_day_count"
@@ -131,6 +152,7 @@ object SyncPrefs {
         // Keep the chosen sync frequency: the WorkManager schedule outlives a logout.
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE).edit()
             .remove(KEY_PAUSED).remove(KEY_DAY).remove(KEY_DAY_COUNT)
-            .remove(KEY_LAST_SYNC).remove(KEY_FIRST_SYNC).remove(KEY_LAST_BG_SYNC).apply()
+            .remove(KEY_LAST_SYNC).remove(KEY_FIRST_SYNC).remove(KEY_LAST_BG_SYNC)
+            .remove(KEY_ADAPTER_PERIOD).apply()
     }
 }

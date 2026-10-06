@@ -50,7 +50,7 @@ class DailySyncWorker(context: Context, params: WorkerParameters) : CoroutineWor
             return Result.success()
         }
 
-        val result = ContactSync.run(ctx, userId)
+        val result = ContactSync.run(ctx, userId, background = true, source = "worker")
         // A background run that finished cleanly proves the phone lets us run.
         if (result.error == null) SyncPrefs.recordBackgroundSyncSuccess(ctx)
         if (result.error == ContactSync.ERR_NO_INTERNET || result.error == ContactSync.ERR_FETCH) {
