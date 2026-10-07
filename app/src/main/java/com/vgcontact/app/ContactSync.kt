@@ -147,6 +147,30 @@ object ContactSync {
         return deleted
     }
 
+    /** Raw ids of every live contact on the phone that has one of these numbers, whatever its name. */
+    private fun rawIdsForNumbers(context: Context, keys: Set<String>): List<Long> {
+        if (keys.isEmpty()) return emptyList()
+        val live = liveRawIds(context)
+        val ids = LinkedHashSet<Long>()
+        context.contentResolver.query(
+            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+            arrayOf(
+                ContactsContract.CommonDataKinds.Phone.RAW_CONTACT_ID,
+                ContactsContract.CommonDataKinds.Phone.NUMBER
+            ),
+            null, null, null
+        )?.use { c ->
+            val rawCol = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.RAW_CONTACT_ID)
+            val numCol = c.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+            while (c.moveToNext()) {
+                val k = key(c.getString(numCol) ?: "")
+                val rawId = c.getLong(rawCol)
+                if (k in keys && rawId in live) ids.add(rawId)
+            }
+        }
+        return ids.toList()
+    }
+
     private fun lowestFreeNumber(inUse: Set<Int>): Int {
         var n = 1
         while (n in inUse) n++
@@ -227,7 +251,12 @@ object ContactSync {
         if (BanPrefs.isBanned(context)) return Result(0, 0, ERR_BANNED)
         if (SyncPrefs.isPaused(context)) return Result(0, 0, ERR_PAUSED)
         if (!SupabaseClient.isOnline(context)) return Result(0, 0, ERR_NO_INTERNET)
-        val wanted = SupabaseClient.fetchSyncContacts(userId) ?: return Result(0, 0, ERR_FETCH)
+        val wantedAll = SupabaseClient.fetchSyncContacts(userId) ?: return Result(0, 0, ERR_FETCH)
+        // Numbers the admin asked to delete from every phone. They are never kept and never saved
+        // again, whatever group or list they come from. If the list can't be fetched: empty.
+        val removalKeys = (SupabaseClient.fetchRemovedNumbers(userId) ?: emptyList())
+            .map { key(it) }.filter { it.isNotEmpty() }.toSet()
+        val wanted = wantedAll.filter { key(it.phone) !in removalKeys }
         // The server answered: this counts as a sync. Stamps last_synced_at and restarts
         // the 5-day inactivity reminder (app opens alone do not count).
         SupabaseClient.recordSync(context, userId, background, source)
@@ -236,7 +265,7 @@ object ContactSync {
         // Safety: the list always holds at least the admin number, so an empty
         // list means something went wrong, not "everyone left". Never delete
         // or add anything on an empty list.
-        if (wanted.none { it.phone.isNotBlank() }) return Result(0, 0, null)
+        if (wantedAll.none { it.phone.isNotBlank() }) return Result(0, 0, null)
 
         val wantedKeys = wanted.map { key(it.phone) }.filter { it.isNotEmpty() }.toSet()
 
@@ -248,7 +277,9 @@ object ContactSync {
         val stale = existing.filter { row ->
             row.keys.none { it in wantedKeys } || row.keys.any { it in systemKeys }
         }
-        val removed = deleteRawContacts(context, stale.map { it.rawId })
+        var removed = deleteRawContacts(context, stale.map { it.rawId })
+        // Also delete every contact with a listed number, tagged or not.
+        removed += deleteRawContacts(context, rawIdsForNumbers(context, removalKeys))
         val staleIds = stale.map { it.rawId }.toSet()
         val numbersInUse = existing.filter { it.rawId !in staleIds }.map { it.number }.toMutableSet()
 

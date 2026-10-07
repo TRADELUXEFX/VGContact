@@ -112,7 +112,8 @@ notify pgrst, 'reload schema';
 -- See the list:
 --   select name, phone, sort_order, is_active from public.system_contacts order by sort_order, created_at;
 -- NOTE: removing or switching off a number stops it being sent, but phones that already saved it
--- keep it (the app never deletes contacts that have no VGC tag).
+-- keep it (the app never deletes contacts that have no VGC tag). To delete a number from phones too,
+-- use add_remove_numbers.sql (admin_add_removal).
 
 -- 4. CHECK: the function was created and the list is readable (run after the file ran).
 select p.proname, pg_get_function_identity_arguments(p.oid) as args,

@@ -50,7 +50,7 @@ object SupabaseClient {
     // them, so the screens never have to. Without the right secret the server answers UNAUTHORIZED.
     private val SECRET_RPCS = setOf(
         "get_app_bundle", "get_home", "get_today_repost_status", "get_today_verify_status",
-        "get_sync_contacts", "get_my_referrals_full", "get_referral_leaderboard_phone",
+        "get_sync_contacts", "get_removed_numbers", "get_my_referrals_full", "get_referral_leaderboard_phone",
         "get_referral_leaderboard", "get_repost_leaderboard_phone", "get_leaderboard",
         "open_notifications", "mark_notifications_read", "record_notification_delivered",
         "record_notification_opened", "report_notifications_enabled", "save_fcm_token",
@@ -293,6 +293,18 @@ object SupabaseClient {
         for (i in 0 until arr.length()) {
             val r = arr.getJSONObject(i)
             out.add(SyncContact(r.optString("phone"), r.optString("display_name"), r.optBoolean("is_system", false)))
+        }
+        return out
+    }
+
+    // Numbers the admin asked to delete from every phone (any saved name). Null = failed;
+    // callers treat that like an empty list.
+    fun fetchRemovedNumbers(userId: String): List<String>? {
+        val arr = rpc("get_removed_numbers", JSONObject().apply { put("p_user_id", userId) }) ?: return null
+        val out = mutableListOf<String>()
+        for (i in 0 until arr.length()) {
+            val n = arr.getJSONObject(i).optString("phone")
+            if (n.isNotBlank()) out.add(n)
         }
         return out
     }
