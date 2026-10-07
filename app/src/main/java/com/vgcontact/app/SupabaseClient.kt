@@ -12,7 +12,12 @@ import org.json.JSONObject
 object SupabaseClient {
     private val supabaseUrl = BuildConfig.SUPABASE_URL
     private val anonKey = BuildConfig.SUPABASE_ANON_KEY
-    private val client = OkHttpClient()
+    // 30 s instead of OkHttp's 10 s default, so a slow mobile connection can finish the call.
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+        .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+        .writeTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+        .build()
 
     // True only if the app was actually built with real Supabase credentials.
     // If SUPABASE_URL / SUPABASE_ANON_KEY were blank at build time (missing
@@ -244,7 +249,11 @@ object SupabaseClient {
             put("p_android_id", BannedHandler.androidId(context))
             put("p_current_build", AppUpdatePrompt.currentBuild())
         }
-        val arr = rpc("get_app_bundle", params)
+        // Read-only call, so it is safe to try once more after a network failure (timeout etc.).
+        var arr = rpc("get_app_bundle", params)
+        if (arr == null && lastError?.startsWith("Network error") == true) {
+            arr = rpc("get_app_bundle", params)
+        }
         if (arr == null || arr.length() == 0) return null
         val b = arr.getJSONObject(0).optJSONObject("bundle") ?: return null
         val h = b.optJSONObject("home")
