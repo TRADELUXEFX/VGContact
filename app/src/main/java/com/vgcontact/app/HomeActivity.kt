@@ -264,7 +264,7 @@ class HomeActivity : AppCompatActivity() {
                 AppUpdatePrompt.handleUpdate(this, bundle.update, { !onboardingActive }) { show ->
                     updateBanner.visibility = if (show) View.VISIBLE else View.GONE
                 }
-                if (!onboardingActive) MaintenanceNotice.check(this)
+                MaintenanceNotice.check(this) // shown to everyone, pending users included
             }
             // Keep the phone's "VGContact" sync account in line with the admin switch
             // (extra background trigger, see VgSyncAdapter.kt). Network call, so still on this thread.
