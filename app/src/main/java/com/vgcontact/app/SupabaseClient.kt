@@ -538,6 +538,12 @@ object SupabaseClient {
         callback(if (arr != null && arr.length() > 0) arr.getJSONObject(0).optString("value").ifBlank { null } else null)
     }
 
+    // The notice the admin wants every user to see (maintenance message). Null = none or failed.
+    fun fetchNotice(callback: (String?) -> Unit) {
+        val arr = rpc("get_notice", JSONObject())
+        callback(if (arr != null && arr.length() > 0) arr.getJSONObject(0).optString("message").trim().ifBlank { null } else null)
+    }
+
     // The newest published build, from get_app_update (see add_app_update.sql).
     fun fetchAppUpdate(build: Int, callback: (JSONObject?) -> Unit) {
         val arr = rpc("get_app_update", JSONObject().apply { put("p_current_build", build) })
