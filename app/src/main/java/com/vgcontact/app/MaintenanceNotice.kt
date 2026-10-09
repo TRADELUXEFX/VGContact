@@ -1,12 +1,8 @@
 package com.vgcontact.app
 
 import android.app.Activity
-import android.content.res.ColorStateList
-import android.graphics.Color
 import android.view.View
 import android.widget.TextView
-import androidx.core.content.ContextCompat
-import com.google.android.material.button.MaterialButton
 import kotlin.concurrent.thread
 
 /** What the server says right now (get_notice). [paused] = Maintenance mode is on. */
@@ -14,9 +10,9 @@ data class Notice(val message: String, val paused: Boolean)
 
 /**
  * Maintenance banner on Home (admin: Settings > Maintenance).
- *  - Notice written, or Maintenance mode on  -> amber card under the header.
- *  - Maintenance mode on                     -> the Sync button shows "Sync paused".
- * The app keeps working. Nothing is blocked and nothing is deleted.
+ *  - Notice written (Maintenance mode off)   -> amber card under the header.
+ *  - Maintenance mode on                     -> full-screen "We're doing maintenance" cover on Home.
+ * Nothing is deleted.
  * Server side: get_notice() in supabase/migrations/add_notice.sql.
  */
 object MaintenanceNotice {
@@ -24,6 +20,16 @@ object MaintenanceNotice {
     /** True while Maintenance mode is on. HomeActivity.startSync reads it. */
     @Volatile var paused = false
         private set
+
+    /**
+     * Shows the last known state at once (before the server answers), so the full-screen
+     * maintenance cover is already up on open and nothing can be tapped in the first seconds.
+     */
+    fun restore(activity: Activity) {
+        val prefs = activity.getSharedPreferences("maintenance", android.content.Context.MODE_PRIVATE)
+        paused = prefs.getBoolean("was_paused", false)
+        showOverlay(activity, prefs.getString("last_message", "") ?: "")
+    }
 
     /**
      * [onEnded] runs once when Maintenance mode was on the last time this phone looked and is
@@ -36,7 +42,8 @@ object MaintenanceNotice {
                 val prefs = activity.getSharedPreferences("maintenance", android.content.Context.MODE_PRIVATE)
                 val wasPaused = prefs.getBoolean("was_paused", false)
                 paused = notice?.paused == true
-                prefs.edit().putBoolean("was_paused", paused).apply()
+                prefs.edit().putBoolean("was_paused", paused)
+                    .putString("last_message", notice?.message ?: "").apply()
                 activity.runOnUiThread {
                     if (activity.isFinishing || activity.isDestroyed) return@runOnUiThread
                     apply(activity, notice)
@@ -47,26 +54,23 @@ object MaintenanceNotice {
     }
 
     private fun apply(activity: Activity, notice: Notice?) {
+        showOverlay(activity, notice?.message ?: "")
+        // Plain notice (Maintenance mode off): the amber card. While paused the full-screen cover is up.
         val banner = activity.findViewById<View>(R.id.maintenanceBanner) ?: return
-        if (notice == null) {
+        if (notice == null || notice.paused) {
             banner.visibility = View.GONE
         } else {
-            activity.findViewById<TextView>(R.id.maintenanceTitle).text =
-                if (notice.paused) "We're doing maintenance" else "Notice"
+            activity.findViewById<TextView>(R.id.maintenanceTitle).text = "Notice"
             activity.findViewById<TextView>(R.id.maintenanceSub).text = notice.message
             banner.visibility = View.VISIBLE
         }
-        val btn = activity.findViewById<MaterialButton>(R.id.syncContactsBtn) ?: return
-        if (paused) {
-            btn.text = "Sync paused"
-            btn.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#F0F2F5"))
-            btn.setTextColor(Color.parseColor("#A8B0AC"))
-            btn.iconTint = ColorStateList.valueOf(Color.parseColor("#A8B0AC"))
-        } else if (btn.text.toString() == "Sync paused") {
-            btn.setText(R.string.btn_sync_contacts)
-            btn.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.vg_green))
-            btn.setTextColor(Color.WHITE)
-            btn.iconTint = ColorStateList.valueOf(Color.WHITE)
-        }
+    }
+
+    private fun showOverlay(activity: Activity, message: String) {
+        val overlay = activity.findViewById<View>(R.id.maintenanceOverlay) ?: return
+        activity.findViewById<TextView>(R.id.maintenanceOverlayMsg)?.text = message.trim()
+        activity.findViewById<View>(R.id.maintenanceMsgCard)?.visibility =
+            if (message.isBlank()) View.GONE else View.VISIBLE
+        overlay.visibility = if (paused) View.VISIBLE else View.GONE
     }
 }

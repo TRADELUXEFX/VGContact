@@ -103,6 +103,10 @@ class HomeActivity : AppCompatActivity() {
             CommunityLink.open(this)
         }
 
+        findViewById<Button>(R.id.maintenanceCommunityBtn).setOnClickListener {
+            CommunityLink.open(this)
+        }
+
         setupReferralLink()
         applyCachedStatus()
 
@@ -313,6 +317,7 @@ class HomeActivity : AppCompatActivity() {
         val banner = findViewById<View>(R.id.waitingBanner)
         if (h.status == "pending") { banner.visibility = View.GONE; return }
         if (isSyncing || autoSyncing || syncedThisOpen) return
+        if (MaintenanceNotice.paused) return
         val userId = sessionManager.getUserId()
         if (userId.isNullOrBlank()) return
         if (SyncPrefs.isPaused(this) || !ContactSync.hasPermission(this)) {
@@ -460,6 +465,7 @@ class HomeActivity : AppCompatActivity() {
             return
         }
         syncedThisOpen = false
+        MaintenanceNotice.restore(this)
         loadHome()
         refreshLastSync()
         updatePermissionBanner()

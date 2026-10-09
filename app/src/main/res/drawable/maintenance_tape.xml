@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Caution tape strip for the maintenance cover. Wider than any phone so it runs edge to edge. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="800dp"
+    android:height="34dp"
+    android:viewportWidth="800"
+    android:viewportHeight="34">
+    <path android:fillColor="#F5B83D" android:pathData="M0,0 H800 V34 H0 Z"/>
+    <path android:fillColor="#2C2C2A" android:pathData="M-10,0 h14 l-10,34 h-14 z M30,0 h14 l-10,34 h-14 z M70,0 h14 l-10,34 h-14 z M110,0 h14 l-10,34 h-14 z M150,0 h14 l-10,34 h-14 z M190,0 h14 l-10,34 h-14 z M230,0 h14 l-10,34 h-14 z M270,0 h14 l-10,34 h-14 z M310,0 h14 l-10,34 h-14 z M350,0 h14 l-10,34 h-14 z M390,0 h14 l-10,34 h-14 z M430,0 h14 l-10,34 h-14 z M470,0 h14 l-10,34 h-14 z M510,0 h14 l-10,34 h-14 z M550,0 h14 l-10,34 h-14 z M590,0 h14 l-10,34 h-14 z M630,0 h14 l-10,34 h-14 z M670,0 h14 l-10,34 h-14 z M710,0 h14 l-10,34 h-14 z M750,0 h14 l-10,34 h-14 z M790,0 h14 l-10,34 h-14 z "/>
+</vector>
