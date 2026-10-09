@@ -33,7 +33,7 @@ object MaintenanceNotice {
         thread {
             SupabaseClient.fetchNotice { notice, failed ->
                 if (failed) return@fetchNotice // offline: leave everything as it was
-                val prefs = activity.getSharedPreferences("maintenance", Activity.MODE_PRIVATE)
+                val prefs = activity.getSharedPreferences("maintenance", android.content.Context.MODE_PRIVATE)
                 val wasPaused = prefs.getBoolean("was_paused", false)
                 paused = notice?.paused == true
                 prefs.edit().putBoolean("was_paused", paused).apply()
