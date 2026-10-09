@@ -1,31 +1,30 @@
--- add_notice.sql  (updated)
+-- add_notice.sql  (updated: now also says whether Maintenance mode is on)
 -- RUN: Supabase > SQL Editor > paste the WHOLE file > Run (one time). Safe to run twice.
--- "Notice to users": the admin writes a message (Settings > Maintenance) and every user sees
--- it once as a pop-up when they open the app. Empty = no notice.
--- While maintenance mode (sync_paused) is ON and no message is written, users see a default one.
--- Needs the app update (versionCode 82). Nothing existing is changed.
+-- Home shows an amber banner when the admin writes a notice (Settings > Maintenance) or turns
+-- Maintenance mode on. While Maintenance mode is on and no notice is written, users see a default.
+-- Needs the app update. Nothing existing is changed.
 
 insert into public.app_settings (key, value) values ('maintenance_message', ' ')
 on conflict (key) do nothing;
 
-create or replace function public.get_notice()
- returns table(message text)
+drop function if exists public.get_notice();
+
+create function public.get_notice()
+ returns table(message text, paused boolean)
  language sql
  stable
  security definer
  set search_path to 'public'
 as $function$
-  select q.m
+  select coalesce(s.custom,
+                  case when s.p then 'Contacts sync is paused. Your saved contacts are safe.' end) as m,
+         s.p
     from (
-      select coalesce(
-               (select nullif(btrim(s.value), '') from app_settings s where s.key = 'maintenance_message'),
-               case when exists (select 1 from app_settings p
-                                  where p.key = 'sync_paused' and lower(btrim(p.value)) = 'true')
-                    then 'We are doing maintenance. Your contacts will update again when it is finished.'
-               end
-             ) as m
-    ) q
-   where q.m is not null;
+      select (select nullif(btrim(a.value), '') from app_settings a where a.key = 'maintenance_message') as custom,
+             exists (select 1 from app_settings b
+                      where b.key = 'sync_paused' and lower(btrim(b.value)) = 'true') as p
+    ) s
+   where coalesce(s.custom, case when s.p then 'x' end) is not null;
 $function$;
 
 revoke all on function public.get_notice() from public;
@@ -33,5 +32,5 @@ grant execute on function public.get_notice() to anon, authenticated;
 
 notify pgrst, 'reload schema';
 
--- CHECK: one row, value is blank (no notice yet)
-select key, '[' || value || ']' as value from public.app_settings where key = 'maintenance_message';
+-- CHECK: returns no row while there is no notice and Maintenance mode is off
+select * from public.get_notice();

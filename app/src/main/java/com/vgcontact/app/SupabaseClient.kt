@@ -538,10 +538,22 @@ object SupabaseClient {
         callback(if (arr != null && arr.length() > 0) arr.getJSONObject(0).optString("value").ifBlank { null } else null)
     }
 
-    // The notice the admin wants every user to see (maintenance message). Null = none or failed.
-    fun fetchNotice(callback: (String?) -> Unit) {
+    // What the admin wants every user to see (notice and/or Maintenance mode).
+    // callback(notice, failed): notice is null when there is nothing to show; failed = the call
+    // itself failed (offline, server error), so the caller keeps whatever it showed before.
+    fun fetchNotice(callback: (Notice?, Boolean) -> Unit) {
         val arr = rpc("get_notice", JSONObject())
-        callback(if (arr != null && arr.length() > 0) arr.getJSONObject(0).optString("message").trim().ifBlank { null } else null)
+        if (arr == null) {
+            callback(null, true)
+            return
+        }
+        if (arr.length() == 0) {
+            callback(null, false)
+            return
+        }
+        val row = arr.getJSONObject(0)
+        val message = row.optString("message").trim()
+        callback(if (message.isBlank()) null else Notice(message, row.optBoolean("paused", false)), false)
     }
 
     // The newest published build, from get_app_update (see add_app_update.sql).

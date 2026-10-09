@@ -264,7 +264,9 @@ class HomeActivity : AppCompatActivity() {
                 AppUpdatePrompt.handleUpdate(this, bundle.update, { !onboardingActive }) { show ->
                     updateBanner.visibility = if (show) View.VISIBLE else View.GONE
                 }
-                MaintenanceNotice.check(this) // shown to everyone, pending users included
+                // Banner + "Sync paused" while the admin has it on. When maintenance has just ended,
+                // sync right away (unless the user paused syncing themselves in Profile).
+                MaintenanceNotice.refresh(this) { if (!SyncPrefs.isPaused(this)) startSync() }
             }
             // Keep the phone's "VGContact" sync account in line with the admin switch
             // (extra background trigger, see VgSyncAdapter.kt). Network call, so still on this thread.
@@ -362,6 +364,10 @@ class HomeActivity : AppCompatActivity() {
 
     private fun startSync() {
         if (isSyncing) return
+        if (MaintenanceNotice.paused) {
+            Toast.makeText(this, "Sync is paused while we do maintenance. Your saved contacts are safe.", Toast.LENGTH_LONG).show()
+            return
+        }
         if (!ContactSync.hasPermission(this)) {
             androidx.core.app.ActivityCompat.requestPermissions(
                 this,
