@@ -788,8 +788,10 @@
     <include layout="@layout/bottom_nav_bar" />
 
     <!-- Full-screen maintenance cover. Shown by MaintenanceNotice while Maintenance mode is on.
-         Sits above everything (nav bar included) and eats all touches. clipChildren/clipToPadding
-         are off so the caution tape can run edge to edge. -->
+         The high elevation puts it above the nav pill (10dp) and the floating chat button (12dp),
+         so it truly covers the whole screen and eats all touches. No horizontal padding on this
+         root and on the scroll area, so the caution tape can run edge to edge; side padding lives
+         on the content blocks instead. -->
     <LinearLayout
         android:id="@+id/maintenanceOverlay"
         android:layout_width="match_parent"
@@ -798,127 +800,165 @@
         android:clickable="true"
         android:clipChildren="false"
         android:clipToPadding="false"
+        android:elevation="100dp"
         android:focusable="true"
-        android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:paddingBottom="20dp"
+        android:translationZ="100dp"
         android:visibility="gone">
 
-        <FrameLayout
-            android:layout_width="300dp"
-            android:layout_height="290dp"
-            android:layout_marginTop="40dp"
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:clipChildren="false"
-            android:clipToPadding="false">
+            android:clipToPadding="false"
+            android:fillViewport="true"
+            android:overScrollMode="never"
+            android:scrollbars="none">
 
-            <ImageView
-                android:layout_width="300dp"
-                android:layout_height="290dp"
-                android:importantForAccessibility="no"
-                android:src="@drawable/maintenance_illustration" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:gravity="center"
+                android:minHeight="0dp"
+                android:orientation="vertical"
+                android:paddingTop="24dp"
+                android:paddingBottom="16dp">
 
-            <FrameLayout
-                android:layout_width="800dp"
-                android:layout_height="34dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="135dp"
-                android:rotation="-9">
+                <FrameLayout
+                    android:layout_width="300dp"
+                    android:layout_height="290dp"
+                    android:clipChildren="false"
+                    android:clipToPadding="false">
 
-                <ImageView
-                    android:layout_width="800dp"
-                    android:layout_height="34dp"
-                    android:importantForAccessibility="no"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/maintenance_tape" />
+                    <ImageView
+                        android:layout_width="300dp"
+                        android:layout_height="290dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/maintenance_illustration" />
+
+                    <FrameLayout
+                        android:layout_width="800dp"
+                        android:layout_height="34dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="120dp"
+                        android:rotation="-9">
+
+                        <ImageView
+                            android:layout_width="800dp"
+                            android:layout_height="34dp"
+                            android:importantForAccessibility="no"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/maintenance_tape" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:background="#F5B83D"
+                            android:fontFamily="@font/poppins_medium"
+                            android:gravity="center"
+                            android:includeFontPadding="false"
+                            android:letterSpacing="0.1"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:text="MAINTENANCE"
+                            android:textColor="#2C2C2A"
+                            android:textSize="12sp" />
+                    </FrameLayout>
+                </FrameLayout>
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="22dp"
-                    android:layout_gravity="center"
-                    android:background="#F5B83D"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     android:fontFamily="@font/poppins_medium"
                     android:gravity="center"
                     android:includeFontPadding="false"
-                    android:letterSpacing="0.1"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp"
-                    android:text="MAINTENANCE"
-                    android:textColor="#2C2C2A"
-                    android:textSize="12sp" />
-            </FrameLayout>
-        </FrameLayout>
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:text="We're doing maintenance"
+                    android:textColor="@android:color/white"
+                    android:textSize="22sp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:fontFamily="@font/poppins_medium"
-            android:gravity="center"
-            android:text="We're doing maintenance"
-            android:textColor="@android:color/white"
-            android:textSize="22sp" />
+                <LinearLayout
+                    android:id="@+id/maintenanceMsgCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="20dp"
+                    android:background="@drawable/maintenance_message_card"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingStart="18dp"
+                    android:paddingTop="14dp"
+                    android:paddingEnd="18dp"
+                    android:paddingBottom="14dp">
 
+                    <TextView
+                        android:id="@+id/maintenanceOverlayMsg"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/poppins"
+                        android:gravity="center"
+                        android:textColor="@color/vg_dark"
+                        android:textSize="15sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- Bottom block: always pinned to the bottom, same side margins as the card above. -->
         <LinearLayout
-            android:id="@+id/maintenanceMsgCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:background="@drawable/maintenance_message_card"
-            android:gravity="center"
+            android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:paddingStart="18dp"
-            android:paddingTop="14dp"
-            android:paddingEnd="18dp"
-            android:paddingBottom="14dp">
+            android:paddingStart="20dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="24dp">
+
+            <Button
+                android:id="@+id/maintenanceCommunityBtn"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:fontFamily="@font/poppins_bold"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:letterSpacing="0.02"
+                android:text="Join Our Community"
+                android:textAllCaps="true"
+                android:textColor="@color/vg_green_dark"
+                android:textSize="16sp"
+                app:backgroundTint="@android:color/white"
+                app:cornerRadius="16dp"
+                app:icon="@drawable/ic_pending_whatsapp"
+                app:iconGravity="textStart"
+                app:iconPadding="10dp"
+                app:iconTint="@color/vg_green_dark" />
 
             <TextView
-                android:id="@+id/maintenanceOverlayMsg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/maintenance_pill_background"
                 android:fontFamily="@font/poppins"
                 android:gravity="center"
-                android:textColor="@color/vg_dark"
-                android:textSize="15sp" />
+                android:includeFontPadding="false"
+                android:paddingStart="16dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp"
+                android:text="Your saved contacts are safe"
+                android:textColor="@android:color/white"
+                android:textSize="13sp" />
         </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <Button
-            android:id="@+id/maintenanceCommunityBtn"
-            style="@style/Widget.MaterialComponents.Button"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:fontFamily="@font/poppins_bold"
-            android:includeFontPadding="false"
-            android:letterSpacing="0.02"
-            android:text="Join Our Community"
-            android:textAllCaps="true"
-            android:textColor="@color/vg_green_dark"
-            android:textSize="16sp"
-            app:backgroundTint="@android:color/white"
-            app:cornerRadius="16dp"
-            app:icon="@drawable/ic_pending_whatsapp"
-            app:iconGravity="textStart"
-            app:iconTint="@color/vg_green_dark" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/maintenance_pill_background"
-            android:fontFamily="@font/poppins"
-            android:paddingStart="16dp"
-            android:paddingTop="8dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="8dp"
-            android:text="Your saved contacts are safe"
-            android:textColor="@android:color/white"
-            android:textSize="13sp" />
     </LinearLayout>
 
 </FrameLayout>

@@ -72,5 +72,19 @@ object MaintenanceNotice {
         activity.findViewById<View>(R.id.maintenanceMsgCard)?.visibility =
             if (message.isBlank()) View.GONE else View.VISIBLE
         overlay.visibility = if (paused) View.VISIBLE else View.GONE
+        tintSystemBars(activity)
+    }
+
+    private var originalNavColor: Int? = null
+
+    /** Paint the phone's bottom system bar green while the cover is up, so it is truly full screen. */
+    private fun tintSystemBars(activity: Activity) {
+        val window = activity.window
+        if (originalNavColor == null) originalNavColor = window.navigationBarColor
+        window.navigationBarColor = if (paused)
+            androidx.core.content.ContextCompat.getColor(activity, R.color.vg_green)
+        else originalNavColor!!
+        androidx.core.view.WindowCompat.getInsetsController(window, window.decorView)
+            .isAppearanceLightNavigationBars = false
     }
 }
