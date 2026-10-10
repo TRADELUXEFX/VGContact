@@ -18,6 +18,7 @@
     <style name="TextAppearance.VG.Button" parent="TextAppearance.MaterialComponents.Button">
         <item name="android:fontFamily">@font/poppins_extrabold</item>
         <item name="fontFamily">@font/poppins_extrabold</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
     <!-- Splash theme. Applied ONLY to the launcher activity in the
@@ -64,26 +65,28 @@
 
 
     <!-- ===== Type scale (Poppins) =====
-         One style per role, so every screen follows the same hierarchy.
-         Weights: Light 300, Regular 400, Medium 500, SemiBold 600, Bold 700, ExtraBold 800.
-         Display / Title        Bold       28 / 24sp   screen titles, big numbers
-         Heading                SemiBold   18sp        section headings
-         Subheading             SemiBold   16sp        card titles
-         Body                   Regular    14sp        paragraphs
-         Body strong / Label    Medium     14 / 13sp   names, row titles, field labels
-         Caption                Regular    12sp        timestamps, hints
-         Overline / Nav label   SemiBold   10-11sp     tiny labels, tab labels, badges
-         Button                 ExtraBold  14sp        every button label -->
-    <style name="TextAppearance.VG.Display" parent="android:TextAppearance"><item name="android:fontFamily">@font/poppins_bold</item><item name="fontFamily">@font/poppins_bold</item><item name="android:textSize">28sp</item></style>
+         One style per role. Every screen uses these via android:textAppearance, so
+         changing a role here changes it everywhere.
+         Display 32 Bold | Title 24 Bold | Heading 18 SemiBold | Subheading 16 SemiBold | Lead 16 Regular
+         Body 14 (Regular / Medium / SemiBold) | BodySmall 13 (R / M / SB)
+         Caption 12 (R / M / SB) | Micro 11 (R / M / SB) | Button 14 ExtraBold -->
+    <style name="TextAppearance.VG.Display" parent="android:TextAppearance"><item name="android:fontFamily">@font/poppins_bold</item><item name="fontFamily">@font/poppins_bold</item><item name="android:textSize">32sp</item></style>
     <style name="TextAppearance.VG.Title" parent="android:TextAppearance"><item name="android:fontFamily">@font/poppins_bold</item><item name="fontFamily">@font/poppins_bold</item><item name="android:textSize">24sp</item></style>
     <style name="TextAppearance.VG.Heading" parent="android:TextAppearance"><item name="android:fontFamily">@font/poppins_semibold</item><item name="fontFamily">@font/poppins_semibold</item><item name="android:textSize">18sp</item></style>
     <style name="TextAppearance.VG.Subheading" parent="android:TextAppearance"><item name="android:fontFamily">@font/poppins_semibold</item><item name="fontFamily">@font/poppins_semibold</item><item name="android:textSize">16sp</item></style>
+    <style name="TextAppearance.VG.Lead" parent="android:TextAppearance"><item name="android:fontFamily">@font/poppins</item><item name="fontFamily">@font/poppins</item><item name="android:textSize">16sp</item></style>
     <style name="TextAppearance.VG.Body" parent="android:TextAppearance"><item name="android:fontFamily">@font/poppins</item><item name="fontFamily">@font/poppins</item><item name="android:textSize">14sp</item></style>
-    <style name="TextAppearance.VG.BodyStrong" parent="android:TextAppearance"><item name="android:fontFamily">@font/poppins_medium</item><item name="fontFamily">@font/poppins_medium</item><item name="android:textSize">14sp</item></style>
-    <style name="TextAppearance.VG.Label" parent="android:TextAppearance"><item name="android:fontFamily">@font/poppins_medium</item><item name="fontFamily">@font/poppins_medium</item><item name="android:textSize">13sp</item></style>
+    <style name="TextAppearance.VG.BodyMedium" parent="android:TextAppearance"><item name="android:fontFamily">@font/poppins_medium</item><item name="fontFamily">@font/poppins_medium</item><item name="android:textSize">14sp</item></style>
+    <style name="TextAppearance.VG.BodySemibold" parent="android:TextAppearance"><item name="android:fontFamily">@font/poppins_semibold</item><item name="fontFamily">@font/poppins_semibold</item><item name="android:textSize">14sp</item></style>
+    <style name="TextAppearance.VG.BodySmall" parent="android:TextAppearance"><item name="android:fontFamily">@font/poppins</item><item name="fontFamily">@font/poppins</item><item name="android:textSize">13sp</item></style>
+    <style name="TextAppearance.VG.BodySmallMedium" parent="android:TextAppearance"><item name="android:fontFamily">@font/poppins_medium</item><item name="fontFamily">@font/poppins_medium</item><item name="android:textSize">13sp</item></style>
+    <style name="TextAppearance.VG.BodySmallSemibold" parent="android:TextAppearance"><item name="android:fontFamily">@font/poppins_semibold</item><item name="fontFamily">@font/poppins_semibold</item><item name="android:textSize">13sp</item></style>
     <style name="TextAppearance.VG.Caption" parent="android:TextAppearance"><item name="android:fontFamily">@font/poppins</item><item name="fontFamily">@font/poppins</item><item name="android:textSize">12sp</item></style>
-    <style name="TextAppearance.VG.Overline" parent="android:TextAppearance"><item name="android:fontFamily">@font/poppins_semibold</item><item name="fontFamily">@font/poppins_semibold</item><item name="android:textSize">11sp</item></style>
-
+    <style name="TextAppearance.VG.CaptionMedium" parent="android:TextAppearance"><item name="android:fontFamily">@font/poppins_medium</item><item name="fontFamily">@font/poppins_medium</item><item name="android:textSize">12sp</item></style>
+    <style name="TextAppearance.VG.CaptionSemibold" parent="android:TextAppearance"><item name="android:fontFamily">@font/poppins_semibold</item><item name="fontFamily">@font/poppins_semibold</item><item name="android:textSize">12sp</item></style>
+    <style name="TextAppearance.VG.Micro" parent="android:TextAppearance"><item name="android:fontFamily">@font/poppins</item><item name="fontFamily">@font/poppins</item><item name="android:textSize">11sp</item></style>
+    <style name="TextAppearance.VG.MicroMedium" parent="android:TextAppearance"><item name="android:fontFamily">@font/poppins_medium</item><item name="fontFamily">@font/poppins_medium</item><item name="android:textSize">11sp</item></style>
+    <style name="TextAppearance.VG.MicroSemibold" parent="android:TextAppearance"><item name="android:fontFamily">@font/poppins_semibold</item><item name="fontFamily">@font/poppins_semibold</item><item name="android:textSize">11sp</item></style>
     <!-- Button Styles -->
     <style name="ButtonPrimary" parent="Widget.MaterialComponents.Button">
         <item name="backgroundTint">@color/vg_green</item>

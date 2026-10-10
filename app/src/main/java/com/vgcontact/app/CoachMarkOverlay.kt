@@ -366,7 +366,7 @@ object CoachMarkOverlay {
             val poppinsExtra = ResourcesCompat.getFont(activity, R.font.poppins_extrabold)
 
             val title = TextView(activity).apply {
-                textSize = 17f
+                textSize = 18f
                 includeFontPadding = false
                 typeface = poppinsSemi
                 setTextColor(ContextCompat.getColor(activity, R.color.vg_dark))

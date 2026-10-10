@@ -26,21 +26,20 @@
             android:paddingBottom="32dp">
 
             <TextView
+                android:textAppearance="@style/TextAppearance.VG.Lead"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Create your"
-                android:textSize="15sp"
                 android:alpha="0.92"
                 android:gravity="center"
                 android:textColor="@color/white" />
 
             <TextView
-                android:fontFamily="@font/poppins_bold"
+                android:textAppearance="@style/TextAppearance.VG.Display"
                 android:includeFontPadding="false"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/login_title"
-                android:textSize="28sp"
                 android:layout_marginTop="2dp"
                 android:gravity="center"
                 android:textColor="@color/white" />
@@ -70,10 +69,10 @@
 
                     <!-- ==== Field 00: Username (required) ==== -->
                     <TextView
+                        android:textAppearance="@style/TextAppearance.VG.Caption"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/login_username"
-                        android:textSize="12sp"
                         android:textColor="@color/vg_green_dark"
                         android:gravity="center"
                         android:layout_marginBottom="6dp" />
@@ -95,12 +94,12 @@
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                         <com.google.android.material.textfield.TextInputEditText
+                            android:textAppearance="@style/TextAppearance.VG.Lead"
                             android:id="@+id/username_input"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:inputType="text"
-                            android:textSize="15sp"
                             android:textColor="@color/vg_dark"
                             android:textColorHint="@color/text_muted"
                             android:includeFontPadding="false"
@@ -120,10 +119,10 @@
 
                     <!-- ==== Field 01: Phone number (required) ==== -->
                     <TextView
+                        android:textAppearance="@style/TextAppearance.VG.Caption"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/login_phone"
-                        android:textSize="12sp"
                         android:textColor="@color/vg_green_dark"
                         android:gravity="center"
                         android:layout_marginBottom="6dp" />
@@ -145,6 +144,7 @@
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                         <com.google.android.material.textfield.TextInputEditText
+                            android:textAppearance="@style/TextAppearance.VG.Lead"
                             android:id="@+id/phone_input"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -157,7 +157,6 @@
                             android:imeOptions="actionDone"
                             android:importantForAutofill="no"
                             android:letterSpacing="0.04"
-                            android:textSize="15sp"
                             android:textColor="@color/vg_dark"
                             android:textColorHint="@color/text_muted"
                             android:includeFontPadding="false"
@@ -177,10 +176,10 @@
 
                     <!-- ==== Field 02: Referral (optional) ==== -->
                     <TextView
+                        android:textAppearance="@style/TextAppearance.VG.Caption"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/login_referral"
-                        android:textSize="12sp"
                         android:textColor="@color/vg_green_dark"
                         android:gravity="center"
                         android:layout_marginBottom="6dp" />
@@ -202,12 +201,12 @@
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                         <com.google.android.material.textfield.TextInputEditText
+                            android:textAppearance="@style/TextAppearance.VG.Lead"
                             android:id="@+id/referral_input"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:inputType="text"
-                            android:textSize="15sp"
                             android:textColor="@color/vg_dark"
                             android:textColorHint="@color/text_muted"
                             android:includeFontPadding="false"
@@ -236,13 +235,12 @@
                 android:layout_height="56dp">
 
                 <com.google.android.material.button.MaterialButton
-                    android:fontFamily="@font/poppins_extrabold"
+                    android:textAppearance="@style/TextAppearance.VG.Button"
                     android:includeFontPadding="false"
                     android:id="@+id/register_btn"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:text="@string/login_button"
-                    android:textSize="18sp"
                     android:textAllCaps="false"
                     android:backgroundTint="@color/vg_green"
                     android:textColor="@color/white"
@@ -260,12 +258,12 @@
             </FrameLayout>
 
             <TextView
+                android:textAppearance="@style/TextAppearance.VG.Caption"
                 android:id="@+id/register_consent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:gravity="center"
-                android:textSize="12sp"
                 android:textColor="@color/text_secondary"
                 android:linksClickable="true" />
 
@@ -274,12 +272,11 @@
                  fresh - matches VGKontact's onboarding_recover_account
                  link pattern. -->
             <TextView
+                android:textAppearance="@style/TextAppearance.VG.BodySmallSemibold"
                 android:id="@+id/login_link"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Already have an account? Log in"
-                android:fontFamily="@font/poppins_semibold"
-        android:textSize="13sp"
                 android:textColor="@color/vg_green_dark"
                 android:gravity="center"
                 android:clickable="true"
@@ -289,11 +286,11 @@
                 android:layout_marginTop="8dp" />
 
             <TextView
+                android:textAppearance="@style/TextAppearance.VG.Caption"
                 android:id="@+id/creditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Powered by VGContact"
-                android:textSize="12sp"
                 android:textColor="@color/text_muted"
                 android:gravity="center"
                 android:layout_marginTop="6dp" />

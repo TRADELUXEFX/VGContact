@@ -62,10 +62,10 @@
                     android:orientation="horizontal">
 
                     <TextView
+                        android:textAppearance="@style/TextAppearance.VG.MicroSemibold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/pending_free_pill"
-                        android:fontFamily="@font/poppins_semibold"
                         android:includeFontPadding="false"
                         android:letterSpacing="0.06"
                         android:paddingStart="12dp"
@@ -73,8 +73,7 @@
                         android:paddingEnd="12dp"
                         android:paddingBottom="5dp"
                         android:text="@string/update_pill"
-                        android:textColor="@color/vg_green_dark"
-                        android:textSize="11sp" />
+                        android:textColor="@color/vg_green_dark" />
 
                     <View
                         android:layout_width="0dp"
@@ -95,27 +94,25 @@
                 </LinearLayout>
 
                 <TextView
+                    android:textAppearance="@style/TextAppearance.VG.Title"
                     android:id="@+id/updateTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:fontFamily="@font/poppins_bold"
                     android:includeFontPadding="false"
                     android:lineSpacingExtra="1dp"
                     android:text="@string/update_title"
-                    android:textColor="@color/white"
-                    android:textSize="24sp" />
+                    android:textColor="@color/white" />
 
                 <TextView
+                    android:textAppearance="@style/TextAppearance.VG.BodySmall"
                     android:id="@+id/updateSubtitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
                     android:alpha="0.9"
-                    android:fontFamily="@font/poppins"
                     android:includeFontPadding="false"
-                    android:textColor="@color/white"
-                    android:textSize="13sp" />
+                    android:textColor="@color/white" />
             </LinearLayout>
         </FrameLayout>
 
@@ -165,38 +162,35 @@
                         app:tint="@color/vg_green_dark" />
 
                     <TextView
+                        android:textAppearance="@style/TextAppearance.VG.Subheading"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
-                        android:fontFamily="@font/poppins_semibold"
                         android:includeFontPadding="false"
                         android:text="@string/update_whats_new"
-                        android:textColor="@color/vg_dark"
-                        android:textSize="16sp" />
+                        android:textColor="@color/vg_dark" />
                 </LinearLayout>
 
                 <TextView
+                    android:textAppearance="@style/TextAppearance.VG.Body"
                     android:id="@+id/updateNotesBody"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:fontFamily="@font/poppins"
                     android:includeFontPadding="false"
                     android:lineSpacingExtra="3dp"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp" />
+                    android:textColor="@color/text_secondary" />
             </LinearLayout>
 
             <TextView
+                android:textAppearance="@style/TextAppearance.VG.BodySmall"
                 android:id="@+id/updateYourVersion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
-                android:fontFamily="@font/poppins"
                 android:gravity="center"
                 android:includeFontPadding="false"
-                android:textColor="@color/text_secondary"
-                android:textSize="13sp" />
+                android:textColor="@color/text_secondary" />
 
             <FrameLayout
                 android:id="@+id/updateBtnWrap"
@@ -211,11 +205,11 @@
                     android:background="@drawable/btn_primary_shadow" />
 
                 <com.google.android.material.button.MaterialButton
+                    android:textAppearance="@style/TextAppearance.VG.Button"
                     android:id="@+id/updateBtn"
                     android:layout_width="match_parent"
                     android:layout_height="54dp"
                     android:backgroundTint="@color/vg_green"
-                    android:fontFamily="@font/poppins_extrabold"
                     android:includeFontPadding="false"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
@@ -224,7 +218,6 @@
                     android:text="@string/update_btn_now"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
-                    android:textSize="16sp"
                     app:cornerRadius="18dp"
                     app:icon="@drawable/ic_download"
                     app:iconGravity="textStart"
@@ -234,12 +227,12 @@
             </FrameLayout>
 
             <com.google.android.material.button.MaterialButton
+                android:textAppearance="@style/TextAppearance.VG.Button"
                 android:id="@+id/updateLaterBtn"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginTop="10dp"
                 android:backgroundTint="@color/white"
-                android:fontFamily="@font/poppins_extrabold"
                 android:includeFontPadding="false"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
@@ -247,7 +240,6 @@
                 android:text="@string/update_btn_later"
                 android:textAllCaps="false"
                 android:textColor="@color/vg_green_dark"
-                android:textSize="14sp"
                 app:cornerRadius="18dp"
                 app:strokeColor="@color/vg_green"
                 app:strokeWidth="1.5dp" />

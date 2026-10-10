@@ -568,7 +568,7 @@ class RepostActivity : AppCompatActivity() {
         }
         row.addView(TextView(this).apply {
             text = entry.rank.toString()
-            textSize = 15f
+            textSize = 14f
             typeface = Fonts.semibold(this@RepostActivity)
             includeFontPadding = false
             gravity = Gravity.CENTER
@@ -590,7 +590,7 @@ class RepostActivity : AppCompatActivity() {
             } else {
                 if (entry.username.isNotBlank()) entry.username else formatPhone(entry.phone)
             }
-            textSize = 16f
+            textSize = 14f
             typeface = if (entry.isMe || top3) Fonts.semibold(this@RepostActivity) else Fonts.medium(this@RepostActivity)
             includeFontPadding = false
             maxLines = 1
@@ -601,7 +601,7 @@ class RepostActivity : AppCompatActivity() {
 
         row.addView(TextView(this).apply {
             text = entry.score.toString()
-            textSize = 18f
+            textSize = 14f
             typeface = Fonts.semibold(this@RepostActivity)
             includeFontPadding = false
             setTextColor(ContextCompat.getColor(this@RepostActivity, R.color.vg_green))

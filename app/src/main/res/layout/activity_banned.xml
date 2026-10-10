@@ -23,20 +23,19 @@
             android:paddingBottom="32dp">
 
             <TextView
+                android:textAppearance="@style/TextAppearance.VG.Lead"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Your account has been"
-                android:textSize="15sp"
                 android:alpha="0.92"
                 android:gravity="center"
                 android:textColor="@color/white" />
 
             <TextView
+                android:textAppearance="@style/TextAppearance.VG.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Banned"
-                android:fontFamily="@font/poppins_bold"
-        android:textSize="26sp"
                 android:layout_marginTop="2dp"
                 android:gravity="center"
                 android:textColor="@color/white" />
@@ -85,21 +84,19 @@
                         android:visibility="gone">
 
                         <TextView
+                            android:textAppearance="@style/TextAppearance.VG.MicroSemibold"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="ACCOUNT"
-                            android:fontFamily="@font/poppins_semibold"
-        android:textSize="11sp"
                             android:letterSpacing="0.1"
                             android:textColor="@color/text_muted" />
 
                         <TextView
+                            android:textAppearance="@style/TextAppearance.VG.Subheading"
                             android:id="@+id/bannedNumberText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:fontFamily="@font/poppins_semibold"
-        android:textSize="16sp"
                             android:textColor="@color/vg_dark" />
                     </LinearLayout>
 
@@ -119,22 +116,20 @@
                         android:paddingBottom="16dp">
 
                         <TextView
+                            android:textAppearance="@style/TextAppearance.VG.MicroSemibold"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="REASON"
-                            android:fontFamily="@font/poppins_semibold"
-        android:textSize="11sp"
                             android:letterSpacing="0.1"
                             android:textColor="@color/text_muted" />
 
                         <TextView
+                            android:textAppearance="@style/TextAppearance.VG.Heading"
                             android:id="@+id/bannedReasonText"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="Breaking the app's rules"
-                            android:fontFamily="@font/poppins_semibold"
-        android:textSize="18sp"
                             android:textColor="@color/vg_red" />
                     </LinearLayout>
 
@@ -154,11 +149,10 @@
                         android:paddingBottom="18dp">
 
                         <TextView
+                            android:textAppearance="@style/TextAppearance.VG.MicroSemibold"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="WHAT THIS MEANS"
-                            android:fontFamily="@font/poppins_semibold"
-        android:textSize="11sp"
                             android:letterSpacing="0.1"
                             android:textColor="@color/text_muted" />
 
@@ -169,13 +163,12 @@
                             android:layout_marginTop="14dp">
 
                             <TextView
+                                android:textAppearance="@style/TextAppearance.VG.MicroSemibold"
                                 android:layout_width="26dp"
                                 android:layout_height="26dp"
                                 android:background="@drawable/dialog_warning_icon_background"
                                 android:gravity="center"
                                 android:text="✕"
-                                android:fontFamily="@font/poppins_semibold"
-        android:textSize="11sp"
                                 android:textColor="@color/vg_red" />
 
                             <LinearLayout
@@ -186,19 +179,18 @@
                                 android:layout_marginStart="12dp">
 
                                 <TextView
+                                    android:textAppearance="@style/TextAppearance.VG.Subheading"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="No keys, unlocks or reposts"
-                                    android:fontFamily="@font/poppins_semibold"
-        android:textSize="15sp"
                                     android:textColor="@color/vg_dark" />
 
                                 <TextView
+                                    android:textAppearance="@style/TextAppearance.VG.BodySmall"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="1dp"
                                     android:text="You can't earn keys, unlock contact groups or repost while banned."
-                                    android:textSize="13sp"
                                     android:textColor="@color/text_muted" />
                             </LinearLayout>
                         </LinearLayout>
@@ -206,13 +198,12 @@
                 </LinearLayout>
 
                 <TextView
+                    android:textAppearance="@style/TextAppearance.VG.BodySmallSemibold"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:gravity="center"
                     android:text="Opening a new account with the same number or phone won't get around this."
-                    android:fontFamily="@font/poppins_semibold"
-        android:textSize="13sp"
                     android:textColor="@color/text_secondary" />
             </LinearLayout>
         </ScrollView>
@@ -228,13 +219,12 @@
             android:paddingBottom="20dp">
 
             <Button
+                android:textAppearance="@style/TextAppearance.VG.Button"
                 android:id="@+id/contactCareButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="Contact customer care"
-                android:fontFamily="@font/poppins_extrabold"
                 android:includeFontPadding="false"
-                android:textSize="16sp"
                 android:textAllCaps="false"
                 android:backgroundTint="@color/vg_green"
                 android:textColor="@color/white"
@@ -242,12 +232,12 @@
                 app:cornerRadius="16dp" />
 
             <TextView
+                android:textAppearance="@style/TextAppearance.VG.Caption"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:gravity="center"
                 android:text="Contact us if you think we're wrong"
-                android:textSize="12sp"
                 android:lineSpacingMultiplier="1.25"
                 android:textColor="@color/text_muted" />
         </LinearLayout>

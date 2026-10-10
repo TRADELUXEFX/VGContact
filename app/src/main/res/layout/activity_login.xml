@@ -28,21 +28,20 @@
             android:paddingBottom="32dp">
 
             <TextView
+                android:textAppearance="@style/TextAppearance.VG.Lead"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Log In To Your"
-                android:textSize="15sp"
                 android:alpha="0.92"
                 android:gravity="center"
                 android:textColor="@color/white" />
 
             <TextView
-                android:fontFamily="@font/poppins_bold"
+                android:textAppearance="@style/TextAppearance.VG.Display"
                 android:includeFontPadding="false"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Account"
-                android:textSize="28sp"
                 android:layout_marginTop="2dp"
                 android:gravity="center"
                 android:textColor="@color/white" />
@@ -60,21 +59,20 @@
             android:paddingTop="24dp">
 
             <TextView
+                android:textAppearance="@style/TextAppearance.VG.BodySmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Enter the phone number you registered with. If this is the same device, you'll be logged in automatically."
-                android:textSize="13sp"
                 android:textColor="@color/text_muted"
                 android:gravity="center"
                 android:lineSpacingMultiplier="1.3"
                 android:layout_marginBottom="20dp" />
 
             <TextView
+                android:textAppearance="@style/TextAppearance.VG.MicroSemibold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="YOUR PHONE NUMBER"
-                android:fontFamily="@font/poppins_semibold"
-        android:textSize="11sp"
                 android:textAllCaps="true"
                 android:letterSpacing="0.05"
                 android:textColor="@color/text_muted"
@@ -97,6 +95,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:textAppearance="@style/TextAppearance.VG.Lead"
                     android:id="@+id/login_phone_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -109,7 +108,6 @@
                     android:imeOptions="actionDone"
                     android:importantForAutofill="no"
                     android:letterSpacing="0.04"
-                    android:textSize="15sp"
                     android:textColor="@color/vg_dark"
                     android:textColorHint="@color/text_muted"
                     android:includeFontPadding="false"
@@ -130,13 +128,12 @@
             android:padding="20dp">
 
             <com.google.android.material.button.MaterialButton
-                android:fontFamily="@font/poppins_extrabold"
+                android:textAppearance="@style/TextAppearance.VG.Button"
                 android:includeFontPadding="false"
                 android:id="@+id/login_btn"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="Log In"
-                android:textSize="18sp"
                 android:textAllCaps="false"
                 android:backgroundTint="@color/vg_green"
                 android:textColor="@color/white"

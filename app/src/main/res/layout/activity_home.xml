@@ -61,12 +61,11 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:textAppearance="@style/TextAppearance.VG.Heading"
                     android:id="@+id/headerUsernameText"
-                    android:fontFamily="@font/poppins_semibold"
                     android:includeFontPadding="false"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="18sp"
                     android:textColor="@color/white"
                     android:maxLines="1"
                     android:ellipsize="end" />
@@ -90,12 +89,11 @@
                         android:background="@drawable/badge_dot" />
 
                     <TextView
+                        android:textAppearance="@style/TextAppearance.VG.MicroSemibold"
                         android:id="@+id/statusBadgeText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="PENDING"
-                        android:fontFamily="@font/poppins_semibold"
-        android:textSize="10sp"
                         android:textAllCaps="true"
                         android:letterSpacing="0.04"
                         android:textColor="@color/white" />
@@ -153,12 +151,11 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:textAppearance="@style/TextAppearance.VG.Micro"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Your referral link"
-                    android:fontFamily="@font/poppins"
                     android:includeFontPadding="false"
-                    android:textSize="11sp"
                     android:textColor="@color/white"
                     android:alpha="0.85" />
 
@@ -171,12 +168,11 @@
                     android:overScrollMode="never">
 
                     <TextView
+                        android:textAppearance="@style/TextAppearance.VG.BodySmallMedium"
                         android:id="@+id/home_referral_link_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/poppins_medium"
                         android:includeFontPadding="false"
-                        android:textSize="13sp"
                         android:textColor="@color/white"
                         android:singleLine="true" />
 
@@ -185,6 +181,7 @@
             </LinearLayout>
 
             <com.google.android.material.button.MaterialButton
+                android:textAppearance="@style/TextAppearance.VG.Button"
                 android:id="@+id/home_referral_copy_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
@@ -194,11 +191,9 @@
                 android:paddingEnd="14dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:fontFamily="@font/poppins_extrabold"
                 android:includeFontPadding="false"
                 android:text="Copy"
                 android:textAllCaps="false"
-                android:textSize="13sp"
                 android:textColor="@color/vg_green_dark"
                 android:backgroundTint="@color/white"
                 app:cornerRadius="10dp" />
@@ -250,27 +245,25 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:fontFamily="@font/poppins_semibold"
+                        android:textAppearance="@style/TextAppearance.VG.BodySemibold"
                         android:includeFontPadding="false"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/update_banner_title"
-                        android:textSize="14sp"
                         android:textColor="@color/white" />
 
                     <TextView
-                        android:fontFamily="@font/poppins"
+                        android:textAppearance="@style/TextAppearance.VG.Caption"
                         android:includeFontPadding="false"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
                         android:text="@string/update_banner_sub"
-                        android:textSize="12sp"
                         android:textColor="#E6FFFFFF" />
                 </LinearLayout>
 
                 <TextView
-                    android:fontFamily="@font/poppins_semibold"
+                    android:textAppearance="@style/TextAppearance.VG.BodySmallSemibold"
                     android:includeFontPadding="false"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -280,7 +273,6 @@
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
                     android:text="@string/update_banner_action"
-                    android:textSize="13sp"
                     android:textColor="@color/vg_red_dark" />
             </LinearLayout>
 
@@ -316,27 +308,25 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:fontFamily="@font/poppins_semibold"
+                        android:textAppearance="@style/TextAppearance.VG.BodySemibold"
                         android:includeFontPadding="false"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Account pending"
-                        android:textSize="14sp"
                         android:textColor="@color/white" />
 
                     <TextView
-                        android:fontFamily="@font/poppins"
+                        android:textAppearance="@style/TextAppearance.VG.Caption"
                         android:includeFontPadding="false"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
                         android:text="Verify to unlock the app"
-                        android:textSize="12sp"
                         android:textColor="#E6FFFFFF" />
                 </LinearLayout>
 
                 <TextView
-                    android:fontFamily="@font/poppins_semibold"
+                    android:textAppearance="@style/TextAppearance.VG.BodySmallSemibold"
                     android:includeFontPadding="false"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -346,7 +336,6 @@
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
                     android:text="VERIFY"
-                    android:textSize="13sp"
                     android:textColor="#8A5A00" />
             </LinearLayout>
 
@@ -371,24 +360,22 @@
                     android:contentDescription="@null" />
 
                 <TextView
+                    android:textAppearance="@style/TextAppearance.VG.BodySemibold"
                     android:id="@+id/permissionBannerText"
-                    android:fontFamily="@font/poppins_semibold"
                     android:includeFontPadding="false"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginStart="12dp"
                     android:layout_marginEnd="12dp"
-                    android:textSize="14sp"
                     android:textColor="@color/white" />
 
                 <TextView
-                    android:fontFamily="@font/poppins_semibold"
+                    android:textAppearance="@style/TextAppearance.VG.BodySemibold"
                     android:includeFontPadding="false"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="FIX"
-                    android:textSize="14sp"
                     android:textColor="@color/white" />
             </LinearLayout>
 
@@ -426,27 +413,25 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:fontFamily="@font/poppins_semibold"
+                        android:textAppearance="@style/TextAppearance.VG.BodySemibold"
                         android:includeFontPadding="false"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Join our community"
-                        android:textSize="14sp"
                         android:textColor="@color/white" />
 
                     <TextView
-                        android:fontFamily="@font/poppins"
+                        android:textAppearance="@style/TextAppearance.VG.Caption"
                         android:includeFontPadding="false"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
                         android:text="Updates, tips and help from other members."
-                        android:textSize="12sp"
                         android:textColor="#E6FFFFFF" />
                 </LinearLayout>
 
                 <TextView
-                    android:fontFamily="@font/poppins_semibold"
+                    android:textAppearance="@style/TextAppearance.VG.BodySmallSemibold"
                     android:includeFontPadding="false"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -456,7 +441,6 @@
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
                     android:text="JOIN"
-                    android:textSize="13sp"
                     android:textColor="#8A5A00" />
             </LinearLayout>
 
@@ -492,27 +476,25 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:textAppearance="@style/TextAppearance.VG.BodySemibold"
                         android:id="@+id/waitingBannerTitle"
-                        android:fontFamily="@font/poppins_semibold"
                         android:includeFontPadding="false"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="14sp"
                         android:textColor="@color/white" />
 
                     <TextView
+                        android:textAppearance="@style/TextAppearance.VG.Caption"
                         android:id="@+id/waitingBannerText"
-                        android:fontFamily="@font/poppins"
                         android:includeFontPadding="false"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="3dp"
-                        android:textSize="12sp"
                         android:textColor="#E6FFFFFF" />
                 </LinearLayout>
 
                 <TextView
-                    android:fontFamily="@font/poppins_semibold"
+                    android:textAppearance="@style/TextAppearance.VG.BodySmallSemibold"
                     android:includeFontPadding="false"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -522,7 +504,6 @@
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
                     android:text="SAVE"
-                    android:textSize="13sp"
                     android:textColor="#8A5A00" />
             </LinearLayout>
 
@@ -565,12 +546,11 @@
                         android:gravity="center_vertical">
 
                         <TextView
+                            android:textAppearance="@style/TextAppearance.VG.MicroSemibold"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="@string/home_contacts_label"
-                            android:fontFamily="@font/poppins_semibold"
-        android:textSize="11sp"
                             android:textAllCaps="true"
                             android:letterSpacing="0.05"
                             android:textColor="@color/text_muted"
@@ -579,6 +559,7 @@
                         <!-- Last sync status: sync icon + time. Text, colors and
                              state are set in HomeActivity.refreshLastSync(). -->
                         <TextView
+                            android:textAppearance="@style/TextAppearance.VG.MicroMedium"
                             android:id="@+id/lastSyncPill"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -590,9 +571,7 @@
                             android:paddingEnd="10dp"
                             android:paddingTop="4dp"
                             android:paddingBottom="4dp"
-                            android:fontFamily="@font/poppins_medium"
                             android:includeFontPadding="false"
-                            android:textSize="11sp"
                             android:maxLines="1"
                             android:text="Not synced yet" />
                     </LinearLayout>
@@ -613,30 +592,28 @@
                             android:background="@drawable/viewers_dot_green" />
 
                         <TextView
+                            android:textAppearance="@style/TextAppearance.VG.BodySmall"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="@string/label_free_viewers"
-                            android:textSize="13sp"
                             android:textColor="@color/text_primary" />
 
                         <TextView
+                            android:textAppearance="@style/TextAppearance.VG.Subheading"
                             android:id="@+id/freeViewersCurrentText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/poppins_semibold"
                             android:includeFontPadding="false"
-                            android:textSize="15sp"
                             android:textColor="@color/vg_dark"
                             android:text="0" />
 
                         <TextView
+                            android:textAppearance="@style/TextAppearance.VG.BodySmallSemibold"
                             android:id="@+id/freeViewersMaxText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/poppins_semibold"
                             android:includeFontPadding="false"
-                            android:textSize="13sp"
                             android:textColor="@color/text_muted"
                             android:text="/0" />
                     </LinearLayout>
@@ -662,30 +639,28 @@
                             android:background="@drawable/viewers_dot_blue" />
 
                         <TextView
+                            android:textAppearance="@style/TextAppearance.VG.BodySmall"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="@string/label_extra_viewers"
-                            android:textSize="13sp"
                             android:textColor="@color/text_primary" />
 
                         <TextView
+                            android:textAppearance="@style/TextAppearance.VG.Subheading"
                             android:id="@+id/extraViewersCurrentText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/poppins_semibold"
                             android:includeFontPadding="false"
-                            android:textSize="15sp"
                             android:textColor="@color/vg_dark"
                             android:text="0" />
 
                         <TextView
+                            android:textAppearance="@style/TextAppearance.VG.BodySmallSemibold"
                             android:id="@+id/extraViewersMaxText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/poppins_semibold"
                             android:includeFontPadding="false"
-                            android:textSize="13sp"
                             android:textColor="@color/text_muted"
                             android:text="/0" />
                     </LinearLayout>
@@ -712,20 +687,19 @@
                             android:background="@drawable/viewers_dot_amber" />
 
                         <TextView
+                            android:textAppearance="@style/TextAppearance.VG.BodySmall"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="@string/label_referral_viewers"
-                            android:textSize="13sp"
                             android:textColor="@color/text_primary" />
 
                         <TextView
+                            android:textAppearance="@style/TextAppearance.VG.Subheading"
                             android:id="@+id/referralViewersCountText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/poppins_semibold"
                             android:includeFontPadding="false"
-                            android:textSize="15sp"
                             android:textColor="@color/vg_dark"
                             android:text="0" />
 
@@ -735,10 +709,9 @@
                 </LinearLayout>
 
                 <com.google.android.material.button.MaterialButton
+                    android:textAppearance="@style/TextAppearance.VG.Button"
                     android:id="@+id/syncContactsBtn"
-                    android:fontFamily="@font/poppins_extrabold"
                     android:includeFontPadding="false"
-                    android:textSize="16sp"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:layout_marginTop="18dp"
@@ -764,10 +737,9 @@
             android:paddingBottom="26dp">
 
             <com.google.android.material.button.MaterialButton
+                android:textAppearance="@style/TextAppearance.VG.Button"
                 android:id="@+id/buyViewersBtn"
-                android:fontFamily="@font/poppins_extrabold"
                 android:includeFontPadding="false"
-                android:textSize="16sp"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginBottom="12dp"
@@ -782,10 +754,9 @@
                 app:cornerRadius="16dp" />
 
             <Button
+                android:textAppearance="@style/TextAppearance.VG.Button"
                 android:id="@+id/join_community_btn"
-                android:fontFamily="@font/poppins_extrabold"
                 android:includeFontPadding="false"
-                android:textSize="16sp"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="Join Our Community"
@@ -872,34 +843,32 @@
                             android:src="@drawable/maintenance_tape" />
 
                         <TextView
+                            android:textAppearance="@style/TextAppearance.VG.CaptionMedium"
                             android:layout_width="wrap_content"
                             android:layout_height="22dp"
                             android:layout_gravity="center"
                             android:background="#F5B83D"
-                            android:fontFamily="@font/poppins_medium"
                             android:gravity="center"
                             android:includeFontPadding="false"
                             android:letterSpacing="0.1"
                             android:paddingStart="12dp"
                             android:paddingEnd="12dp"
                             android:text="MAINTENANCE"
-                            android:textColor="#2C2C2A"
-                            android:textSize="12sp" />
+                            android:textColor="#2C2C2A" />
                     </FrameLayout>
                 </FrameLayout>
 
                 <TextView
+                    android:textAppearance="@style/TextAppearance.VG.Title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:fontFamily="@font/poppins_semibold"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:paddingStart="20dp"
                     android:paddingEnd="20dp"
                     android:text="We're doing maintenance"
-                    android:textColor="@android:color/white"
-                    android:textSize="22sp" />
+                    android:textColor="@android:color/white" />
 
                 <LinearLayout
                     android:id="@+id/maintenanceMsgCard"
@@ -917,13 +886,12 @@
                     android:paddingBottom="14dp">
 
                     <TextView
+                        android:textAppearance="@style/TextAppearance.VG.Lead"
                         android:id="@+id/maintenanceOverlayMsg"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/poppins"
                         android:gravity="center"
-                        android:textColor="@color/vg_dark"
-                        android:textSize="15sp" />
+                        android:textColor="@color/vg_dark" />
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>
@@ -940,11 +908,11 @@
             android:paddingBottom="24dp">
 
             <Button
+                android:textAppearance="@style/TextAppearance.VG.Button"
                 android:id="@+id/maintenanceCommunityBtn"
                 style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:fontFamily="@font/poppins_extrabold"
                 android:gravity="center"
                 android:includeFontPadding="false"
                 android:insetTop="0dp"
@@ -953,7 +921,6 @@
                 android:text="Join Our Community"
                 android:textAllCaps="true"
                 android:textColor="@color/vg_green_dark"
-                android:textSize="16sp"
                 app:backgroundTint="@android:color/white"
                 app:cornerRadius="16dp"
                 app:icon="@drawable/ic_pending_whatsapp"
@@ -962,11 +929,11 @@
                 app:iconTint="@color/vg_green_dark" />
 
             <TextView
+                android:textAppearance="@style/TextAppearance.VG.BodySmall"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:background="@drawable/maintenance_pill_background"
-                android:fontFamily="@font/poppins"
                 android:gravity="center"
                 android:includeFontPadding="false"
                 android:paddingStart="16dp"
@@ -974,8 +941,7 @@
                 android:paddingEnd="16dp"
                 android:paddingBottom="8dp"
                 android:text="Your saved contacts are safe"
-                android:textColor="@android:color/white"
-                android:textSize="13sp" />
+                android:textColor="@android:color/white" />
         </LinearLayout>
     </LinearLayout>
 

@@ -65,26 +65,24 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:textAppearance="@style/TextAppearance.VG.Title"
                     android:id="@+id/payHeaderTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/poppins_bold"
                     android:includeFontPadding="false"
                     android:text="@string/pay_title"
-                    android:textColor="@color/white"
-                    android:textSize="24sp" />
+                    android:textColor="@color/white" />
 
                 <TextView
+                    android:textAppearance="@style/TextAppearance.VG.BodySmall"
                     android:id="@+id/payHeaderSubtitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:alpha="0.9"
-                    android:fontFamily="@font/poppins"
                     android:includeFontPadding="false"
                     android:text="@string/pay_subtitle"
-                    android:textColor="@color/white"
-                    android:textSize="13sp" />
+                    android:textColor="@color/white" />
             </LinearLayout>
         </LinearLayout>
     </FrameLayout>
@@ -127,23 +125,21 @@
                         android:orientation="vertical">
 
                         <TextView
+                            android:textAppearance="@style/TextAppearance.VG.BodySmall"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/poppins"
                             android:includeFontPadding="false"
                             android:text="@string/pay_amount_label"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="13sp" />
+                            android:textColor="@color/text_secondary" />
 
                         <TextView
+                            android:textAppearance="@style/TextAppearance.VG.Display"
                             android:id="@+id/payAmount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:fontFamily="@font/poppins_bold"
                             android:includeFontPadding="false"
-                            android:textColor="@color/vg_green_dark"
-                            android:textSize="34sp" />
+                            android:textColor="@color/vg_green_dark" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -165,14 +161,13 @@
                             app:tint="@color/vg_green_dark" />
 
                         <TextView
+                            android:textAppearance="@style/TextAppearance.VG.BodySemibold"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="6dp"
-                            android:fontFamily="@font/poppins_semibold"
                             android:includeFontPadding="false"
                             android:text="@string/pay_one_time"
-                            android:textColor="@color/vg_green_dark"
-                            android:textSize="14sp" />
+                            android:textColor="@color/vg_green_dark" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -204,14 +199,13 @@
                             app:tint="@color/vg_green_dark" />
 
                         <TextView
+                            android:textAppearance="@style/TextAppearance.VG.Subheading"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:fontFamily="@font/poppins_semibold"
                             android:includeFontPadding="false"
                             android:text="@string/pay_send_to"
-                            android:textColor="@color/vg_dark"
-                            android:textSize="16sp" />
+                            android:textColor="@color/vg_dark" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -221,23 +215,21 @@
                         android:orientation="horizontal">
 
                         <TextView
+                            android:textAppearance="@style/TextAppearance.VG.BodySmall"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:fontFamily="@font/poppins"
                             android:includeFontPadding="false"
                             android:text="@string/pay_bank"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="13sp" />
+                            android:textColor="@color/text_secondary" />
 
                         <TextView
+                            android:textAppearance="@style/TextAppearance.VG.Subheading"
                             android:id="@+id/payBankName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/poppins_semibold"
                             android:includeFontPadding="false"
-                            android:textColor="@color/vg_dark"
-                            android:textSize="15sp" />
+                            android:textColor="@color/vg_dark" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -247,23 +239,21 @@
                         android:orientation="horizontal">
 
                         <TextView
+                            android:textAppearance="@style/TextAppearance.VG.BodySmall"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:fontFamily="@font/poppins"
                             android:includeFontPadding="false"
                             android:text="@string/pay_account_name"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="13sp" />
+                            android:textColor="@color/text_secondary" />
 
                         <TextView
+                            android:textAppearance="@style/TextAppearance.VG.Subheading"
                             android:id="@+id/payAccountName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/poppins_semibold"
                             android:includeFontPadding="false"
-                            android:textColor="@color/vg_dark"
-                            android:textSize="15sp" />
+                            android:textColor="@color/vg_dark" />
                     </LinearLayout>
 
                     <View
@@ -286,24 +276,22 @@
                             android:orientation="vertical">
 
                             <TextView
+                                android:textAppearance="@style/TextAppearance.VG.BodySmall"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:fontFamily="@font/poppins"
                                 android:includeFontPadding="false"
                                 android:text="@string/pay_account_number"
-                                android:textColor="@color/text_secondary"
-                                android:textSize="13sp" />
+                                android:textColor="@color/text_secondary" />
 
                             <TextView
+                                android:textAppearance="@style/TextAppearance.VG.Title"
                                 android:id="@+id/payAccountNumber"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
-                                android:fontFamily="@font/poppins_bold"
                                 android:includeFontPadding="false"
                                 android:textColor="@color/vg_dark"
-                                android:textIsSelectable="true"
-                                android:textSize="26sp" />
+                                android:textIsSelectable="true" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -329,29 +317,27 @@
                                 app:tint="@color/vg_green_dark" />
 
                             <TextView
+                                android:textAppearance="@style/TextAppearance.VG.BodySmallSemibold"
                                 android:id="@+id/payCopyAccountText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="6dp"
-                                android:fontFamily="@font/poppins_semibold"
                                 android:includeFontPadding="false"
                                 android:text="@string/pay_copy"
-                                android:textColor="@color/vg_green_dark"
-                                android:textSize="13sp" />
+                                android:textColor="@color/vg_green_dark" />
                         </LinearLayout>
                     </LinearLayout>
 
                     <TextView
+                        android:textAppearance="@style/TextAppearance.VG.BodySmall"
                         android:id="@+id/payDetailsMissing"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:fontFamily="@font/poppins"
                         android:includeFontPadding="false"
                         android:lineSpacingExtra="2dp"
                         android:text="@string/pay_details_missing"
                         android:textColor="@color/vg_red_dark"
-                        android:textSize="13sp"
                         android:visibility="gone" />
                 </LinearLayout>
 
@@ -368,11 +354,11 @@
                         android:background="@drawable/btn_primary_shadow" />
 
                     <com.google.android.material.button.MaterialButton
+                        android:textAppearance="@style/TextAppearance.VG.Button"
                         android:id="@+id/payProofBtn"
                         android:layout_width="match_parent"
                         android:layout_height="54dp"
                         android:backgroundTint="@color/vg_green"
-                        android:fontFamily="@font/poppins_extrabold"
                         android:includeFontPadding="false"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
@@ -381,7 +367,6 @@
                         android:text="@string/pay_btn_proof"
                         android:textAllCaps="false"
                         android:textColor="@color/white"
-                        android:textSize="16sp"
                         app:cornerRadius="18dp"
                         app:icon="@drawable/ic_pending_whatsapp"
                         app:iconGravity="textStart"
@@ -391,18 +376,17 @@
                 </FrameLayout>
 
                 <TextView
+                    android:textAppearance="@style/TextAppearance.VG.BodySmall"
                     android:id="@+id/payNote"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
-                    android:fontFamily="@font/poppins"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:lineSpacingExtra="2dp"
                     android:padding="6dp"
                     android:text="@string/pay_note"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
+                    android:textColor="@color/text_secondary" />
             </LinearLayout>
         </FrameLayout>
     </ScrollView>

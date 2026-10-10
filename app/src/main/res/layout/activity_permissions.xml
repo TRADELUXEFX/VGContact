@@ -26,11 +26,10 @@
             android:gravity="center">
 
             <TextView
+                android:textAppearance="@style/TextAppearance.VG.CaptionSemibold"
                 android:id="@+id/stepCounterText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/poppins_semibold"
-        android:textSize="12sp"
                 android:textAllCaps="true"
                 android:letterSpacing="0.08"
                 android:textColor="@color/white"
@@ -38,13 +37,12 @@
                 tools:text="STEP 1 OF 1" />
 
             <TextView
-                android:fontFamily="@font/poppins_bold"
+                android:textAppearance="@style/TextAppearance.VG.Title"
                 android:includeFontPadding="false"
                 android:id="@+id/stepTitleText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:textSize="26sp"
                 android:textColor="@color/white"
                 android:gravity="center"
                 tools:text="Stay Notified" />
@@ -81,11 +79,11 @@
                     android:contentDescription="@null" />
 
                 <TextView
+                    android:textAppearance="@style/TextAppearance.VG.Body"
                     android:id="@+id/stepDescriptionText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:textSize="14sp"
                     android:textColor="@color/text_muted"
                     android:gravity="center"
                     android:lineSpacingExtra="4dp"
@@ -102,12 +100,11 @@
             android:padding="24dp">
 
             <Button
-                android:fontFamily="@font/poppins_extrabold"
+                android:textAppearance="@style/TextAppearance.VG.Button"
                 android:includeFontPadding="false"
                 android:id="@+id/stepActionButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:textSize="18sp"
                 android:maxLines="1"
                 android:ellipsize="none"
                 android:letterSpacing="0.02"
@@ -143,11 +140,11 @@
             android:indeterminateTint="@color/vg_green" />
 
         <TextView
+            android:textAppearance="@style/TextAppearance.VG.BodySmall"
             android:id="@+id/loadingText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:textSize="13sp"
             android:textColor="@color/text_muted"
             android:text=""
             android:visibility="gone" />

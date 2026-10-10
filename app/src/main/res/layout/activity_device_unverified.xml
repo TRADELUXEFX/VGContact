@@ -23,21 +23,19 @@
             android:paddingBottom="32dp">
 
             <TextView
+                android:textAppearance="@style/TextAppearance.VG.Lead"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/poppins"
                 android:text="We couldn't verify"
-                android:textSize="15sp"
                 android:alpha="0.92"
                 android:gravity="center"
                 android:textColor="@color/white" />
 
             <TextView
+                android:textAppearance="@style/TextAppearance.VG.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/poppins_bold"
                 android:text="This Phone"
-                android:textSize="26sp"
                 android:layout_marginTop="2dp"
                 android:gravity="center"
                 android:textColor="@color/white" />
@@ -60,11 +58,10 @@
                 android:paddingBottom="16dp">
 
             <TextView
+                android:textAppearance="@style/TextAppearance.VG.BodySmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/poppins"
                 android:text="We couldn't generate a verification code for this phone. Try again, or contact customer care for help."
-                android:textSize="13sp"
                 android:textColor="@color/text_muted"
                 android:gravity="center"
                 android:lineSpacingMultiplier="1.3"
@@ -80,27 +77,25 @@
             android:padding="20dp">
 
             <com.google.android.material.button.MaterialButton
+                android:textAppearance="@style/TextAppearance.VG.Button"
                 android:id="@+id/tryAgainButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:fontFamily="@font/poppins_extrabold"
                 android:includeFontPadding="false"
                 android:text="Try again"
-                android:textSize="16sp"
                 android:textAllCaps="false"
                 android:backgroundTint="@color/vg_green"
                 android:textColor="@color/white"
                 android:layout_marginBottom="12dp"
                 app:cornerRadius="16dp" />
             <com.google.android.material.button.MaterialButton
+                android:textAppearance="@style/TextAppearance.VG.Button"
                 android:id="@+id/contactCareButton"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:fontFamily="@font/poppins_extrabold"
                 android:includeFontPadding="false"
                 android:text="Contact customer care"
-                android:textSize="15sp"
                 android:textAllCaps="false"
                 android:textColor="@color/vg_green_dark"
                 app:strokeColor="@color/vg_green"

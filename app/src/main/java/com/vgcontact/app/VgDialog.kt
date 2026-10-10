@@ -124,7 +124,7 @@ object VgDialog {
             tile.addView(radio, LinearLayout.LayoutParams(activity.dp(20), activity.dp(20)))
             tile.addView(TextView(activity).apply {
                 text = label
-                textSize = 14.5f
+                textSize = 14f
                 typeface = ResourcesCompat.getFont(activity, R.font.poppins_medium)
                 setTextColor(if (on) greenDark else ContextCompat.getColor(activity, R.color.vg_dark))
             }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
@@ -192,8 +192,8 @@ object VgDialog {
 
     private fun titleView(activity: Activity, text: String, topMarginDp: Int) = TextView(activity).apply {
         this.text = text
-        textSize = 21f
-        typeface = ResourcesCompat.getFont(activity, R.font.poppins_bold)
+        textSize = 18f
+        typeface = ResourcesCompat.getFont(activity, R.font.poppins_semibold)
         setTextColor(ContextCompat.getColor(activity, R.color.vg_dark))
         setLineSpacing(0f, 1.05f)
         layoutParams = LinearLayout.LayoutParams(

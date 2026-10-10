@@ -42,13 +42,12 @@
             app:tint="@color/text_muted" />
 
         <TextView
+            android:textAppearance="@style/TextAppearance.VG.MicroSemibold"
             android:id="@+id/navHomeLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
             android:text="@string/nav_home"
-            android:fontFamily="@font/poppins_semibold"
-        android:textSize="10sp"
             android:textColor="@color/text_muted" />
 
     </LinearLayout>
@@ -75,13 +74,12 @@
             app:tint="@color/text_muted" />
 
         <TextView
+            android:textAppearance="@style/TextAppearance.VG.MicroSemibold"
             android:id="@+id/navRepostLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
             android:text="@string/nav_repost"
-            android:fontFamily="@font/poppins_semibold"
-        android:textSize="10sp"
             android:textColor="@color/text_muted" />
 
     </LinearLayout>
@@ -108,13 +106,12 @@
             app:tint="@color/text_muted" />
 
         <TextView
+            android:textAppearance="@style/TextAppearance.VG.MicroSemibold"
             android:id="@+id/navReferralLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
             android:text="@string/nav_referral"
-            android:fontFamily="@font/poppins_semibold"
-        android:textSize="10sp"
             android:textColor="@color/text_muted" />
 
     </LinearLayout>
@@ -141,13 +138,12 @@
             app:tint="@color/text_muted" />
 
         <TextView
+            android:textAppearance="@style/TextAppearance.VG.MicroSemibold"
             android:id="@+id/navProfileLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
             android:text="@string/nav_profile"
-            android:fontFamily="@font/poppins_semibold"
-        android:textSize="10sp"
             android:textColor="@color/text_muted" />
 
     </LinearLayout>

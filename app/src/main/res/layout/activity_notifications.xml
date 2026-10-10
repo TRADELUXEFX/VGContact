@@ -24,12 +24,11 @@
         android:gravity="center">
 
         <TextView
-            android:fontFamily="@font/poppins_bold"
+            android:textAppearance="@style/TextAppearance.VG.Title"
             android:includeFontPadding="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Notifications"
-            android:textSize="24sp"
             android:textColor="@color/white"
             android:textAlignment="center" />
 
@@ -68,12 +67,12 @@
             android:importantForAccessibility="no" />
 
         <TextView
+            android:textAppearance="@style/TextAppearance.VG.Lead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="No notifications yet"
-            android:textColor="@color/text_secondary"
-            android:textSize="15sp" />
+            android:textColor="@color/text_secondary" />
     </LinearLayout>
 
     <!-- Shown while the list is loading (default state) -->
@@ -111,28 +110,26 @@
             android:importantForAccessibility="no" />
 
         <TextView
-            android:fontFamily="@font/poppins_semibold"
+            android:textAppearance="@style/TextAppearance.VG.Heading"
             android:includeFontPadding="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="Couldn't load notifications"
-            android:textColor="@color/vg_dark"
-            android:textSize="18sp" />
+            android:textColor="@color/vg_dark" />
 
         <TextView
+            android:textAppearance="@style/TextAppearance.VG.Body"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:text="Check your connection and try again."
             android:textColor="@color/text_secondary"
-            android:textSize="14sp"
             android:textAlignment="center" />
 
         <com.google.android.material.button.MaterialButton
-            android:fontFamily="@font/poppins_extrabold"
+            android:textAppearance="@style/TextAppearance.VG.Button"
             android:includeFontPadding="false"
-            android:textSize="16sp"
             android:id="@+id/notifications_retry_btn"
             android:layout_width="wrap_content"
             android:layout_height="48dp"

@@ -28,28 +28,27 @@
         android:orientation="vertical">
 
         <TextView
-            android:fontFamily="@font/poppins_semibold"
+            android:textAppearance="@style/TextAppearance.VG.Subheading"
             android:includeFontPadding="false"
             android:id="@+id/notification_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
             android:textColor="@color/vg_dark" />
 
         <TextView
+            android:textAppearance="@style/TextAppearance.VG.BodySmall"
             android:id="@+id/notification_body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
-            android:textSize="13sp"
             android:textColor="@color/text_secondary" />
 
         <TextView
+            android:textAppearance="@style/TextAppearance.VG.Micro"
             android:id="@+id/notification_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:textSize="11sp"
             android:textColor="@color/text_muted" />
 
     </LinearLayout>

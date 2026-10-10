@@ -30,17 +30,16 @@
         android:src="@drawable/ic_arrow_back" />
 
     <TextView
+        android:textAppearance="@style/TextAppearance.VG.Heading"
         android:id="@+id/back_header_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:layout_marginStart="14dp"
         android:ellipsize="end"
-        android:fontFamily="@font/poppins_semibold"
         android:gravity="start|center_vertical"
         android:includeFontPadding="false"
         android:maxLines="1"
-        android:textColor="@color/white"
-        android:textSize="20sp" />
+        android:textColor="@color/white" />
 
 </LinearLayout>

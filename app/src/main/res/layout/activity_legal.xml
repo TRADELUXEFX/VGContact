@@ -28,11 +28,11 @@
         android:fillViewport="true">
 
         <TextView
+            android:textAppearance="@style/TextAppearance.VG.Body"
             android:id="@+id/legal_body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="24dp"
-            android:textSize="14sp"
             android:lineSpacingExtra="4dp"
             android:textColor="@color/vg_dark" />
 
