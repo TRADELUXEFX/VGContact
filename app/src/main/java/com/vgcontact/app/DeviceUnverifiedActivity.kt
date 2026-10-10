@@ -10,7 +10,7 @@ import androidx.core.content.ContextCompat
  * phone can't be checked without it, so sign-up / login stops here and the
  * user can try again (back to the form) or contact support.
  */
-class DeviceUnverifiedActivity : AppCompatActivity() {
+class DeviceUnverifiedActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

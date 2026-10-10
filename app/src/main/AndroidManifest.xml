@@ -35,6 +35,7 @@
             android:name=".RegisterActivity"
             android:exported="true"
             android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateHidden"
             android:theme="@style/Theme.VGContact.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -52,6 +53,7 @@
         <activity
             android:name=".LoginActivity"
             android:exported="false"
+            android:windowSoftInputMode="adjustResize|stateHidden"
             android:screenOrientation="portrait" />
 
         <!-- One account per phone: shown when sign-up / login is stopped by the device rule -->
@@ -90,6 +92,7 @@
         <activity
             android:name=".ReferralActivity"
             android:exported="false"
+            android:windowSoftInputMode="adjustResize|stateHidden"
             android:screenOrientation="portrait" />
 
         <!-- Profile Screen -->

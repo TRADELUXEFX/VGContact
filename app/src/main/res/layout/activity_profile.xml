@@ -142,6 +142,11 @@
                 android:paddingBottom="16dp">
 
                 <TextView
+                    app:autoSizeTextType="uniform"
+                    app:autoSizeMinTextSize="10sp"
+                    app:autoSizeMaxTextSize="18sp"
+                    app:autoSizeStepGranularity="1sp"
+                    android:maxLines="1"
                     android:textAppearance="@style/TextAppearance.VG.Heading"
                     android:id="@+id/profile_phone"
                     android:layout_width="0dp"
@@ -240,6 +245,11 @@
                         app:tint="@color/vg_green_dark" />
 
                     <TextView
+                        app:autoSizeTextType="uniform"
+                        app:autoSizeMinTextSize="10sp"
+                        app:autoSizeMaxTextSize="13sp"
+                        app:autoSizeStepGranularity="1sp"
+                        android:maxLines="1"
                         android:textAppearance="@style/TextAppearance.VG.BodySmallSemibold"
                         android:id="@+id/profile_referrer_phone"
                         android:layout_width="wrap_content"
@@ -308,7 +318,8 @@
             android:includeFontPadding="false"
             android:id="@+id/sync_frequency_btn"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="wrap_content"
+        android:minHeight="56dp"
             android:layout_marginTop="16dp"
             android:text="Sync every 24 hours"
             android:textAllCaps="false"
@@ -326,7 +337,8 @@
             android:includeFontPadding="false"
             android:id="@+id/delete_contacts_btn"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="wrap_content"
+        android:minHeight="56dp"
             android:layout_marginTop="16dp"
             android:text="Delete My Contacts"
             android:textAllCaps="false"

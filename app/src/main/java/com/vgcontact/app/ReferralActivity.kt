@@ -34,7 +34,7 @@ import java.util.TimeZone
  * The referral code is the user's phone number (same value new users type
  * into the "Referral Username" box at sign-up; users.referred_by stores it).
  */
-class ReferralActivity : AppCompatActivity() {
+class ReferralActivity : BaseActivity() {
 
     private lateinit var sessionManager: SessionManager
 
@@ -132,6 +132,11 @@ class ReferralActivity : AppCompatActivity() {
         tabBoard = findViewById(R.id.referral_tab_board)
         searchMine = findViewById(R.id.referral_search_mine)
         searchBoard = findViewById(R.id.referral_search_board)
+        // Keyboard open: hide the floating nav and the big title so the search box and the
+        // list keep their room.
+        KeyboardAware.hideWhileKeyboardOpen(
+            this, findViewById(R.id.bottomNavBar), findViewById(R.id.referral_title)
+        )
         panelMine = findViewById(R.id.referral_panel_mine)
         panelBoard = findViewById(R.id.referral_panel_board)
         breadcrumb = findViewById(R.id.referral_breadcrumb)
@@ -307,6 +312,7 @@ class ReferralActivity : AppCompatActivity() {
             setTextColor(ContextCompat.getColor(this@ReferralActivity, R.color.vg_dark))
             maxLines = 1
             ellipsize = android.text.TextUtils.TruncateAt.END
+            TextFit.shrinkToFit(this, 14)
         })
         col.addView(TextView(this).apply {
             text = relativeTime(item.createdAt)
@@ -562,6 +568,7 @@ class ReferralActivity : AppCompatActivity() {
                 typeface = if (e.isMe) Fonts.semibold(this@ReferralActivity) else Fonts.medium(this@ReferralActivity)
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
                     .apply { marginStart = dp(12) }
+                TextFit.shrinkToFit(this, 14)
             })
             line.addView(TextView(this).apply {
                 text = e.referralCount.toString()

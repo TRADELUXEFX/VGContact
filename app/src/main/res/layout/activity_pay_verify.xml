@@ -344,7 +344,8 @@
                 <FrameLayout
                     android:id="@+id/payProofWrap"
                     android:layout_width="match_parent"
-                    android:layout_height="58dp"
+                    android:layout_height="wrap_content"
+        android:minHeight="58dp"
                     android:layout_marginTop="18dp">
 
                     <View
@@ -357,7 +358,8 @@
                         android:textAppearance="@style/TextAppearance.VG.Button"
                         android:id="@+id/payProofBtn"
                         android:layout_width="match_parent"
-                        android:layout_height="54dp"
+                        android:layout_height="wrap_content"
+        android:minHeight="54dp"
                         android:backgroundTint="@color/vg_green"
                         android:includeFontPadding="false"
                         android:insetTop="0dp"

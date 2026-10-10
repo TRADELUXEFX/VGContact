@@ -29,6 +29,7 @@
             android:gravity="center">
 
             <TextView
+                android:id="@+id/referral_title"
                 android:textAppearance="@style/TextAppearance.VG.Title"
                 android:includeFontPadding="false"
                 android:layout_width="match_parent"
@@ -49,7 +50,8 @@
                 android:textAppearance="@style/TextAppearance.VG.BodySmallMedium"
                 android:id="@+id/referral_tab_mine"
                 android:layout_width="0dp"
-                android:layout_height="44dp"
+                android:layout_height="wrap_content"
+        android:minHeight="44dp"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="My referrals"
@@ -63,7 +65,8 @@
                 android:textAppearance="@style/TextAppearance.VG.BodySmallMedium"
                 android:id="@+id/referral_tab_board"
                 android:layout_width="0dp"
-                android:layout_height="44dp"
+                android:layout_height="wrap_content"
+        android:minHeight="44dp"
                 android:layout_weight="1"
                 android:layout_marginStart="4dp"
                 android:gravity="center"
@@ -79,7 +82,8 @@
             android:textAppearance="@style/TextAppearance.VG.Lead"
             android:id="@+id/referral_search_mine"
             android:layout_width="match_parent"
-            android:layout_height="46dp"
+            android:layout_height="wrap_content"
+        android:minHeight="46dp"
             android:layout_marginTop="16dp"
             android:drawableStart="@drawable/ic_search"
             android:drawablePadding="10dp"
@@ -97,7 +101,8 @@
             android:textAppearance="@style/TextAppearance.VG.Lead"
             android:id="@+id/referral_search_board"
             android:layout_width="match_parent"
-            android:layout_height="46dp"
+            android:layout_height="wrap_content"
+        android:minHeight="46dp"
             android:layout_marginTop="16dp"
             android:drawableStart="@drawable/ic_search"
             android:drawablePadding="10dp"
@@ -210,6 +215,10 @@
                         android:gravity="center_vertical">
 
                         <TextView
+                            app:autoSizeTextType="uniform"
+                            app:autoSizeMinTextSize="10sp"
+                            app:autoSizeMaxTextSize="18sp"
+                            app:autoSizeStepGranularity="1sp"
                             android:textAppearance="@style/TextAppearance.VG.Heading"
                             android:id="@+id/referral_code_text"
                             android:layout_width="0dp"
@@ -239,7 +248,8 @@
                             android:textAppearance="@style/TextAppearance.VG.Button"
                             android:id="@+id/referral_share_btn"
                             android:layout_width="wrap_content"
-                            android:layout_height="40dp"
+                            android:layout_height="wrap_content"
+        android:minHeight="40dp"
                             android:layout_marginStart="8dp"
                             android:minWidth="0dp"
                             android:paddingStart="18dp"
@@ -287,6 +297,10 @@
                                 app:tint="@color/vg_green_dark"
                                 android:contentDescription="Back" />
                             <TextView
+                                app:autoSizeTextType="uniform"
+                                app:autoSizeMinTextSize="10sp"
+                                app:autoSizeMaxTextSize="13sp"
+                                app:autoSizeStepGranularity="1sp"
                                 android:textAppearance="@style/TextAppearance.VG.BodySmallMedium"
                                 android:id="@+id/referral_breadcrumb_text"
                                 android:layout_width="0dp"

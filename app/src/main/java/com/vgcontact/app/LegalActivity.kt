@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
 /** Shows either the Terms & Conditions or the Privacy Policy. */
-class LegalActivity : AppCompatActivity() {
+class LegalActivity : BaseActivity() {
 
     companion object {
         private const val EXTRA_TYPE = "legal_type"

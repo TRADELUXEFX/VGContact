@@ -77,6 +77,48 @@ object SupabaseClient {
         }
     }
 
+    // ---- Plain-language messages for server errors --------------------------------
+    // Rule: users never see raw server text ("HTTP 400: {...}"). Every screen that shows a
+    // failure goes through one of these. Codes come from the SQL (see
+    // supabase/migrations/check_error_codes.sql to list every code the database can send).
+
+    /** True when the server refused a new account because registrations are switched off. */
+    fun isSignupClosed(err: String?): Boolean {
+        if (err.isNullOrBlank()) return false
+        if (err.contains("REGISTRATIONS_CLOSED", ignoreCase = true)) return true
+        val about = listOf("regist", "sign up", "signup", "sign-up").any { err.contains(it, true) }
+        val state = listOf("closed", "paus", "disabled", "not open", "locked", "stopped", "suspend")
+            .any { err.contains(it, true) }
+        return about && state
+    }
+
+    /** Message for a failed call, from lastError. [what] completes "Couldn't ...". */
+    fun userMessage(err: String?, what: String): String {
+        val e = err.orEmpty()
+        return when {
+            e.isBlank() -> "Couldn't $what. Please try again."
+            e.startsWith("Network error") -> "Couldn't reach the server. Check your internet and try again."
+            isSignupClosed(e) -> "Registration is paused right now. Please try again later."
+            e.contains("INVALID_INPUT") -> "Please check the details you entered and try again."
+            e.contains("UNAUTHORIZED") -> "Your session expired. Please log out and log in again."
+            e.contains("ACCOUNT_BANNED") -> "This account has been banned."
+            e.startsWith("HTTP 429") -> "Too many attempts. Please wait a moment and try again."
+            e.startsWith("HTTP 5") -> "Our server is having a problem. Please try again in a few minutes."
+            e.contains("missing its server settings") -> "This version of the app isn't set up correctly. Please update the app."
+            else -> "Couldn't $what. Please try again."
+        }
+    }
+
+    /** Message for a code returned by submit_daily_repost, or null if there is no specific one. */
+    fun messageForCode(code: String?): String? = when (code) {
+        "NOT_VERIFIED" -> "Get verified first: post your invite on your status and send us the screenshot."
+        "ALREADY_VERIFIED" -> "You're already verified. You can start reposting."
+        "REPOST_LIMIT_REACHED" -> "You've reached your repost limit, so there's nothing more to post right now."
+        "USER_NOT_FOUND" -> "We couldn't find your account. Please log out and log in again."
+        "NO_INTERNET" -> "Couldn't reach the server. Check your internet and try again."
+        else -> null
+    }
+
     private fun rpc(name: String, params: JSONObject): org.json.JSONArray? {
         lastError = null
         if (name in SECRET_RPCS) params.put("p_secret", currentSecret())
@@ -188,7 +230,11 @@ object SupabaseClient {
             put("p_kind", kind)
         })
         when {
-            arr == null -> callback(false, if (!isConfigured()) "NOT_CONFIGURED" else "REQUEST_FAILED")
+            arr == null -> callback(false, when {
+                !isConfigured() -> "NOT_CONFIGURED"
+                lastError?.startsWith("Network error") == true -> "NO_INTERNET"
+                else -> "REQUEST_FAILED"
+            })
             arr.length() == 0 -> callback(false, "EMPTY_RESPONSE")
             else -> {
                 val row = arr.getJSONObject(0)

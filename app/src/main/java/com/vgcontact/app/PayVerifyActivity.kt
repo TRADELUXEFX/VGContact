@@ -21,7 +21,7 @@ import androidx.core.content.ContextCompat
  * (the same way the pending sheet's "Send proof" does), and the user attaches the receipt.
  * There is no payment API and nothing is stored on the phone: the owner verifies by hand.
  */
-class PayVerifyActivity : AppCompatActivity() {
+class PayVerifyActivity : BaseActivity() {
 
     companion object {
         fun open(context: Context) {

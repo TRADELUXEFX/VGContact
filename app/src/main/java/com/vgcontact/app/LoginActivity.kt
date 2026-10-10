@@ -26,7 +26,7 @@ import kotlin.concurrent.thread
  *    refuse and explain why, instead of registering.
  *  - Phone not found at all -> tell them to register instead.
  */
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : BaseActivity() {
 
     private lateinit var sessionManager: SessionManager
     private lateinit var progressBar: ProgressBar
@@ -106,7 +106,7 @@ class LoginActivity : AppCompatActivity() {
                                 // Server/network problem - NOT "no account".
                                 Toast.makeText(
                                     this,
-                                    "Couldn't reach the server (${SupabaseClient.lastError}). Try again.",
+                                    SupabaseClient.userMessage(SupabaseClient.lastError, "log in"),
                                     Toast.LENGTH_LONG
                                 ).show()
                             }

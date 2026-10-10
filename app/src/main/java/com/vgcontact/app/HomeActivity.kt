@@ -19,7 +19,7 @@ import com.google.android.material.button.MaterialButton
  * buttons: Sync contacts (put the user's group contacts on the phone)
  * and Buy status viewers (opens the buy screen).
  */
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : BaseActivity() {
 
     // A push was tapped while Home is already open.
     override fun onNewIntent(intent: Intent) {
@@ -256,7 +256,8 @@ class HomeActivity : AppCompatActivity() {
                 if (bundle == null || bundle.home == null) {
                     Toast.makeText(
                         this,
-                        "Couldn't load your viewers: " + (err ?: "no account found for this login. Log out and log in again."),
+                        if (err == null) "No account found for this login. Log out and log in again."
+                        else SupabaseClient.userMessage(err, "load your viewers"),
                         Toast.LENGTH_LONG
                     ).show()
                     return@runOnUiThread

@@ -92,7 +92,7 @@ object BannedHandler {
 }
 
 /** Full-screen "Banned" page: account number, reason, what it means, WhatsApp appeal. */
-class BannedActivity : AppCompatActivity() {
+class BannedActivity : BaseActivity() {
 
     private var accountNumber: String? = null
 

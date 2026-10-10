@@ -119,7 +119,11 @@ object PendingPrompt {
                         saveVerifyStatus(app, "pending")
                         Toast.makeText(app, app.getString(R.string.pending_toast_logged), Toast.LENGTH_SHORT).show()
                     } else if (message != "ALREADY_REPOSTED_TODAY") {
-                        Toast.makeText(app, app.getString(R.string.pending_toast_log_failed), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            app,
+                            SupabaseClient.messageForCode(message) ?: app.getString(R.string.pending_toast_log_failed),
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                 }
             }

@@ -6,7 +6,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
-class NotificationsActivity : AppCompatActivity() {
+class NotificationsActivity : BaseActivity() {
 
     private lateinit var sessionManager: SessionManager
 

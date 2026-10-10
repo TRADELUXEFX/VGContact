@@ -33,7 +33,7 @@ import kotlin.concurrent.thread
  * VGKontact's repost leaderboard). The board comes from get_leaderboard:
  * usernames and counts only, never phone numbers.
  */
-class RepostActivity : AppCompatActivity() {
+class RepostActivity : BaseActivity() {
 
     companion object {
         private const val PREF_TODAYS_TASK_DISMISSED = "todays_task_dismissed"
@@ -349,8 +349,7 @@ class RepostActivity : AppCompatActivity() {
                         repostedToday = false
                         showRepostReady()
                         statusCard.visibility = android.view.View.GONE
-                        val msg = if (message == "NOT_VERIFIED") "Get verified first: post your invite on your status and send us the screenshot."
-                                  else "Couldn't log your repost. Try again."
+                        val msg = SupabaseClient.messageForCode(message) ?: "Couldn't log your repost. Try again."
                         Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
                     }
                 }
@@ -595,6 +594,7 @@ class RepostActivity : AppCompatActivity() {
             includeFontPadding = false
             maxLines = 1
             ellipsize = TextUtils.TruncateAt.END
+            TextFit.shrinkToFit(this, 14)
             setTextColor(ContextCompat.getColor(this@RepostActivity, R.color.vg_dark))
         })
         row.addView(nameCol)

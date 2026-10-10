@@ -34,7 +34,7 @@ import kotlin.concurrent.thread
  * switches to Theme.VGContact so the splash color stays out of the
  * register screen.
  */
-class RegisterActivity : AppCompatActivity() {
+class RegisterActivity : BaseActivity() {
 
     private lateinit var sessionManager: SessionManager
     private lateinit var progressBar: ProgressBar
@@ -100,6 +100,11 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            if (username.length > 50) {
+                Toast.makeText(this, "Your username can be up to 50 characters.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             if (!PhoneUtils.isValid(phone)) {
                 Toast.makeText(this, PhoneUtils.ERROR_MESSAGE, Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -139,17 +144,21 @@ class RegisterActivity : AppCompatActivity() {
                             }
                         } else {
                             val err = SupabaseClient.lastError.orEmpty()
+                            if (SupabaseClient.isSignupClosed(err)) {
+                                showRegistrationPaused()
+                                return@runOnUiThread
+                            }
                             val msg = when {
                                 err.contains("23505") || err.contains("duplicate", true) ->
                                     "That username or phone is already registered. Try logging in instead."
+                                err.contains("INVALID_INPUT") ->
+                                    "Please check your username (up to 50 characters) and your 11-digit phone number."
                                 err.contains("RESERVED_NAME") ->
                                     "That username isn't allowed. Please choose a different one."
-                                err.startsWith("Network error") ->
-                                    "Couldn't reach the server. Check your internet and try again."
-                                err.isNotBlank() ->
-                                    "Couldn't sign up ($err)"
-                                else ->
-                                    "Couldn't sign up. Please try again."
+                                else -> {
+                                    if (err.isNotBlank()) android.util.Log.w("Register", "sign up failed: $err")
+                                    SupabaseClient.userMessage(err, "sign up")
+                                }
                             }
                             Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
                         }
@@ -157,6 +166,22 @@ class RegisterActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    // The server blocks new accounts while the admin has switched registrations off
+    // (setting registrations_open = false, trigger a_block_signup_when_closed). The raw
+    // database error used to be shown ("Couldn't sign up (HTTP 400 ...)"); now it is
+    // recognised and explained (see SupabaseClient.isSignupClosed).
+    private fun showRegistrationPaused() {
+        VgDialog.show(
+            this, VgDialog.Tone.WARNING,
+            "Registration is paused",
+            "New sign-ups are closed right now. Please try again later. If you already have an account, tap Log in.",
+            primary = VgDialog.Action("Log in") {
+                startActivity(Intent(this, LoginActivity::class.java))
+            },
+            secondary = VgDialog.Action("Close")
+        )
     }
 
     // Saves the session and moves on to the permissions screen.

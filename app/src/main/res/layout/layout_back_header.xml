@@ -11,6 +11,7 @@
      (Legal) and the solid green screens (Buy Keys, Referral). Screens that
      need a gradient wrap it in their own container. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/back_header_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -30,6 +31,10 @@
         android:src="@drawable/ic_arrow_back" />
 
     <TextView
+        app:autoSizeTextType="uniform"
+        app:autoSizeMinTextSize="10sp"
+        app:autoSizeMaxTextSize="18sp"
+        app:autoSizeStepGranularity="1sp"
         android:textAppearance="@style/TextAppearance.VG.Heading"
         android:id="@+id/back_header_title"
         android:layout_width="0dp"

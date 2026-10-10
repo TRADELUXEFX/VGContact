@@ -26,7 +26,7 @@ import org.json.JSONObject
  * a verification code is shown (tap to copy, also put in the support message)
  * so the admin can move the account here.
  */
-class DeviceBlockedActivity : AppCompatActivity() {
+class DeviceBlockedActivity : BaseActivity() {
 
     companion object {
         const val EXTRA_REASON = "reason"

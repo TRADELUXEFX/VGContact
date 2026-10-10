@@ -153,7 +153,12 @@ object VgDialog {
     // ---------------------------------------------------------------- pieces
 
     private fun build(activity: Activity, content: View): AlertDialog {
-        val dialog = AlertDialog.Builder(activity).setView(content).create()
+        // Scrollable, so a long message or a large font size never pushes the buttons off screen.
+        val scroll = android.widget.ScrollView(activity).apply {
+            overScrollMode = View.OVER_SCROLL_NEVER
+            addView(content)
+        }
+        val dialog = AlertDialog.Builder(activity).setView(scroll).create()
         dialog.show()
         val d = activity.resources.displayMetrics.density
         val bg = GradientDrawable().apply {

@@ -31,7 +31,7 @@ import androidx.core.content.ContextCompat
  * to HomeActivity.
  * Denial never blocks the user - we only ever advance forward.
  */
-class PermissionsActivity : AppCompatActivity() {
+class PermissionsActivity : BaseActivity() {
 
     private enum class Step { CONTACTS, NOTIFICATIONS, BATTERY, DONE }
 
