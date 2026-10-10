@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Poppins Thin: official static font files (SIL OFL). -->
+<font-family xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <font
+        android:font="@font/poppins_thin_bundled"
+        android:fontStyle="normal"
+        android:fontWeight="100"
+        app:font="@font/poppins_thin_bundled"
+        app:fontStyle="normal"
+        app:fontWeight="100" />
+    <font
+        android:font="@font/poppins_thin_italic_bundled"
+        android:fontStyle="italic"
+        android:fontWeight="100"
+        app:font="@font/poppins_thin_italic_bundled"
+        app:fontStyle="italic"
+        app:fontWeight="100" />
+</font-family>

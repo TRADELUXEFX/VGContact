@@ -362,11 +362,13 @@ object CoachMarkOverlay {
             // Poppins face the rest of the UI uses.
             val poppinsBold = ResourcesCompat.getFont(activity, R.font.poppins_bold)
             val poppins = ResourcesCompat.getFont(activity, R.font.poppins)
+            val poppinsSemi = ResourcesCompat.getFont(activity, R.font.poppins_semibold)
+            val poppinsExtra = ResourcesCompat.getFont(activity, R.font.poppins_extrabold)
 
             val title = TextView(activity).apply {
                 textSize = 17f
                 includeFontPadding = false
-                typeface = poppinsBold
+                typeface = poppinsSemi
                 setTextColor(ContextCompat.getColor(activity, R.color.vg_dark))
                 layoutParams = LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -431,7 +433,7 @@ object CoachMarkOverlay {
             val next = Button(activity).apply {
                 text = "Next"
                 textSize = 14f
-                typeface = poppinsBold
+                typeface = poppinsExtra
                 setTextColor(Color.WHITE)
                 isAllCaps = false
                 background = ContextCompat.getDrawable(activity, R.drawable.coach_mark_button_background)

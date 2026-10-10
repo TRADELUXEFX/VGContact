@@ -47,8 +47,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
             android:text="@string/nav_home"
-            android:textSize="10sp"
-            android:textStyle="bold"
+            android:fontFamily="@font/poppins_semibold"
+        android:textSize="10sp"
             android:textColor="@color/text_muted" />
 
     </LinearLayout>
@@ -80,8 +80,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
             android:text="@string/nav_repost"
-            android:textSize="10sp"
-            android:textStyle="bold"
+            android:fontFamily="@font/poppins_semibold"
+        android:textSize="10sp"
             android:textColor="@color/text_muted" />
 
     </LinearLayout>
@@ -113,8 +113,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
             android:text="@string/nav_referral"
-            android:textSize="10sp"
-            android:textStyle="bold"
+            android:fontFamily="@font/poppins_semibold"
+        android:textSize="10sp"
             android:textColor="@color/text_muted" />
 
     </LinearLayout>
@@ -146,8 +146,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
             android:text="@string/nav_profile"
-            android:textSize="10sp"
-            android:textStyle="bold"
+            android:fontFamily="@font/poppins_semibold"
+        android:textSize="10sp"
             android:textColor="@color/text_muted" />
 
     </LinearLayout>

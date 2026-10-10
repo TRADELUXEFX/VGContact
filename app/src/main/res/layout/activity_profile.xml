@@ -81,8 +81,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/poppins_semibold"
+        android:textSize="18sp"
                     android:textColor="@color/vg_dark" />
 
                 <LinearLayout
@@ -113,8 +113,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
                         android:text="Copy"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
+                        android:fontFamily="@font/poppins_semibold"
+        android:textSize="12sp"
                         android:textColor="@color/vg_green" />
 
                 </LinearLayout>
@@ -149,8 +149,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/poppins_semibold"
+        android:textSize="18sp"
                     android:textColor="@color/vg_dark" />
 
                 <LinearLayout
@@ -181,10 +181,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
                         android:text="Copy"
-                        android:fontFamily="@font/poppins_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:includeFontPadding="false"
                         android:textSize="12sp"
-                        android:textStyle="bold"
                         android:textColor="@color/vg_green" />
 
                 </LinearLayout>
@@ -219,8 +218,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/poppins_semibold"
+        android:textSize="18sp"
                     android:textColor="@color/vg_dark" />
 
                 <!-- Referrer's phone number in a green container with a chat
@@ -251,10 +250,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
-                        android:fontFamily="@font/poppins_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:includeFontPadding="false"
                         android:textSize="13sp"
-                        android:textStyle="bold"
                         android:textColor="@color/vg_green_dark" />
 
                 </LinearLayout>
@@ -281,8 +279,8 @@
                 android:id="@+id/profile_created"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:textStyle="bold"
+                android:fontFamily="@font/poppins_semibold"
+        android:textSize="18sp"
                 android:textColor="@color/vg_dark"
                 android:paddingBottom="16dp" />
 
@@ -306,8 +304,8 @@
                 android:id="@+id/profile_app_version"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:textStyle="bold"
+                android:fontFamily="@font/poppins_semibold"
+        android:textSize="18sp"
                 android:textColor="@color/vg_dark"
                 android:paddingBottom="16dp" />
 
@@ -315,7 +313,7 @@
 
         <com.google.android.material.button.MaterialButton
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:fontFamily="@font/poppins_bold"
+            android:fontFamily="@font/poppins_extrabold"
             android:includeFontPadding="false"
             android:textSize="16sp"
             android:id="@+id/sync_frequency_btn"
@@ -334,7 +332,7 @@
 
         <com.google.android.material.button.MaterialButton
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:fontFamily="@font/poppins_bold"
+            android:fontFamily="@font/poppins_extrabold"
             android:includeFontPadding="false"
             android:textSize="16sp"
             android:id="@+id/delete_contacts_btn"

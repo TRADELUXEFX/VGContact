@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Poppins ExtraBold: official static font files (SIL OFL). -->
+<font-family xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <font
+        android:font="@font/poppins_extrabold_bundled"
+        android:fontStyle="normal"
+        android:fontWeight="800"
+        app:font="@font/poppins_extrabold_bundled"
+        app:fontStyle="normal"
+        app:fontWeight="800" />
+    <font
+        android:font="@font/poppins_extrabold_italic_bundled"
+        android:fontStyle="italic"
+        android:fontWeight="800"
+        app:font="@font/poppins_extrabold_italic_bundled"
+        app:fontStyle="italic"
+        app:fontWeight="800" />
+</font-family>

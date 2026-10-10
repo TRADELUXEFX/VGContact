@@ -543,10 +543,6 @@ class RepostActivity : AppCompatActivity() {
         buildBoardPager(pages)
     }
 
-    private fun fontBold(): Typeface? = try {
-        ResourcesCompat.getFont(this, R.font.poppins_bold)
-    } catch (e: Exception) { null }
-
     private fun dp(v: Int): Int = (v * resources.displayMetrics.density).toInt()
 
     // One row, same scheme as VGKontact's repost board: numbered circle
@@ -573,7 +569,7 @@ class RepostActivity : AppCompatActivity() {
         row.addView(TextView(this).apply {
             text = entry.rank.toString()
             textSize = 15f
-            typeface = fontBold()
+            typeface = Fonts.semibold(this@RepostActivity)
             includeFontPadding = false
             gravity = Gravity.CENTER
             setBackgroundResource(badgeBg)
@@ -595,7 +591,7 @@ class RepostActivity : AppCompatActivity() {
                 if (entry.username.isNotBlank()) entry.username else formatPhone(entry.phone)
             }
             textSize = 16f
-            if (entry.isMe || top3) typeface = fontBold()
+            typeface = if (entry.isMe || top3) Fonts.semibold(this@RepostActivity) else Fonts.medium(this@RepostActivity)
             includeFontPadding = false
             maxLines = 1
             ellipsize = TextUtils.TruncateAt.END
@@ -606,7 +602,7 @@ class RepostActivity : AppCompatActivity() {
         row.addView(TextView(this).apply {
             text = entry.score.toString()
             textSize = 18f
-            typeface = fontBold()
+            typeface = Fonts.semibold(this@RepostActivity)
             includeFontPadding = false
             setTextColor(ContextCompat.getColor(this@RepostActivity, R.color.vg_green))
         })

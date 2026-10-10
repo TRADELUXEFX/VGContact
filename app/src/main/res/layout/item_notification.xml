@@ -28,12 +28,12 @@
         android:orientation="vertical">
 
         <TextView
-            android:fontFamily="@font/poppins_bold"
+            android:fontFamily="@font/poppins_semibold"
             android:includeFontPadding="false"
             android:id="@+id/notification_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="15.5sp"
+            android:textSize="16sp"
             android:textColor="@color/vg_dark" />
 
         <TextView
@@ -41,7 +41,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
-            android:textSize="12.5sp"
+            android:textSize="13sp"
             android:textColor="@color/text_secondary" />
 
         <TextView
@@ -49,7 +49,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:textSize="10.5sp"
+            android:textSize="11sp"
             android:textColor="@color/text_muted" />
 
     </LinearLayout>

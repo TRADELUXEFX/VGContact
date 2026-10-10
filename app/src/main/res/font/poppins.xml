@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Body text. textStyle="bold" maps to Poppins Medium (middle ground, not full Bold). -->
+<!-- Poppins Regular: official static font files (SIL OFL). -->
 <font-family xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <font
@@ -10,10 +10,24 @@
         app:fontStyle="normal"
         app:fontWeight="400" />
     <font
-        android:font="@font/poppins_medium_bundled"
+        android:font="@font/poppins_regular_italic_bundled"
+        android:fontStyle="italic"
+        android:fontWeight="400"
+        app:font="@font/poppins_regular_italic_bundled"
+        app:fontStyle="italic"
+        app:fontWeight="400" />
+    <font
+        android:font="@font/poppins_bold_bundled"
         android:fontStyle="normal"
-        android:fontWeight="600"
-        app:font="@font/poppins_medium_bundled"
+        android:fontWeight="700"
+        app:font="@font/poppins_bold_bundled"
         app:fontStyle="normal"
-        app:fontWeight="600" />
+        app:fontWeight="700" />
+    <font
+        android:font="@font/poppins_bold_italic_bundled"
+        android:fontStyle="italic"
+        android:fontWeight="700"
+        app:font="@font/poppins_bold_italic_bundled"
+        app:fontStyle="italic"
+        app:fontWeight="700" />
 </font-family>

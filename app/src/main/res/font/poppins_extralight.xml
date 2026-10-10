@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Poppins ExtraLight: official static font files (SIL OFL). -->
+<font-family xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <font
+        android:font="@font/poppins_extralight_bundled"
+        android:fontStyle="normal"
+        android:fontWeight="200"
+        app:font="@font/poppins_extralight_bundled"
+        app:fontStyle="normal"
+        app:fontWeight="200" />
+    <font
+        android:font="@font/poppins_extralight_italic_bundled"
+        android:fontStyle="italic"
+        android:fontWeight="200"
+        app:font="@font/poppins_extralight_italic_bundled"
+        app:fontStyle="italic"
+        app:fontWeight="200" />
+</font-family>

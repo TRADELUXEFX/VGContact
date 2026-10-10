@@ -284,7 +284,7 @@ class ReferralActivity : AppCompatActivity() {
                 setColorFilter(pendingColor)
                 background = ContextCompat.getDrawable(this@ReferralActivity, R.drawable.pending_avatar_background)
             } else {
-                setImageResource(R.drawable.ic_profile_person)
+                setImageResource(R.drawable.ic_profile)
                 setColorFilter(ContextCompat.getColor(this@ReferralActivity, R.color.vg_green))
                 background = ContextCompat.getDrawable(this@ReferralActivity, R.drawable.referral_avatar_background)
             }
@@ -303,6 +303,7 @@ class ReferralActivity : AppCompatActivity() {
                 if (item.username.isNotBlank()) item.username else formatPhone(item.phone)
             }
             textSize = 14f
+            typeface = Fonts.medium(this@ReferralActivity)
             setTextColor(ContextCompat.getColor(this@ReferralActivity, R.color.vg_dark))
             maxLines = 1
             ellipsize = android.text.TextUtils.TruncateAt.END
@@ -340,7 +341,7 @@ class ReferralActivity : AppCompatActivity() {
                         if (count > 0) R.color.vg_green else R.color.text_muted
                     )
                 )
-                if (item.isPending || count > 0) setTypeface(typeface, android.graphics.Typeface.BOLD)
+                typeface = if (item.isPending || count > 0) Fonts.semibold(this@ReferralActivity) else Fonts.regular(this@ReferralActivity)
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
                 )
@@ -539,7 +540,7 @@ class ReferralActivity : AppCompatActivity() {
             }
             // Same green person circle as the My referrals rows, in front of the number / username.
             line.addView(ImageView(this).apply {
-                setImageResource(R.drawable.ic_profile_person)
+                setImageResource(R.drawable.ic_profile)
                 setColorFilter(ContextCompat.getColor(this@ReferralActivity, R.color.vg_green))
                 background = ContextCompat.getDrawable(this@ReferralActivity, R.drawable.referral_avatar_background)
                 setPadding(dp(7), dp(7), dp(7), dp(7))
@@ -558,14 +559,14 @@ class ReferralActivity : AppCompatActivity() {
                         this@ReferralActivity, if (e.isMe) R.color.vg_green_dark else R.color.vg_dark
                     )
                 )
-                if (e.isMe) setTypeface(typeface, android.graphics.Typeface.BOLD)
+                typeface = if (e.isMe) Fonts.semibold(this@ReferralActivity) else Fonts.medium(this@ReferralActivity)
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
                     .apply { marginStart = dp(12) }
             })
             line.addView(TextView(this).apply {
                 text = e.referralCount.toString()
                 textSize = 14f
-                setTypeface(typeface, android.graphics.Typeface.BOLD)
+                typeface = Fonts.semibold(this@ReferralActivity)
                 setTextColor(ContextCompat.getColor(this@ReferralActivity, R.color.vg_green))
             })
             row.addView(line)

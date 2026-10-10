@@ -65,7 +65,7 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="My Repost"
-                    android:fontFamily="@font/poppins_semibold"
+                    android:fontFamily="@font/poppins_medium"
                     android:includeFontPadding="false"
                     android:textSize="13sp"
                     android:clickable="true"
@@ -81,7 +81,7 @@
                     android:layout_marginStart="4dp"
                     android:gravity="center"
                     android:text="Leaderboard"
-                    android:fontFamily="@font/poppins_semibold"
+                    android:fontFamily="@font/poppins_medium"
                     android:includeFontPadding="false"
                     android:textSize="13sp"
                     android:clickable="true"
@@ -140,7 +140,7 @@
                             android:layout_marginBottom="10dp">
 
                             <TextView
-                                android:fontFamily="@font/poppins_bold"
+                                android:fontFamily="@font/poppins_semibold"
                                 android:includeFontPadding="false"
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
@@ -169,7 +169,7 @@
                             android:layout_marginBottom="10dp">
 
                             <TextView
-                                android:fontFamily="@font/poppins_bold"
+                                android:fontFamily="@font/poppins_semibold"
                                 android:includeFontPadding="false"
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
@@ -198,7 +198,7 @@
                             android:layout_marginBottom="0dp">
 
                             <TextView
-                                android:fontFamily="@font/poppins_bold"
+                                android:fontFamily="@font/poppins_semibold"
                                 android:includeFontPadding="false"
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
@@ -241,8 +241,8 @@
                     android:layout_height="wrap_content"
                     android:text="Show how it works"
                     android:textColor="@color/vg_green_dark"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/poppins_semibold"
+        android:textSize="14sp"
                     android:gravity="center"
                     android:padding="16dp"
                     android:background="@drawable/card_background"
@@ -275,7 +275,7 @@
                         android:contentDescription="@null" />
 
                     <TextView
-                        android:fontFamily="@font/poppins_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:includeFontPadding="false"
                         android:id="@+id/repost_status_title"
                         android:layout_width="wrap_content"
@@ -325,8 +325,8 @@
                                 android:layout_height="24dp"
                                 android:gravity="center_vertical"
                                 android:text="FREE REPOSTS"
-                                android:textSize="11sp"
-                                android:textStyle="bold"
+                                android:fontFamily="@font/poppins_semibold"
+        android:textSize="11sp"
                                 android:letterSpacing="0.05"
                                 android:textColor="@color/text_muted" />
 
@@ -356,8 +356,8 @@
                                 android:paddingEnd="10dp"
                                 android:paddingTop="4dp"
                                 android:paddingBottom="4dp"
-                                android:textSize="11sp"
-                                android:textStyle="bold"
+                                android:fontFamily="@font/poppins_semibold"
+        android:textSize="11sp"
                                 android:textColor="@color/pending_pill_text" />
 
                             <LinearLayout
@@ -372,8 +372,8 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="1 Day Streak"
-                                    android:textSize="13sp"
-                                    android:textStyle="bold"
+                                    android:fontFamily="@font/poppins_semibold"
+        android:textSize="13sp"
                                     android:textColor="@color/vg_green_dark" />
                             </LinearLayout>
                         </LinearLayout>
@@ -400,7 +400,7 @@
 
                 <!-- 1. Repost button: stands on its own, not inside any card. -->
                 <com.google.android.material.button.MaterialButton
-                    android:fontFamily="@font/poppins_bold"
+                    android:fontFamily="@font/poppins_extrabold"
                     android:includeFontPadding="false"
                     android:textSize="16sp"
                     android:id="@+id/repost_btn"
@@ -424,7 +424,7 @@
 
                 <!-- Buy status viewers: one slim outlined button, no big card -->
                 <com.google.android.material.button.MaterialButton
-                    android:fontFamily="@font/poppins_bold"
+                    android:fontFamily="@font/poppins_extrabold"
                     android:includeFontPadding="false"
                     android:textSize="16sp"
                     android:id="@+id/buy_viewers_btn"
@@ -486,7 +486,7 @@
                                         android:paddingTop="4dp"
                                         android:paddingBottom="4dp"
                                         android:text="Phone number"
-                                        android:fontFamily="@font/poppins_semibold"
+                                        android:fontFamily="@font/poppins_medium"
                                         android:includeFontPadding="false"
                                         android:textSize="11sp"
                                         android:textColor="@color/text_secondary"
@@ -501,7 +501,7 @@
                                         android:paddingTop="4dp"
                                         android:paddingBottom="4dp"
                                         android:text="Username"
-                                        android:fontFamily="@font/poppins_semibold"
+                                        android:fontFamily="@font/poppins_medium"
                                         android:includeFontPadding="false"
                                         android:textSize="11sp"
                                         android:textColor="@color/white"

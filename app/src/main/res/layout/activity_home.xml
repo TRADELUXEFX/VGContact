@@ -62,7 +62,7 @@
 
                 <TextView
                     android:id="@+id/headerUsernameText"
-                    android:fontFamily="@font/poppins_bold"
+                    android:fontFamily="@font/poppins_semibold"
                     android:includeFontPadding="false"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -94,8 +94,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="PENDING"
-                        android:textSize="9sp"
-                        android:textStyle="bold"
+                        android:fontFamily="@font/poppins_semibold"
+        android:textSize="10sp"
                         android:textAllCaps="true"
                         android:letterSpacing="0.04"
                         android:textColor="@color/white" />
@@ -194,7 +194,7 @@
                 android:paddingEnd="14dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
-                android:fontFamily="@font/poppins_bold"
+                android:fontFamily="@font/poppins_extrabold"
                 android:includeFontPadding="false"
                 android:text="Copy"
                 android:textAllCaps="false"
@@ -250,7 +250,7 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:fontFamily="@font/poppins_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:includeFontPadding="false"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -270,7 +270,7 @@
                 </LinearLayout>
 
                 <TextView
-                    android:fontFamily="@font/poppins_bold"
+                    android:fontFamily="@font/poppins_semibold"
                     android:includeFontPadding="false"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -316,7 +316,7 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:fontFamily="@font/poppins_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:includeFontPadding="false"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -336,7 +336,7 @@
                 </LinearLayout>
 
                 <TextView
-                    android:fontFamily="@font/poppins_bold"
+                    android:fontFamily="@font/poppins_semibold"
                     android:includeFontPadding="false"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -372,7 +372,7 @@
 
                 <TextView
                     android:id="@+id/permissionBannerText"
-                    android:fontFamily="@font/poppins_bold"
+                    android:fontFamily="@font/poppins_semibold"
                     android:includeFontPadding="false"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -383,7 +383,7 @@
                     android:textColor="@color/white" />
 
                 <TextView
-                    android:fontFamily="@font/poppins_bold"
+                    android:fontFamily="@font/poppins_semibold"
                     android:includeFontPadding="false"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -426,7 +426,7 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:fontFamily="@font/poppins_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:includeFontPadding="false"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -446,7 +446,7 @@
                 </LinearLayout>
 
                 <TextView
-                    android:fontFamily="@font/poppins_bold"
+                    android:fontFamily="@font/poppins_semibold"
                     android:includeFontPadding="false"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -493,7 +493,7 @@
 
                     <TextView
                         android:id="@+id/waitingBannerTitle"
-                        android:fontFamily="@font/poppins_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:includeFontPadding="false"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -512,7 +512,7 @@
                 </LinearLayout>
 
                 <TextView
-                    android:fontFamily="@font/poppins_bold"
+                    android:fontFamily="@font/poppins_semibold"
                     android:includeFontPadding="false"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -569,8 +569,8 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="@string/home_contacts_label"
-                            android:textSize="11sp"
-                            android:textStyle="bold"
+                            android:fontFamily="@font/poppins_semibold"
+        android:textSize="11sp"
                             android:textAllCaps="true"
                             android:letterSpacing="0.05"
                             android:textColor="@color/text_muted"
@@ -590,7 +590,7 @@
                             android:paddingEnd="10dp"
                             android:paddingTop="4dp"
                             android:paddingBottom="4dp"
-                            android:fontFamily="@font/poppins_semibold"
+                            android:fontFamily="@font/poppins_medium"
                             android:includeFontPadding="false"
                             android:textSize="11sp"
                             android:maxLines="1"
@@ -624,7 +624,7 @@
                             android:id="@+id/freeViewersCurrentText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/poppins_bold"
+                            android:fontFamily="@font/poppins_semibold"
                             android:includeFontPadding="false"
                             android:textSize="15sp"
                             android:textColor="@color/vg_dark"
@@ -634,7 +634,7 @@
                             android:id="@+id/freeViewersMaxText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/poppins_bold"
+                            android:fontFamily="@font/poppins_semibold"
                             android:includeFontPadding="false"
                             android:textSize="13sp"
                             android:textColor="@color/text_muted"
@@ -673,7 +673,7 @@
                             android:id="@+id/extraViewersCurrentText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/poppins_bold"
+                            android:fontFamily="@font/poppins_semibold"
                             android:includeFontPadding="false"
                             android:textSize="15sp"
                             android:textColor="@color/vg_dark"
@@ -683,7 +683,7 @@
                             android:id="@+id/extraViewersMaxText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/poppins_bold"
+                            android:fontFamily="@font/poppins_semibold"
                             android:includeFontPadding="false"
                             android:textSize="13sp"
                             android:textColor="@color/text_muted"
@@ -723,7 +723,7 @@
                             android:id="@+id/referralViewersCountText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/poppins_bold"
+                            android:fontFamily="@font/poppins_semibold"
                             android:includeFontPadding="false"
                             android:textSize="15sp"
                             android:textColor="@color/vg_dark"
@@ -736,7 +736,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/syncContactsBtn"
-                    android:fontFamily="@font/poppins_bold"
+                    android:fontFamily="@font/poppins_extrabold"
                     android:includeFontPadding="false"
                     android:textSize="16sp"
                     android:layout_width="match_parent"
@@ -765,7 +765,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/buyViewersBtn"
-                android:fontFamily="@font/poppins_bold"
+                android:fontFamily="@font/poppins_extrabold"
                 android:includeFontPadding="false"
                 android:textSize="16sp"
                 android:layout_width="match_parent"
@@ -783,7 +783,7 @@
 
             <Button
                 android:id="@+id/join_community_btn"
-                android:fontFamily="@font/poppins_bold"
+                android:fontFamily="@font/poppins_extrabold"
                 android:includeFontPadding="false"
                 android:textSize="16sp"
                 android:layout_width="match_parent"
@@ -892,7 +892,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:fontFamily="@font/poppins_medium"
+                    android:fontFamily="@font/poppins_semibold"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:paddingStart="20dp"
@@ -944,7 +944,7 @@
                 style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:fontFamily="@font/poppins_bold"
+                android:fontFamily="@font/poppins_extrabold"
                 android:gravity="center"
                 android:includeFontPadding="false"
                 android:insetTop="0dp"

@@ -111,7 +111,7 @@
             android:importantForAccessibility="no" />
 
         <TextView
-            android:fontFamily="@font/poppins_bold"
+            android:fontFamily="@font/poppins_semibold"
             android:includeFontPadding="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -130,7 +130,7 @@
             android:textAlignment="center" />
 
         <com.google.android.material.button.MaterialButton
-            android:fontFamily="@font/poppins_bold"
+            android:fontFamily="@font/poppins_extrabold"
             android:includeFontPadding="false"
             android:textSize="16sp"
             android:id="@+id/notifications_retry_btn"

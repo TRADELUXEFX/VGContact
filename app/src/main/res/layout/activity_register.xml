@@ -74,7 +74,6 @@
                         android:layout_height="wrap_content"
                         android:text="@string/login_username"
                         android:textSize="12sp"
-                        android:textStyle="normal"
                         android:textColor="@color/vg_green_dark"
                         android:gravity="center"
                         android:layout_marginBottom="6dp" />
@@ -125,7 +124,6 @@
                         android:layout_height="wrap_content"
                         android:text="@string/login_phone"
                         android:textSize="12sp"
-                        android:textStyle="normal"
                         android:textColor="@color/vg_green_dark"
                         android:gravity="center"
                         android:layout_marginBottom="6dp" />
@@ -183,7 +181,6 @@
                         android:layout_height="wrap_content"
                         android:text="@string/login_referral"
                         android:textSize="12sp"
-                        android:textStyle="normal"
                         android:textColor="@color/vg_green_dark"
                         android:gravity="center"
                         android:layout_marginBottom="6dp" />
@@ -239,7 +236,7 @@
                 android:layout_height="56dp">
 
                 <com.google.android.material.button.MaterialButton
-                    android:fontFamily="@font/poppins_bold"
+                    android:fontFamily="@font/poppins_extrabold"
                     android:includeFontPadding="false"
                     android:id="@+id/register_btn"
                     android:layout_width="match_parent"
@@ -281,8 +278,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Already have an account? Log in"
-                android:textSize="13sp"
-                android:textStyle="bold"
+                android:fontFamily="@font/poppins_semibold"
+        android:textSize="13sp"
                 android:textColor="@color/vg_green_dark"
                 android:gravity="center"
                 android:clickable="true"

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Static (bundled) Poppins: no Google Play services download, so the weights always render. -->
+<!-- Poppins Medium: official static font files (SIL OFL). -->
 <font-family xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <font
@@ -10,10 +10,10 @@
         app:fontStyle="normal"
         app:fontWeight="500" />
     <font
-        android:font="@font/poppins_bold_bundled"
-        android:fontStyle="normal"
-        android:fontWeight="700"
-        app:font="@font/poppins_bold_bundled"
-        app:fontStyle="normal"
-        app:fontWeight="700" />
+        android:font="@font/poppins_medium_italic_bundled"
+        android:fontStyle="italic"
+        android:fontWeight="500"
+        app:font="@font/poppins_medium_italic_bundled"
+        app:fontStyle="italic"
+        app:fontWeight="500" />
 </font-family>

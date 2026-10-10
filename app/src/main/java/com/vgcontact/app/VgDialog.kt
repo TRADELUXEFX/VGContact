@@ -231,8 +231,8 @@ object VgDialog {
         return TextView(activity).apply {
             text = label
             gravity = Gravity.CENTER
-            textSize = 14.5f
-            typeface = ResourcesCompat.getFont(activity, R.font.poppins_bold)
+            textSize = 14f
+            typeface = ResourcesCompat.getFont(activity, R.font.poppins_extrabold)
             setTextColor(if (filled) Color.WHITE else ContextCompat.getColor(activity, R.color.vg_dark))
             background = ripple
             isClickable = true

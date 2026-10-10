@@ -133,7 +133,7 @@
                             android:includeFontPadding="false"
                             android:text="@string/pay_amount_label"
                             android:textColor="@color/text_secondary"
-                            android:textSize="12.5sp" />
+                            android:textSize="13sp" />
 
                         <TextView
                             android:id="@+id/payAmount"
@@ -168,7 +168,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="6dp"
-                            android:fontFamily="@font/poppins_bold"
+                            android:fontFamily="@font/poppins_semibold"
                             android:includeFontPadding="false"
                             android:text="@string/pay_one_time"
                             android:textColor="@color/vg_green_dark"
@@ -207,7 +207,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:fontFamily="@font/poppins_bold"
+                            android:fontFamily="@font/poppins_semibold"
                             android:includeFontPadding="false"
                             android:text="@string/pay_send_to"
                             android:textColor="@color/vg_dark"
@@ -228,13 +228,13 @@
                             android:includeFontPadding="false"
                             android:text="@string/pay_bank"
                             android:textColor="@color/text_secondary"
-                            android:textSize="12.5sp" />
+                            android:textSize="13sp" />
 
                         <TextView
                             android:id="@+id/payBankName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/poppins_bold"
+                            android:fontFamily="@font/poppins_semibold"
                             android:includeFontPadding="false"
                             android:textColor="@color/vg_dark"
                             android:textSize="15sp" />
@@ -254,13 +254,13 @@
                             android:includeFontPadding="false"
                             android:text="@string/pay_account_name"
                             android:textColor="@color/text_secondary"
-                            android:textSize="12.5sp" />
+                            android:textSize="13sp" />
 
                         <TextView
                             android:id="@+id/payAccountName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/poppins_bold"
+                            android:fontFamily="@font/poppins_semibold"
                             android:includeFontPadding="false"
                             android:textColor="@color/vg_dark"
                             android:textSize="15sp" />
@@ -292,7 +292,7 @@
                                 android:includeFontPadding="false"
                                 android:text="@string/pay_account_number"
                                 android:textColor="@color/text_secondary"
-                                android:textSize="12.5sp" />
+                                android:textSize="13sp" />
 
                             <TextView
                                 android:id="@+id/payAccountNumber"
@@ -333,7 +333,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="6dp"
-                                android:fontFamily="@font/poppins_bold"
+                                android:fontFamily="@font/poppins_semibold"
                                 android:includeFontPadding="false"
                                 android:text="@string/pay_copy"
                                 android:textColor="@color/vg_green_dark"
@@ -351,7 +351,7 @@
                         android:lineSpacingExtra="2dp"
                         android:text="@string/pay_details_missing"
                         android:textColor="@color/vg_red_dark"
-                        android:textSize="12.5sp"
+                        android:textSize="13sp"
                         android:visibility="gone" />
                 </LinearLayout>
 
@@ -372,7 +372,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="54dp"
                         android:backgroundTint="@color/vg_green"
-                        android:fontFamily="@font/poppins_bold"
+                        android:fontFamily="@font/poppins_extrabold"
                         android:includeFontPadding="false"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
@@ -402,7 +402,7 @@
                     android:padding="6dp"
                     android:text="@string/pay_note"
                     android:textColor="@color/text_secondary"
-                    android:textSize="12.5sp" />
+                    android:textSize="13sp" />
             </LinearLayout>
         </FrameLayout>
     </ScrollView>

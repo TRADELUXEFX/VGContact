@@ -73,8 +73,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="YOUR PHONE NUMBER"
-                android:textSize="11sp"
-                android:textStyle="bold"
+                android:fontFamily="@font/poppins_semibold"
+        android:textSize="11sp"
                 android:textAllCaps="true"
                 android:letterSpacing="0.05"
                 android:textColor="@color/text_muted"
@@ -130,7 +130,7 @@
             android:padding="20dp">
 
             <com.google.android.material.button.MaterialButton
-                android:fontFamily="@font/poppins_bold"
+                android:fontFamily="@font/poppins_extrabold"
                 android:includeFontPadding="false"
                 android:id="@+id/login_btn"
                 android:layout_width="match_parent"

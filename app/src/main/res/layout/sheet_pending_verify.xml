@@ -181,7 +181,7 @@
                         android:text="@string/pending_step1_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/poppins_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:includeFontPadding="false"
                         android:textColor="@color/vg_dark"
                         android:textSize="14sp" />
@@ -195,7 +195,7 @@
                         android:includeFontPadding="false"
                         android:lineSpacingExtra="2dp"
                         android:textColor="@color/text_secondary"
-                        android:textSize="12.5sp" />
+                        android:textSize="13sp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -240,7 +240,7 @@
                         android:id="@+id/pendingStep2Title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/poppins_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:includeFontPadding="false"
                         android:textColor="@color/vg_dark"
                         android:textSize="14sp" />
@@ -254,7 +254,7 @@
                         android:includeFontPadding="false"
                         android:lineSpacingExtra="2dp"
                         android:textColor="@color/text_secondary"
-                        android:textSize="12.5sp" />
+                        android:textSize="13sp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -292,7 +292,7 @@
                         android:text="@string/pending_step3_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/poppins_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:includeFontPadding="false"
                         android:textColor="@color/vg_dark"
                         android:textSize="14sp" />
@@ -306,7 +306,7 @@
                         android:includeFontPadding="false"
                         android:lineSpacingExtra="2dp"
                         android:textColor="@color/text_secondary"
-                        android:textSize="12.5sp" />
+                        android:textSize="13sp" />
                 </LinearLayout>
             </LinearLayout>
             </LinearLayout>
@@ -328,7 +328,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="54dp"
                     android:backgroundTint="@color/vg_green"
-                    android:fontFamily="@font/poppins_bold"
+                    android:fontFamily="@font/poppins_extrabold"
                     android:includeFontPadding="false"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
@@ -353,7 +353,7 @@
                 android:layout_height="50dp"
                 android:layout_marginTop="12dp"
                 android:backgroundTint="@color/white"
-                android:fontFamily="@font/poppins_bold"
+                android:fontFamily="@font/poppins_extrabold"
                 android:includeFontPadding="false"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
@@ -388,7 +388,7 @@
                         android:id="@+id/pendingCantReach"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/poppins_bold"
+                        android:fontFamily="@font/poppins_semibold"
                         android:includeFontPadding="false"
                         android:textColor="@color/vg_dark"
                         android:textSize="13sp" />
@@ -410,7 +410,7 @@
                     android:layout_height="42dp"
                     android:layout_marginStart="10dp"
                     android:backgroundTint="@color/vg_dark"
-                    android:fontFamily="@font/poppins_bold"
+                    android:fontFamily="@font/poppins_extrabold"
                     android:includeFontPadding="false"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
@@ -420,7 +420,7 @@
                     android:stateListAnimator="@null"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
-                    android:textSize="13.5sp"
+                    android:textSize="14sp"
                     app:cornerRadius="14dp" />
             </LinearLayout>
         </LinearLayout>
