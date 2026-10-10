@@ -2,6 +2,7 @@ package com.vgcontact.app
 
 import android.app.Activity
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import kotlin.concurrent.thread
 
@@ -9,9 +10,10 @@ import kotlin.concurrent.thread
 data class Notice(val message: String, val paused: Boolean)
 
 /**
- * Maintenance banner on Home (admin: Settings > Maintenance).
- *  - Notice written (Maintenance mode off)   -> amber card under the header.
- *  - Maintenance mode on                     -> full-screen "We're doing maintenance" cover on Home.
+ * Maintenance on Home (admin: Settings > Maintenance mode).
+ * Maintenance mode on  -> full-screen "We're doing maintenance" cover on Home (the notice text, if
+ *                         any, is shown inside it). The floating chat button is hidden meanwhile.
+ * Maintenance mode off -> nothing at all. There is no amber card or pop-up any more.
  * Nothing is deleted.
  * Server side: get_notice() in supabase/migrations/add_notice.sql.
  */
@@ -46,23 +48,10 @@ object MaintenanceNotice {
                     .putString("last_message", notice?.message ?: "").apply()
                 activity.runOnUiThread {
                     if (activity.isFinishing || activity.isDestroyed) return@runOnUiThread
-                    apply(activity, notice)
+                    showOverlay(activity, notice?.message ?: "")
                     if (wasPaused && !paused) onEnded()
                 }
             }
-        }
-    }
-
-    private fun apply(activity: Activity, notice: Notice?) {
-        showOverlay(activity, notice?.message ?: "")
-        // Plain notice (Maintenance mode off): the amber card. While paused the full-screen cover is up.
-        val banner = activity.findViewById<View>(R.id.maintenanceBanner) ?: return
-        if (notice == null || notice.paused) {
-            banner.visibility = View.GONE
-        } else {
-            activity.findViewById<TextView>(R.id.maintenanceTitle).text = "Notice"
-            activity.findViewById<TextView>(R.id.maintenanceSub).text = notice.message
-            banner.visibility = View.VISIBLE
         }
     }
 
@@ -72,7 +61,18 @@ object MaintenanceNotice {
         activity.findViewById<View>(R.id.maintenanceMsgCard)?.visibility =
             if (message.isBlank()) View.GONE else View.VISIBLE
         overlay.visibility = if (paused) View.VISIBLE else View.GONE
+        hideChatButton(activity)
         tintSystemBars(activity)
+    }
+
+    /**
+     * The floating chat button lives in the activity's content root, next to Home's own layout, so
+     * the cover's elevation cannot lift the cover above it. Hide it while the cover is up.
+     */
+    private fun hideChatButton(activity: Activity) {
+        activity.findViewById<ViewGroup>(android.R.id.content)
+            ?.findViewWithTag<View>(FloatingContactHelper.FAB_TAG)
+            ?.visibility = if (paused) View.GONE else View.VISIBLE
     }
 
     private var originalNavColor: Int? = null

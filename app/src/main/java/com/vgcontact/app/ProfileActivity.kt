@@ -87,8 +87,8 @@ class ProfileActivity : AppCompatActivity() {
         val current = choices.indexOf(SyncPrefs.getIntervalHours(this)).coerceAtLeast(0)
         VgDialog.showChoices(
             this,
-            "How often should contacts sync?",
-            "Pick how often VGContact saves new viewers to your phone.",
+            "How often should VGContact save new viewers to your phone?",
+            "",
             labels.toList(),
             current
         ) { which ->
@@ -183,7 +183,7 @@ class ProfileActivity : AppCompatActivity() {
                 deleteContactsBtn.isEnabled = true
                 val msg = when {
                     result.error == ContactSync.ERR_NO_INTERNET -> "No internet. Contacts will sync later."
-                    result.error == ContactSync.ERR_FETCH -> "Couldn't reach the server. Try Sync Contacts on Home."
+                    result.error == ContactSync.ERR_FETCH -> "Couldn't reach the server. Try Get new viewers on Home."
                     result.added == 0 -> "Your contacts are up to date"
                     result.added == 1 -> "1 contact added"
                     else -> "${result.added} contacts added"

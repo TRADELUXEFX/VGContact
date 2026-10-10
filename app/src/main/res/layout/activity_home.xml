@@ -216,56 +216,6 @@
             android:paddingEnd="20dp"
             android:paddingBottom="8dp">
 
-            <!-- Amber maintenance / notice card. Driven by MaintenanceNotice (server: get_notice).
-                 Shown while the admin has a notice or Maintenance mode on. -->
-            <LinearLayout
-                android:id="@+id/maintenanceBanner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="top"
-                android:padding="14dp"
-                android:layout_marginBottom="12dp"
-                android:background="@drawable/maintenance_banner_background"
-                android:visibility="gone">
-
-                <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/maintenance_icon_background"
-                    android:padding="9dp"
-                    android:src="@drawable/ic_maintenance"
-                    app:tint="#B7791F"
-                    android:contentDescription="@null" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="12dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/maintenanceTitle"
-                        android:fontFamily="@font/poppins_bold"
-                        android:includeFontPadding="false"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="14sp"
-                        android:textColor="#7A4E0E" />
-
-                    <TextView
-                        android:id="@+id/maintenanceSub"
-                        android:fontFamily="@font/poppins"
-                        android:includeFontPadding="false"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:textSize="12sp"
-                        android:textColor="#8A6420" />
-                </LinearLayout>
-            </LinearLayout>
-
             <!-- Red "update available" card. Stays on Home until the user installs the new version,
                  even after "Maybe later" on the pop-up. Driven by AppUpdatePrompt. -->
             <LinearLayout
@@ -440,6 +390,74 @@
                     android:text="FIX"
                     android:textSize="14sp"
                     android:textColor="@color/white" />
+            </LinearLayout>
+
+            <!-- Community banner. No close button: it stays until the user taps it and joins
+                 (CommunityLink.hasJoined). A new community_link makes it show again. -->
+            <LinearLayout
+                android:id="@+id/communityBanner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:minHeight="68dp"
+                android:padding="14dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/pending_banner_background"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/banner_icon_circle"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_pending_whatsapp"
+                    app:tint="@color/white"
+                    android:contentDescription="@null" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:fontFamily="@font/poppins_bold"
+                        android:includeFontPadding="false"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Join our community"
+                        android:textSize="14sp"
+                        android:textColor="@color/white" />
+
+                    <TextView
+                        android:fontFamily="@font/poppins"
+                        android:includeFontPadding="false"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="Updates, tips and help from other members."
+                        android:textSize="12sp"
+                        android:textColor="#E6FFFFFF" />
+                </LinearLayout>
+
+                <TextView
+                    android:fontFamily="@font/poppins_bold"
+                    android:includeFontPadding="false"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/banner_pill_white"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:text="JOIN"
+                    android:textSize="13sp"
+                    android:textColor="#8A5A00" />
             </LinearLayout>
 
             <LinearLayout

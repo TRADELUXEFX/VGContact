@@ -5,6 +5,6 @@
     <string name="label_free_viewers">Free viewers</string>
     <string name="label_extra_viewers">Extra viewers</string>
     <string name="label_referral_viewers">Referral viewers</string>
-    <string name="btn_sync_contacts">Sync contacts</string>
+    <string name="btn_sync_contacts">Get new viewers</string>
     <string name="btn_buy_viewers">Buy status viewers</string>
 </resources>

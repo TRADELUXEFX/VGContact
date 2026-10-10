@@ -91,7 +91,7 @@ object VgDialog {
     ): AlertDialog {
         val root = column(activity)
         root.addView(titleView(activity, title, topMarginDp = 0))
-        root.addView(bodyView(activity, message, topMarginDp = 8))
+        if (message.isNotBlank()) root.addView(bodyView(activity, message, topMarginDp = 8))
 
         var dialog: AlertDialog? = null
         val green = ContextCompat.getColor(activity, R.color.vg_green)

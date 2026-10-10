@@ -534,8 +534,17 @@ class ReferralActivity : AppCompatActivity() {
             }
             val line = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
-                setPadding(0, dp(16), 0, dp(16))
+                gravity = android.view.Gravity.CENTER_VERTICAL
+                setPadding(0, dp(14), 0, dp(14))
             }
+            // Same green person circle as the My referrals rows, in front of the number / username.
+            line.addView(ImageView(this).apply {
+                setImageResource(R.drawable.ic_profile_person)
+                setColorFilter(ContextCompat.getColor(this@ReferralActivity, R.color.vg_green))
+                background = ContextCompat.getDrawable(this@ReferralActivity, R.drawable.referral_avatar_background)
+                setPadding(dp(7), dp(7), dp(7), dp(7))
+                layoutParams = LinearLayout.LayoutParams(dp(34), dp(34))
+            })
             line.addView(TextView(this).apply {
                 val who = if (showNumber) {
                     if (e.phone.isNotBlank()) formatPhone(e.phone) else e.username
@@ -551,6 +560,7 @@ class ReferralActivity : AppCompatActivity() {
                 )
                 if (e.isMe) setTypeface(typeface, android.graphics.Typeface.BOLD)
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                    .apply { marginStart = dp(12) }
             })
             line.addView(TextView(this).apply {
                 text = e.referralCount.toString()

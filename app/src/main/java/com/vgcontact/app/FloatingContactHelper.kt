@@ -30,7 +30,7 @@ import androidx.core.content.ContextCompat
  */
 object FloatingContactHelper {
 
-    private const val FAB_TAG = "floating_contact_fab"
+    const val FAB_TAG = "floating_contact_fab"
 
     /**
      * Screens that must NOT show the floating button (auth / onboarding /

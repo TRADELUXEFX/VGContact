@@ -101,6 +101,12 @@ class HomeActivity : AppCompatActivity() {
         findViewById<Button>(R.id.join_community_btn).setOnClickListener {
             if (PendingPrompt.showGate(this)) return@setOnClickListener
             CommunityLink.open(this)
+            refreshCommunityBanner()
+        }
+        findViewById<View>(R.id.communityBanner).setOnClickListener {
+            if (PendingPrompt.showGate(this)) return@setOnClickListener
+            CommunityLink.open(this)
+            refreshCommunityBanner()
         }
 
         findViewById<Button>(R.id.maintenanceCommunityBtn).setOnClickListener {
@@ -193,7 +199,7 @@ class HomeActivity : AppCompatActivity() {
             ),
             CoachMarkOverlay.Step(
                 findViewById(R.id.syncContactsBtn),
-                "Sync contacts",
+                "Get new viewers",
                 "Tap to add your group's contacts to your phone.",
                 dockAtBottom = true,
                 scrollParent = scroller
@@ -263,12 +269,13 @@ class HomeActivity : AppCompatActivity() {
                 findViewById<View>(R.id.headerBellUnreadDot).visibility =
                     if (bundle.hasUnread) View.VISIBLE else View.GONE
                 CommunityLink.save(this, bundle.communityLink)
+                refreshCommunityBanner()
                 // After startOnboarding, so the soft update pop-up yields to the verify sheet.
                 val updateBanner = findViewById<View>(R.id.updateBanner)
                 AppUpdatePrompt.handleUpdate(this, bundle.update, { !onboardingActive }) { show ->
                     updateBanner.visibility = if (show) View.VISIBLE else View.GONE
                 }
-                // Banner + "Sync paused" while the admin has it on. When maintenance has just ended,
+                // Full-screen cover while the admin has Maintenance mode on. When maintenance has just ended,
                 // sync right away (unless the user paused syncing themselves in Profile).
                 MaintenanceNotice.refresh(this) { if (!SyncPrefs.isPaused(this)) startSync() }
             }
@@ -313,6 +320,16 @@ class HomeActivity : AppCompatActivity() {
     // compare, and it only writes contacts that are missing. Pending (unverified) users are
     // skipped, as before. When syncing cannot run (paused, or no contacts permission) the
     // "N contacts waiting" banner is shown instead.
+    /**
+     * Community banner: shown (and not dismissible) until the user has tapped Join for the community
+     * that is live now. The plain "Join Our Community" button is hidden while the banner is up.
+     */
+    private fun refreshCommunityBanner() {
+        val joined = CommunityLink.hasJoined(this)
+        findViewById<View>(R.id.communityBanner).visibility = if (joined) View.GONE else View.VISIBLE
+        findViewById<View>(R.id.join_community_btn).visibility = if (joined) View.VISIBLE else View.GONE
+    }
+
     private fun syncOnOpen(h: SupabaseClient.HomeData) {
         val banner = findViewById<View>(R.id.waitingBanner)
         if (h.status == "pending") { banner.visibility = View.GONE; return }
@@ -466,6 +483,7 @@ class HomeActivity : AppCompatActivity() {
         }
         syncedThisOpen = false
         MaintenanceNotice.restore(this)
+        refreshCommunityBanner()
         loadHome()
         refreshLastSync()
         updatePermissionBanner()
