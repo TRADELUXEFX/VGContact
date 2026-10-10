@@ -83,50 +83,86 @@ object CoachMarkOverlay {
         tooltip.root.visibility = View.GONE
 
         var index = 0
+        // Only steps whose target is really on screen are shown (decided on the first step),
+        // so the tour never dims the screen around nothing, and the counter stays honest.
+        val live = ArrayList<Step>()
+        var started = false
+        var settling = false            // true while the page is scrolling to a target
+        var lastHole = RectF()
+        var layoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
 
         fun finish() {
+            layoutListener?.let {
+                if (root.viewTreeObserver.isAlive) root.viewTreeObserver.removeOnGlobalLayoutListener(it)
+            }
             setTourDone(activity)
             root.removeView(scrim)
             root.removeView(tooltip.root)
             onFinished?.invoke()
         }
 
-        fun showStep() {
-            val step = steps[index]
+        fun applyStep() {
+            val step = live[index]
+            lastHole = positionSpotlight(scrim, step.target, root)
+            tooltip.bind(
+                title = step.title,
+                message = step.message,
+                counter = "${index + 1}/${live.size}",
+                nextLabel = if (index == live.size - 1) "Got it" else "Next"
+            )
+            // Dock on whichever side leaves the target uncovered, measured against the real
+            // nav bar position. If neither side has room (big font), the message scrolls
+            // inside the card instead of covering the target or running off screen.
+            val top = computeDock(activity, tooltip, step.target, root, step.dockAtBottom)
+            tooltip.dockAt(top = top, bottomClearance = bottomClearance(activity, root))
+            tooltip.root.visibility = View.VISIBLE
+        }
 
-            fun apply() {
-                positionSpotlight(scrim, step.target, root)
-                tooltip.bind(
-                    title = step.title,
-                    message = step.message,
-                    counter = "${index + 1}/${steps.size}",
-                    nextLabel = if (index == steps.size - 1) "Got it" else "Next"
-                )
-                // Dock on whichever side leaves the target uncovered. The
-                // old fixed dockAtBottom flag hid buttons that ended up
-                // low on screen (a short page can't scroll them higher).
-                tooltip.dockAt(top = shouldDockAtTop(tooltip, step.target, root, step.dockAtBottom))
-                tooltip.root.visibility = View.VISIBLE
+        fun showStep() {
+            if (!started) {
+                started = true
+                live.addAll(steps.filter { isUsable(it.target) })
+                if (live.isEmpty()) {
+                    // Nothing to point at: remove quietly and try again next launch.
+                    root.removeView(scrim)
+                    root.removeView(tooltip.root)
+                    return
+                }
+                // Keep the cutout glued to its target if the layout shifts after we measured
+                // (balance loading, font change, nav bar appearing).
+                val l = ViewTreeObserver.OnGlobalLayoutListener {
+                    if (!settling && index < live.size && tooltip.root.visibility == View.VISIBLE) {
+                        val now = targetRect(live[index].target, root)
+                        if (now != lastHole) applyStep()
+                    }
+                }
+                layoutListener = l
+                root.viewTreeObserver.addOnGlobalLayoutListener(l)
             }
 
+            val step = live[index]
             val scroller = step.scrollParent
             if (scroller != null) {
-                // Hide the spotlight while scrolling so the cutout never
-                // sits over the wrong spot, then re-measure once the
-                // scroll has settled.
+                // Hide the spotlight while scrolling so the cutout never sits over the wrong
+                // spot, then wait until the scroll has really stopped (not a fixed delay,
+                // which was too short on slow phones).
+                settling = true
                 scrim.clearHole()
                 val density = activity.resources.displayMetrics.density
                 val targetTop = offsetInScroller(step.target, scroller)
                 val desired = (targetTop - 160 * density).toInt().coerceAtLeast(0)
                 scroller.smoothScrollTo(0, desired)
-                scroller.postDelayed({ apply() }, 350)
+                whenScrollSettled(scroller) {
+                    settling = false
+                    if (index < live.size) applyStep()
+                }
             } else {
-                apply()
+                applyStep()
             }
         }
 
         tooltip.onNext = {
-            if (index < steps.size - 1) {
+            if (index < live.size - 1) {
                 index += 1
                 showStep()
             } else {
@@ -169,38 +205,73 @@ object CoachMarkOverlay {
         }
     }
 
-    /**
-     * True when the tooltip should sit at the top of the screen. Measures the
-     * tooltip and checks which side the target does not overlap; when both
-     * sides are free it keeps the step's preferred side.
-     */
-    private fun shouldDockAtTop(tooltip: TooltipView, target: View, root: View, preferBottom: Boolean): Boolean {
+    /** A target can be spotlighted only if it is visible and has been laid out. */
+    private fun isUsable(v: View): Boolean = v.isShown && v.width > 0 && v.height > 0
+
+    /** Calls [done] once the scroller has stopped moving (or after at most 1.5 seconds). */
+    private fun whenScrollSettled(scroller: NestedScrollView, done: () -> Unit) {
+        var last = scroller.scrollY
+        var stable = 0
+        var waited = 0
+        val tick = object : Runnable {
+            override fun run() {
+                val y = scroller.scrollY
+                stable = if (y == last) stable + 1 else 0
+                last = y
+                waited += 40
+                if (stable >= 3 || waited >= 1500) done() else scroller.postDelayed(this, 40)
+            }
+        }
+        scroller.postDelayed(tick, 40)
+    }
+
+    /** Space the tooltip must leave at the bottom: the real floating nav bar, or a small margin. */
+    private fun bottomClearance(activity: Activity, root: View): Int {
         val density = root.resources.displayMetrics.density
-        val t = IntArray(2)
-        target.getLocationInWindow(t)
-        val r = IntArray(2)
-        root.getLocationInWindow(r)
+        val nav = activity.findViewById<View>(R.id.bottomNavBar)
+        if (nav != null && nav.isShown && nav.height > 0) {
+            val n = IntArray(2); nav.getLocationInWindow(n)
+            val r = IntArray(2); root.getLocationInWindow(r)
+            return (root.height - (n[1] - r[1]) + 8 * density).toInt()
+        }
+        return (16 * density).toInt()
+    }
+
+    /**
+     * True when the tooltip should sit at the top. Uses the real free space above and below the
+     * target. When neither side can hold the whole card, the larger side is used and the card's
+     * message becomes scrollable so nothing is hidden and the target stays uncovered.
+     */
+    private fun computeDock(activity: Activity, tooltip: TooltipView, target: View, root: View, preferBottom: Boolean): Boolean {
+        val density = root.resources.displayMetrics.density
+        val t = IntArray(2); target.getLocationInWindow(t)
+        val r = IntArray(2); root.getLocationInWindow(r)
         val targetTop = t[1] - r[1] - 6 * density
         val targetBottom = t[1] - r[1] + target.height + 6 * density
 
-        val spec = View.MeasureSpec.makeMeasureSpec(
-            root.width - (32 * density).toInt(), View.MeasureSpec.EXACTLY
-        )
+        tooltip.clearLimit()
+        val spec = View.MeasureSpec.makeMeasureSpec(root.width - (32 * density).toInt(), View.MeasureSpec.EXACTLY)
         tooltip.root.measure(spec, View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
         val h = tooltip.root.measuredHeight
 
         val gap = 8 * density
-        val topEdgeOfBottomDock = root.height - 96 * density - h   // tooltip top when docked at bottom
-        val bottomEdgeOfTopDock = 28 * density + h                  // tooltip bottom when docked at top
-        val bottomFree = targetBottom + gap <= topEdgeOfBottomDock
-        val topFree = targetTop - gap >= bottomEdgeOfTopDock
+        val topInset = 12 * density
+        val spaceAbove = targetTop - gap - topInset
+        val spaceBelow = (root.height - bottomClearance(activity, root)) - (targetBottom + gap)
+        val fitsAbove = h <= spaceAbove
+        val fitsBelow = h <= spaceBelow
 
-        return when {
-            bottomFree && topFree -> !preferBottom
-            bottomFree -> false
-            topFree -> true
-            else -> (targetTop + targetBottom) / 2 > root.height / 2   // neither fits: go opposite the target
+        val top = when {
+            fitsAbove && fitsBelow -> !preferBottom
+            fitsBelow -> false
+            fitsAbove -> true
+            else -> spaceAbove > spaceBelow
         }
+        if (!fitsAbove && !fitsBelow) {
+            val space = maxOf(spaceAbove, spaceBelow, 160 * density).toInt()
+            tooltip.limitHeight(space, h)
+        }
+        return top
     }
 
     /** Target's top edge relative to the scroller's content, walking up the parent chain. */
@@ -215,23 +286,21 @@ object CoachMarkOverlay {
         return y
     }
 
-    /**
-     * Moves the spotlight cutout to sit around target's current on-screen
-     * position. getLocationInWindow() on both views, subtracted, read
-     * fresh at call time so scroll offsets are already accounted for.
-     */
-    private fun positionSpotlight(scrim: SpotlightScrimView, target: View, root: View) {
-        val t = IntArray(2)
-        target.getLocationInWindow(t)
-        val r = IntArray(2)
-        root.getLocationInWindow(r)
-
-        val pad = 6 * scrim.resources.displayMetrics.density
+    /** Where the cutout should sit: the target's current on-screen bounds plus padding. */
+    private fun targetRect(target: View, root: View): RectF {
+        val t = IntArray(2); target.getLocationInWindow(t)
+        val r = IntArray(2); root.getLocationInWindow(r)
+        val pad = 6 * root.resources.displayMetrics.density
         val left = (t[0] - r[0]).toFloat() - pad
         val top = (t[1] - r[1]).toFloat() - pad
-        scrim.setHole(
-            RectF(left, top, left + target.width + pad * 2, top + target.height + pad * 2)
-        )
+        return RectF(left, top, left + target.width + pad * 2, top + target.height + pad * 2)
+    }
+
+    /** Moves the spotlight cutout around the target and returns the rect it used. */
+    private fun positionSpotlight(scrim: SpotlightScrimView, target: View, root: View): RectF {
+        val rect = targetRect(target, root)
+        scrim.setHole(rect)
+        return rect
     }
 
     /**
@@ -289,6 +358,18 @@ object CoachMarkOverlay {
         }
     }
 
+    /** A ScrollView that never grows taller than [maxHeightPx] (unlimited by default). */
+    private class MaxHeightScrollView(context: Context) : android.widget.ScrollView(context) {
+        var maxHeightPx: Int = Int.MAX_VALUE
+            set(value) { field = value; requestLayout() }
+
+        override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+            val spec = if (maxHeightPx == Int.MAX_VALUE) heightMeasureSpec
+            else View.MeasureSpec.makeMeasureSpec(maxHeightPx, View.MeasureSpec.AT_MOST)
+            super.onMeasure(widthMeasureSpec, spec)
+        }
+    }
+
     /** The tooltip card. Docks at a fixed spot - top or bottom - and never follows the target. */
     private class TooltipView(private val activity: Activity) {
         var onNext: (() -> Unit)? = null
@@ -300,6 +381,7 @@ object CoachMarkOverlay {
         private val counterView: TextView
         private val nextButton: Button
         private val skipView: TextView
+        private val messageScroll: MaxHeightScrollView
 
         init {
             val built = build()
@@ -309,6 +391,7 @@ object CoachMarkOverlay {
             messageView = built.second[2] as TextView
             skipView = built.second[3] as TextView
             nextButton = built.second[4] as Button
+            messageScroll = built.second[5] as MaxHeightScrollView
 
             nextButton.setOnClickListener { onNext?.invoke() }
             skipView.setOnClickListener { onSkip?.invoke() }
@@ -321,23 +404,32 @@ object CoachMarkOverlay {
             nextButton.text = nextLabel
         }
 
-        fun dockAt(top: Boolean) {
+        /** Lets the message scroll when the whole card must fit in [space] pixels. */
+        fun limitHeight(space: Int, naturalHeight: Int) {
+            val density = activity.resources.displayMetrics.density
+            val over = naturalHeight - space
+            messageScroll.maxHeightPx = (messageScroll.measuredHeight - over).coerceAtLeast((72 * density).toInt())
+        }
+
+        fun clearLimit() {
+            messageScroll.maxHeightPx = Int.MAX_VALUE
+        }
+
+        fun dockAt(top: Boolean, bottomClearance: Int) {
             val density = activity.resources.displayMetrics.density
             val sideMargin = (16 * density).toInt()
-            val statusBarClearance = (28 * density).toInt()
-            val navBarClearance = (96 * density).toInt() // floating nav pill + its margin
 
             val params = root.layoutParams as FrameLayout.LayoutParams
             params.leftMargin = sideMargin
             params.rightMargin = sideMargin
             if (top) {
                 params.gravity = Gravity.TOP
-                params.topMargin = statusBarClearance
+                params.topMargin = (12 * density).toInt()
                 params.bottomMargin = 0
             } else {
                 params.gravity = Gravity.BOTTOM
                 params.topMargin = 0
-                params.bottomMargin = navBarClearance
+                params.bottomMargin = bottomClearance
             }
             root.layoutParams = params
         }
@@ -381,12 +473,22 @@ object CoachMarkOverlay {
                 textSize = 14f
                 typeface = poppins
                 setTextColor(ContextCompat.getColor(activity, R.color.text_secondary))
+                layoutParams = FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            }
+            // The message sits in a scroll view that only caps its height when the screen
+            // has no room for the whole card (large font): then it scrolls inside the card.
+            val messageScroll = MaxHeightScrollView(activity).apply {
+                overScrollMode = View.OVER_SCROLL_NEVER
                 layoutParams = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 ).apply { topMargin = dp(6) }
+                addView(message)
             }
-            container.addView(message)
+            container.addView(messageScroll)
 
             // Counter sits on the left of the actions row: "3/6   Skip   Next"
             val counter = TextView(activity).apply {
@@ -424,6 +526,8 @@ object CoachMarkOverlay {
                 setTextColor(ContextCompat.getColor(activity, R.color.text_secondary))
                 background = ContextCompat.getDrawable(activity, R.drawable.coach_mark_skip_background)
                 setPadding(dp(18), dp(10), dp(18), dp(10))
+                minHeight = dp(44)
+                gravity = Gravity.CENTER_VERTICAL
                 layoutParams = LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
                 ).apply { rightMargin = dp(10) }
@@ -444,7 +548,7 @@ object CoachMarkOverlay {
 
             actionsRow.addView(buttonGroup)
             container.addView(actionsRow)
-            return Pair(container, listOf(counter, title, message, skip, next))
+            return Pair(container, listOf(counter, title, message, skip, next, messageScroll))
         }
     }
 }
