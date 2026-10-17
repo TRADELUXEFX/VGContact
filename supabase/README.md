@@ -13,6 +13,7 @@ SQL Editor. Running an old file again can put an old version of a function back 
 ## Current files (newest changes, all already run on the live database)
 | File | What it did |
 | --- | --- |
+| `cleanup_unused_2026_10_17.sql` | Dropped 7 unused functions and removed 4 unused settings (2026-10-17). Already run. |
 | `add_user_secret.sql` | Account secret: `users.secret`, `_auth_ok`, `_name_reserved`, `register_account`, `login_account`, and a `p_secret` version of every app function. Old no-secret versions are locked. |
 | `drop_unknown_referral.sql` | Trigger `_users_set_referrer` saves `referred_by` as NULL when no account matches the typed referral; clears existing unmatched values. |
 | `add_system_contacts_admin.sql` | Admin-only functions the admin page uses to manage `system_contacts` (list, add, update, delete). |
@@ -23,6 +24,8 @@ SQL Editor. Running an old file again can put an old version of a function back 
 | `add_push_caller_check.sql` | `push_caller_ok` for the `send-push` caller check. |
 | `use_nigeria_time.sql` | A repost "day" is a Nigerian day (`_today_ng()`). |
 | `wipe_test_data.sql` | Optional, manual, one-off: clears all users before launch. Not part of the normal history. |
+
+Read-only checks of the live database: `verify_live_schema.sql` (run it block by block; it changes nothing).
 
 ## Switching the Android ID requirement
 Use the admin page setting `require_android_id` (true or false), or run

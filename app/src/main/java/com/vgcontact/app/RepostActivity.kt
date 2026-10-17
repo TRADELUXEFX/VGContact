@@ -128,8 +128,8 @@ class RepostActivity : BaseActivity() {
         repostTodayBtn.setOnClickListener { onRepostTodayClicked() }
         buyViewersBtn.setOnClickListener { openBuyViewers() }
 
-        refreshTodayStatus()
-        refreshFreeReposts()
+        // Loaded in onResume (which always runs right after onCreate), so the
+        // screen makes these two server calls once per open, not twice.
 
         setupBottomNav()
         FloatingContactHelper.attach(this)
