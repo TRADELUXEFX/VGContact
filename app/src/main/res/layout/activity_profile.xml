@@ -22,10 +22,10 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="@drawable/header_gradient_curve"
-        android:paddingTop="40dp"
-        android:paddingBottom="24dp"
-        android:paddingStart="18dp"
-        android:paddingEnd="18dp"
+        android:paddingTop="48dp"
+        android:paddingBottom="26dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
         android:gravity="center">
 
         <TextView
@@ -41,8 +41,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginTop="-24dp"
-        android:background="@drawable/body_sheet_curve"
         android:fillViewport="true"
         android:clipToPadding="false"
         android:paddingBottom="140dp">
@@ -310,18 +308,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/vg_dark"
-                android:paddingBottom="16dp" />
+                android:paddingBottom="0dp" />
 
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
             android:textAppearance="@style/TextAppearance.VG.Button"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:includeFontPadding="false"
             android:id="@+id/sync_frequency_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-        android:minHeight="52dp"
+        android:minHeight="56dp"
             android:layout_marginTop="16dp"
             android:text="Sync every 24 hours"
             android:textAllCaps="false"
@@ -331,16 +331,18 @@
             app:iconGravity="textStart"
             app:strokeColor="@color/vg_green"
             app:strokeWidth="1.5dp"
-            app:cornerRadius="999dp" />
+            app:cornerRadius="16dp" />
 
         <com.google.android.material.button.MaterialButton
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
             android:textAppearance="@style/TextAppearance.VG.Button"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:includeFontPadding="false"
             android:id="@+id/delete_contacts_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-        android:minHeight="52dp"
+        android:minHeight="56dp"
             android:layout_marginTop="16dp"
             android:text="Delete My Contacts"
             android:textAllCaps="false"
@@ -350,7 +352,7 @@
             app:iconGravity="textStart"
             app:strokeColor="@color/vg_red"
             app:strokeWidth="1.5dp"
-            app:cornerRadius="999dp" />
+            app:cornerRadius="16dp" />
 
     </LinearLayout>
 

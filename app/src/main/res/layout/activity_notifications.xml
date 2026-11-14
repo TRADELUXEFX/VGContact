@@ -18,9 +18,9 @@
         android:orientation="vertical"
         android:background="@drawable/header_gradient_curve"
         android:paddingTop="48dp"
-        android:paddingBottom="28dp"
-        android:paddingStart="18dp"
-        android:paddingEnd="18dp"
+        android:paddingBottom="26dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
         android:gravity="center">
 
         <TextView
@@ -46,7 +46,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp" />
+            android:padding="20dp" />
 
     </ScrollView>
 
@@ -128,6 +128,8 @@
             android:textAlignment="center" />
 
         <com.google.android.material.button.MaterialButton
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
             android:textAppearance="@style/TextAppearance.VG.Button"
             android:includeFontPadding="false"
             android:id="@+id/notifications_retry_btn"
@@ -141,7 +143,7 @@
             android:textAllCaps="false"
             android:backgroundTint="@color/vg_green"
             android:textColor="@color/white"
-            app:cornerRadius="999dp" />
+            app:cornerRadius="16dp" />
     </LinearLayout>
 
 </LinearLayout>

@@ -8,7 +8,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/background">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -134,18 +134,20 @@
             android:padding="20dp">
 
             <com.google.android.material.button.MaterialButton
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
                 android:textAppearance="@style/TextAppearance.VG.Button"
                 android:includeFontPadding="false"
                 android:id="@+id/login_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-        android:minHeight="52dp"
+        android:minHeight="56dp"
                 android:text="Log In"
                 android:textAllCaps="false"
                 android:backgroundTint="@color/vg_green"
                 android:textColor="@color/white"
                 android:gravity="center"
-                app:cornerRadius="999dp" />
+                app:cornerRadius="16dp" />
 
             <ProgressBar
                 android:id="@+id/progressBar"

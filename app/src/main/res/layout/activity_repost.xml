@@ -24,9 +24,9 @@
             android:orientation="vertical"
             android:background="@drawable/header_gradient_curve"
             android:paddingTop="48dp"
-            android:paddingBottom="22dp"
-            android:paddingStart="18dp"
-            android:paddingEnd="18dp"
+            android:paddingBottom="26dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
             android:gravity="center">
 
             <TextView
@@ -91,8 +91,6 @@
         </LinearLayout>
 
         <ScrollView
-            android:layout_marginTop="-24dp"
-            android:background="@drawable/body_sheet_curve"
             android:id="@+id/repost_content_scroll"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -104,7 +102,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="20dp">
 
                 <!-- ===== MY REPOST PANEL ===== -->
                 <LinearLayout
@@ -306,7 +304,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:background="@drawable/card_background"
-                    android:padding="16dp"
+                    android:padding="18dp"
                     android:layout_marginBottom="12dp"
                     android:visibility="gone">
 
@@ -398,12 +396,14 @@
 
                 <!-- 1. Repost button: stands on its own, not inside any card. -->
                 <com.google.android.material.button.MaterialButton
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
                     android:textAppearance="@style/TextAppearance.VG.Button"
                     android:includeFontPadding="false"
                     android:id="@+id/repost_btn"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-        android:minHeight="52dp"
+        android:minHeight="56dp"
                     android:layout_marginBottom="12dp"
                     android:text="REPOST TODAY"
                     app:icon="@drawable/ic_pending_send"
@@ -417,11 +417,13 @@
                     android:textColor="@color/white"
                     app:strokeColor="@color/vg_red"
                     app:strokeWidth="2dp"
-                    app:cornerRadius="999dp"
+                    app:cornerRadius="16dp"
                     app:elevation="0dp" />
 
                 <!-- Buy status viewers: one slim outlined button, no big card -->
                 <com.google.android.material.button.MaterialButton
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
                     android:textAppearance="@style/TextAppearance.VG.Button"
                     android:includeFontPadding="false"
                     android:id="@+id/buy_viewers_btn"
@@ -436,7 +438,7 @@
                     app:icon="@drawable/ic_unlock"
                     app:iconTint="@color/vg_green_dark"
                     app:iconGravity="textStart"
-                    app:cornerRadius="999dp" />
+                    app:cornerRadius="16dp" />
 
                 </LinearLayout>
 

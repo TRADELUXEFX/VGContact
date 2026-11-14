@@ -104,9 +104,11 @@ object ShareHelper {
         }
     }
 
-    // 1080 x 1350 invite card ("clean white"): green header with logo and headline, white
-    // number card, three numbered steps, and the link as a green button. Drawn on the
-    // phone, no server.
+    // 1080 x 1350 invite card. Same layout language as VG Reshare's status image: green header with
+    // rounded bottom corners, logo tile + title on the left (x = 70 / 226), a pill right-aligned at
+    // x = 1011, and everything else on one 50..1030 grid (number card edges, three equal step
+    // columns). Text is centred vertically with baseline = middle + size * 0.35, as in Reshare.
+    // Drawn on the phone, no server.
     private fun drawCard(ctx: Context, phone: String): Bitmap {
         val w = 1080
         val h = 1350
@@ -116,20 +118,20 @@ object ShareHelper {
         val green = Color.parseColor("#1FAA59")
         val greenDark = Color.parseColor("#158245")
         val tint = Color.parseColor("#E1F5EB")
+        val soft = Color.parseColor("#D6F4E2")
         val gray = Color.parseColor("#7A8580")
         val dark = Color.parseColor("#111B21")
         val line = Color.parseColor("#DCEEE1")
 
-        val bold: Typeface = try {
-            ResourcesCompat.getFont(ctx, R.font.poppins_bold)
+        fun font(res: Int, fallback: Typeface): Typeface = try {
+            ResourcesCompat.getFont(ctx, res)
         } catch (e: Exception) {
             null
-        } ?: Typeface.DEFAULT_BOLD
-        val regular: Typeface = try {
-            ResourcesCompat.getFont(ctx, R.font.poppins)
-        } catch (e: Exception) {
-            null
-        } ?: Typeface.DEFAULT
+        } ?: fallback
+        val regular = font(R.font.poppins, Typeface.DEFAULT)
+        val semibold = font(R.font.poppins_semibold, Typeface.DEFAULT_BOLD)
+        val bold = font(R.font.poppins_bold, Typeface.DEFAULT_BOLD)
+        val extrabold = font(R.font.poppins_extrabold, bold)
 
         fun paint(size: Float, color: Int, face: Typeface) = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
             textSize = size
@@ -142,38 +144,56 @@ object ShareHelper {
             c.drawText(t, x, y, p)
             p.textAlign = Paint.Align.LEFT
         }
+        // Baseline that centres text of [size] on [mid] (the Reshare rule).
+        fun mid(m: Float, size: Float) = m + size * 0.35f
 
-        // Page background + green header.
+        // Page background.
         c.drawColor(Color.parseColor("#F5FAF6"))
-        c.drawRect(0f, 0f, w.toFloat(), 470f, fill(green))
-        val soft = fill(Color.argb(28, 255, 255, 255))
-        c.drawCircle(w - 80f, 60f, 230f, soft)
-        c.drawCircle(60f, 340f, 120f, fill(Color.argb(22, 255, 255, 255)))
 
-        // Logo in a white ring.
-        c.drawCircle(cx, 120f, 62f, fill(Color.WHITE))
+        // Header: green, bottom corners rounded (drawn from above the top edge so only the bottom curves).
+        val header = RectF(0f, -120f, w.toFloat(), 500f)
+        c.drawRoundRect(header, 100f, 100f, fill(green))
+        c.save()
+        c.clipPath(Path().apply { addRoundRect(header, 100f, 100f, Path.Direction.CW) })
+        c.drawCircle(w - 60f, -40f, 200f, fill(Color.argb(26, 255, 255, 255)))
+        c.drawCircle(40f, 470f, 110f, fill(Color.argb(20, 255, 255, 255)))
+        c.restore()
+
+        // Logo tile + title block on the left, pill right-aligned at x = 1011.
+        val tile = RectF(70f, 100f, 190f, 220f)
+        c.drawRoundRect(tile, 30f, 30f, fill(Color.WHITE))
         try {
             val d = ContextCompat.getDrawable(ctx, R.mipmap.ic_launcher)
             if (d != null) {
                 c.save()
-                c.clipPath(Path().apply { addCircle(cx, 120f, 56f, Path.Direction.CW) })
-                val half = (56f * 1.5f).toInt()
-                d.setBounds(cx.toInt() - half, 120 - half, cx.toInt() + half, 120 + half)
+                c.clipPath(Path().apply { addRoundRect(tile, 30f, 30f, Path.Direction.CW) })
+                val half = 90 // adaptive icon: show its visible area across the 120px tile
+                val tcx = tile.centerX().toInt()
+                val tcy = tile.centerY().toInt()
+                d.setBounds(tcx - half, tcy - half, tcx + half, tcy + half)
                 d.draw(c)
                 c.restore()
             }
         } catch (e: Exception) {
-            drawEye(c, cx, 120f, 40f, greenDark)
+            drawEye(c, tile.centerX(), tile.centerY(), 40f, greenDark)
         }
+        c.drawText("VGContact", 226f, 172f, paint(66f, Color.WHITE, extrabold))
+        c.drawText("Free status viewers, every day", 226f, 216f, paint(32f, soft, regular))
+
+        val pillPaint = paint(27f, greenDark, semibold).apply { textAlign = Paint.Align.CENTER }
+        val pillW = pillPaint.measureText("FREE") + 44f
+        val pill = RectF(1011f - pillW, 135f, 1011f, 184f)
+        c.drawRoundRect(pill, 24.5f, 24.5f, fill(Color.WHITE))
+        c.drawText("FREE", pill.centerX(), mid(pill.centerY(), 27f), pillPaint)
 
         // Headline.
-        val head = paint(84f, Color.WHITE, bold)
-        centered("Get FREE 500+", cx, 300f, head)
-        centered("status viewers", cx, 395f, head)
+        val head = paint(80f, Color.WHITE, bold)
+        centered("Get FREE 500+", cx, 365f, head)
+        centered("status viewers", cx, 455f, head)
 
-        // Number card with a soft shadow and a thin border.
-        val card = RectF(80f, 520f, w - 80f, 800f)
-        val cardShadow = fill(Color.WHITE).apply { setShadowLayer(32f, 0f, 14f, Color.argb(60, 0, 0, 0)) }
+        // Number card on the 50..1030 grid, with a soft shadow and a thin border.
+        val card = RectF(50f, 560f, 1030f, 830f)
+        val cardShadow = fill(Color.WHITE).apply { setShadowLayer(32f, 0f, 14f, Color.argb(55, 0, 0, 0)) }
         c.drawRoundRect(card, 48f, 48f, cardShadow)
         val border = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             style = Paint.Style.STROKE
@@ -185,41 +205,46 @@ object ShareHelper {
         val labelText = "My referral number"
         val rowW = 52f + 16f + label.measureText(labelText)
         val left = cx - rowW / 2f
-        c.drawCircle(left + 26f, 590f, 26f, fill(tint))
-        drawPhone(c, left + 26f, 590f, 26f, greenDark)
-        c.drawText(labelText, left + 68f, 603f, label)
+        c.drawCircle(left + 26f, 630f, 26f, fill(tint))
+        drawPhone(c, left + 26f, 630f, 26f, greenDark)
+        c.drawText(labelText, left + 68f, mid(630f, 38f), label)
         val numPaint = paint(108f, greenDark, bold)
         val numText = formatPhone(phone)
-        while (numPaint.measureText(numText) > 780f && numPaint.textSize > 50f) numPaint.textSize -= 4f
-        centered(numText, cx, 740f, numPaint)
+        while (numPaint.measureText(numText) > 840f && numPaint.textSize > 50f) numPaint.textSize -= 4f
+        centered(numText, cx, 780f, numPaint)
 
-        // Three numbered steps.
-        val xs = floatArrayOf(190f, 540f, 890f)
+        // Three numbered steps: equal thirds of the 50..1030 grid, so they sit symmetric with the card.
+        val col = 980f / 3f
+        val xs = floatArrayOf(50f + col * 0.5f, 50f + col * 1.5f, 50f + col * 2.5f)
         val titles = arrayOf("Download", "Enter referral", "Get free")
         val subs = arrayOf("the app", "number at sign up", "500+ status viewers")
         val rail = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             strokeWidth = 4f
             color = line
         }
-        c.drawLine(xs[0] + 45f, 880f, xs[1] - 45f, 880f, rail)
-        c.drawLine(xs[1] + 45f, 880f, xs[2] - 45f, 880f, rail)
+        c.drawLine(xs[0] + 52f, 935f, xs[1] - 52f, 935f, rail)
+        c.drawLine(xs[1] + 52f, 935f, xs[2] - 52f, 935f, rail)
         for (i in 0..2) {
-            c.drawCircle(xs[i], 880f, 38f, fill(green))
-            centered((i + 1).toString(), xs[i], 893f, paint(40f, Color.WHITE, bold))
-            centered(titles[i], xs[i], 975f, paint(32f, dark, bold))
-            centered(subs[i], xs[i], 1017f, paint(28f, gray, regular))
+            c.drawCircle(xs[i], 935f, 38f, fill(green))
+            centered((i + 1).toString(), xs[i], mid(935f, 40f), paint(40f, Color.WHITE, bold))
+            centered(titles[i], xs[i], 1027f, paint(32f, dark, bold))
+            centered(subs[i], xs[i], 1069f, paint(28f, gray, regular))
         }
 
-        // Instruction + link button.
-        centered("Tap the link below to download the app", cx, 1105f, paint(30f, gray, regular))
+        // Instruction + link button (icon and link centred as one group).
+        centered("Tap the link below to download the app", cx, 1160f, paint(30f, gray, regular))
         val linkText = ReferralActivity.LINK_BASE.removePrefix("https://") + phone
         val linkPaint = paint(36f, Color.WHITE, bold)
-        while (linkPaint.measureText(linkText) > 760f && linkPaint.textSize > 22f) linkPaint.textSize -= 1f
-        val btnW = linkPaint.measureText(linkText) + 130f
-        val btn = RectF(cx - btnW / 2f, 1140f, cx + btnW / 2f, 1240f)
+        while (linkPaint.measureText(linkText) > 800f && linkPaint.textSize > 22f) linkPaint.textSize -= 1f
+        val iconW = 48f
+        val gap = 18f
+        val groupW = iconW + gap + linkPaint.measureText(linkText)
+        val btnW = groupW + 110f
+        val btn = RectF(cx - btnW / 2f, 1195f, cx + btnW / 2f, 1295f)
         c.drawRoundRect(btn, 50f, 50f, fill(green))
-        drawLink(c, btn.left + 56f, 1190f, 20f, Color.WHITE)
-        c.drawText(linkText, btn.left + 96f, 1190f + 13f, linkPaint)
+        val gx = cx - groupW / 2f
+        drawLink(c, gx + iconW / 2f - 4f, 1245f, 20f, Color.WHITE)
+        c.drawText(linkText, gx + iconW + gap, mid(1245f, linkPaint.textSize), linkPaint)
 
         return bmp
     }

@@ -14,6 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/header_gradient_curve"
+        android:translationZ="1dp"
         android:clipChildren="true"
         android:clipToPadding="true">
 
@@ -43,7 +44,7 @@
             android:paddingStart="20dp"
             android:paddingTop="48dp"
             android:paddingEnd="20dp"
-            android:paddingBottom="24dp">
+            android:paddingBottom="46dp">
 
             <ImageView
                 android:id="@+id/payBack"
@@ -90,6 +91,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="-24dp"
         android:layout_weight="1"
         android:overScrollMode="never"
         android:scrollbars="none">
@@ -97,7 +99,10 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp"
+            android:paddingStart="20dp"
+            android:paddingTop="40dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="28dp"
             android:clipToPadding="false">
 
             <LinearLayout
@@ -216,9 +221,8 @@
 
                         <TextView
                             android:textAppearance="@style/TextAppearance.VG.BodySmall"
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:includeFontPadding="false"
                             android:text="@string/pay_bank"
                             android:textColor="@color/text_secondary" />
@@ -226,7 +230,13 @@
                         <TextView
                             android:textAppearance="@style/TextAppearance.VG.Subheading"
                             android:id="@+id/payBankName"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:ellipsize="end"
+                            android:gravity="end"
+                            android:maxLines="1"
+                            android:textAlignment="viewEnd"
                             android:layout_height="wrap_content"
                             android:includeFontPadding="false"
                             android:textColor="@color/vg_dark" />
@@ -240,9 +250,8 @@
 
                         <TextView
                             android:textAppearance="@style/TextAppearance.VG.BodySmall"
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:includeFontPadding="false"
                             android:text="@string/pay_account_name"
                             android:textColor="@color/text_secondary" />
@@ -250,7 +259,13 @@
                         <TextView
                             android:textAppearance="@style/TextAppearance.VG.Subheading"
                             android:id="@+id/payAccountName"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:ellipsize="end"
+                            android:gravity="end"
+                            android:maxLines="1"
+                            android:textAlignment="viewEnd"
                             android:layout_height="wrap_content"
                             android:includeFontPadding="false"
                             android:textColor="@color/vg_dark" />
@@ -345,8 +360,8 @@
                     android:id="@+id/payProofWrap"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-        android:minHeight="58dp"
-                    android:layout_marginTop="18dp">
+                    android:minHeight="58dp"
+                    android:layout_marginTop="20dp">
 
                     <View
                         android:layout_width="match_parent"
@@ -359,7 +374,7 @@
                         android:id="@+id/payProofBtn"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-        android:minHeight="52dp"
+                        android:minHeight="54dp"
                         android:backgroundTint="@color/vg_green"
                         android:includeFontPadding="false"
                         android:insetTop="0dp"
@@ -369,7 +384,7 @@
                         android:text="@string/pay_btn_proof"
                         android:textAllCaps="false"
                         android:textColor="@color/white"
-                        app:cornerRadius="999dp"
+                        app:cornerRadius="18dp"
                         app:icon="@drawable/ic_pending_whatsapp"
                         app:iconGravity="textStart"
                         app:iconPadding="10dp"
@@ -386,7 +401,10 @@
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:lineSpacingExtra="2dp"
-                    android:padding="6dp"
+                    android:paddingStart="8dp"
+                    android:paddingTop="6dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="6dp"
                     android:text="@string/pay_note"
                     android:textColor="@color/text_secondary" />
             </LinearLayout>

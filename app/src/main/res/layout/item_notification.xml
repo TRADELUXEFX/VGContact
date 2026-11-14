@@ -11,7 +11,7 @@
     android:orientation="horizontal"
     android:background="@drawable/card_background"
     android:padding="14dp"
-    android:layout_marginBottom="10dp">
+    android:layout_marginBottom="12dp">
 
     <View
         android:id="@+id/notification_unread_dot"

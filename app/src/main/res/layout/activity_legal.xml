@@ -13,9 +13,9 @@
         android:layout_height="wrap_content"
         android:background="@drawable/header_gradient_curve"
         android:paddingTop="48dp"
-        android:paddingBottom="24dp"
-        android:paddingStart="18dp"
-        android:paddingEnd="18dp">
+        android:paddingBottom="26dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp">
 
         <include layout="@layout/layout_back_header" />
 
@@ -32,7 +32,7 @@
             android:id="@+id/legal_body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="24dp"
+            android:padding="20dp"
             android:lineSpacingExtra="4dp"
             android:textColor="@color/vg_dark" />
 

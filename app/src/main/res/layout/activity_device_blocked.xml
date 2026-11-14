@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/background">
 
     <!-- Whole screen scrolls: on small phones or large font sizes nothing is squeezed
          or hidden between the header and the buttons. -->
@@ -175,25 +175,29 @@
             android:padding="20dp">
 
             <com.google.android.material.button.MaterialButton
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
                 android:textAppearance="@style/TextAppearance.VG.Button"
                 android:id="@+id/loginButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-        android:minHeight="52dp"
+        android:minHeight="56dp"
                 android:includeFontPadding="false"
                 android:text="Log in"
                 android:textAllCaps="false"
                 android:backgroundTint="@color/vg_green"
                 android:textColor="@color/white"
                 android:layout_marginBottom="12dp"
-                app:cornerRadius="999dp" />
+                app:cornerRadius="16dp" />
             <com.google.android.material.button.MaterialButton
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
                 android:textAppearance="@style/TextAppearance.VG.Button"
                 android:id="@+id/contactCareButton"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-        android:minHeight="52dp"
+        android:minHeight="56dp"
                 android:includeFontPadding="false"
                 android:text="Contact customer care"
                 android:textAllCaps="false"
@@ -201,7 +205,7 @@
                 app:strokeColor="@color/vg_green"
                 app:strokeWidth="1.5dp"
                 app:backgroundTint="@android:color/transparent"
-                app:cornerRadius="999dp" />
+                app:cornerRadius="16dp" />
         </LinearLayout>
 
     </LinearLayout>

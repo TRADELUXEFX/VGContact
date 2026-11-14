@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/background">
 
     <!-- ===================== FORM SCREEN ===================== -->
     <!-- The whole screen scrolls, so when the keyboard opens the fields (and the
@@ -14,13 +14,13 @@
         android:layout_height="match_parent"
         android:fillViewport="true"
         android:overScrollMode="never"
-        android:background="@color/white">
+        android:background="@color/background">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="@color/white">
+        android:background="@color/background">
 
         <!-- ==== GREEN HEADER ==== -->
         <LinearLayout
@@ -243,7 +243,8 @@
                 <com.google.android.material.button.MaterialButton
                     android:textAppearance="@style/TextAppearance.VG.Button"
                     android:includeFontPadding="false"
-                    android:minHeight="52dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
                     android:id="@+id/register_btn"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -252,7 +253,7 @@
                     android:backgroundTint="@color/vg_green"
                     android:textColor="@color/white"
                     android:gravity="center"
-                    app:cornerRadius="999dp" />
+                    app:cornerRadius="16dp" />
 
                 <ProgressBar
                     android:id="@+id/progressBar"

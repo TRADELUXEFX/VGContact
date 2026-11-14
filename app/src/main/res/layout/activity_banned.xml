@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/background">
 
     <!-- Whole screen scrolls: on small phones or large font sizes nothing is squeezed
          or hidden between the header and the buttons. -->
@@ -224,18 +224,20 @@
             android:paddingBottom="20dp">
 
             <Button
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
                 android:textAppearance="@style/TextAppearance.VG.Button"
                 android:id="@+id/contactCareButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-        android:minHeight="52dp"
+        android:minHeight="56dp"
                 android:text="Contact customer care"
                 android:includeFontPadding="false"
                 android:textAllCaps="false"
                 android:backgroundTint="@color/vg_green"
                 android:textColor="@color/white"
                 android:gravity="center"
-                app:cornerRadius="999dp" />
+                app:cornerRadius="16dp" />
 
             <TextView
                 android:textAppearance="@style/TextAppearance.VG.Caption"
