@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Green header of the pending sheet: same vertical gradient as header_gradient.xml,
-     with the sheet's rounded top corners. -->
+     with the sheet's rounded top corners and 40dp curved bottom corners, matching the other curved headers. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <gradient
@@ -10,6 +10,6 @@
     <corners
         android:topLeftRadius="28dp"
         android:topRightRadius="28dp"
-        android:bottomLeftRadius="0dp"
-        android:bottomRightRadius="0dp" />
+        android:bottomLeftRadius="40dp"
+        android:bottomRightRadius="40dp" />
 </shape>

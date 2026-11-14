@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center_horizontal"
-            android:background="@drawable/header_gradient"
+            android:background="@drawable/header_gradient_curve"
             android:paddingTop="56dp"
             android:paddingStart="28dp"
             android:paddingEnd="28dp"

@@ -6,16 +6,22 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
 
 /**
- * Wires the floating pill bottom nav (bottom_nav_bar.xml) the same way
- * on every screen. Four tabs: Home, Repost, Referral, Profile.
+ * Wires the bottom nav (bottom_nav_bar.xml) the same way on every screen.
+ * Three tabs: Home, Repost, Referral. Profile is opened from the icon in the Home header.
  */
 object BottomNavHelper {
 
     enum class Tab { HOME, REPOST, REFERRAL, PROFILE }
 
     fun setup(activity: Activity, selected: Tab) {
+        // Paint the phone\'s bottom system bar green, so it continues the green nav bar
+        // (VG RESHARE does the same). Without this it stays black under the nav.
+        activity.window.navigationBarColor = ContextCompat.getColor(activity, R.color.vg_green_dark)
+        WindowCompat.getInsetsController(activity.window, activity.window.decorView)
+            .isAppearanceLightNavigationBars = false
         // Tab screens have no Back arrow. The phone's Back goes to Home
         // (Home itself exits the app as usual).
         if (selected != Tab.HOME && activity is androidx.activity.ComponentActivity) {
@@ -32,8 +38,7 @@ object BottomNavHelper {
         val tabs = listOf(
             Tab.HOME to Triple(R.id.navHomeTab, R.id.navHomeIcon, R.id.navHomeLabel),
             Tab.REPOST to Triple(R.id.navRepostTab, R.id.navRepostIcon, R.id.navRepostLabel),
-            Tab.REFERRAL to Triple(R.id.navReferralTab, R.id.navReferralIcon, R.id.navReferralLabel),
-            Tab.PROFILE to Triple(R.id.navProfileTab, R.id.navProfileIcon, R.id.navProfileLabel)
+            Tab.REFERRAL to Triple(R.id.navReferralTab, R.id.navReferralIcon, R.id.navReferralLabel)
         )
 
         val activeColor = ContextCompat.getColor(activity, R.color.nav_active_on_green)

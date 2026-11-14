@@ -15,6 +15,12 @@ open class BaseActivity : AppCompatActivity() {
         super.attachBaseContext(ScaleGuard.wrap(newBase))
     }
 
+    // Same as VG RESHARE: every screen runs the Poppins pass once its layout is inflated.
+    override fun onContentChanged() {
+        super.onContentChanged()
+        Fonts.apply(window.decorView)
+    }
+
     // AppCompat re-applies the system configuration on top of ours. Keep our scale, but let
     // it keep its own dark/light mode (uiMode).
     override fun applyOverrideConfiguration(overrideConfiguration: Configuration?) {
