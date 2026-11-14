@@ -57,4 +57,6 @@
 
     <color name="pending_pill_bg">#FDF1DA</color>
     <color name="pending_pill_text">#8A5A00</color>
+    <color name="nav_text_on_green">#D9F2E4</color>
+    <color name="nav_active_on_green">#FFFFFF</color>
 </resources>

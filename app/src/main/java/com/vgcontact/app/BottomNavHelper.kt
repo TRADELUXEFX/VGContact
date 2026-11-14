@@ -36,9 +36,9 @@ object BottomNavHelper {
             Tab.PROFILE to Triple(R.id.navProfileTab, R.id.navProfileIcon, R.id.navProfileLabel)
         )
 
-        val activeColor = ContextCompat.getColor(activity, R.color.vg_green)
-        val inactiveColor = ContextCompat.getColor(activity, R.color.text_muted)
-        val activeTabBackground = ContextCompat.getDrawable(activity, R.drawable.nav_active_tab_background)
+        val activeColor = ContextCompat.getColor(activity, R.color.nav_active_on_green)
+        val inactiveColor = ContextCompat.getColor(activity, R.color.nav_text_on_green)
+        val activeTabBackground = ContextCompat.getDrawable(activity, R.drawable.nav_curve_active_tab)
 
         for ((tab, ids) in tabs) {
             val (rowId, iconId, labelId) = ids
