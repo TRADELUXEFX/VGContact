@@ -17,7 +17,7 @@
         android:layout_height="match_parent"
         android:fillViewport="true"
         android:clipToPadding="false"
-        android:paddingBottom="88dp">
+        android:paddingBottom="150dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -30,9 +30,9 @@
             android:orientation="vertical"
             android:background="@drawable/header_gradient_curve"
             android:paddingTop="48dp"
-            android:paddingBottom="18dp"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp">
+            android:paddingBottom="22dp"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -46,9 +46,9 @@
                 android:layout_height="56dp"
                 android:src="@drawable/ic_profile"
                 app:tint="@color/vg_green"
-                android:padding="12dp"
+                android:padding="0dp"
                 android:background="@drawable/avatar_circle_background"
-                android:scaleType="centerInside"
+                android:scaleType="fitCenter"
                 app:shapeAppearanceOverlay="@style/CircleImageView"
                 android:clickable="true"
                 android:focusable="true"
@@ -204,7 +204,7 @@
                 android:textAllCaps="false"
                 android:textColor="@color/vg_green_dark"
                 android:backgroundTint="@color/white"
-                app:cornerRadius="10dp" />
+                app:cornerRadius="999dp" />
 
         </LinearLayout>
 
@@ -214,10 +214,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="20dp"
+            android:paddingTop="44dp"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
-            android:paddingBottom="8dp">
+            android:paddingBottom="8dp"
+            android:layout_marginTop="-24dp"
+            android:background="@drawable/body_sheet_curve">
 
             <!-- Red "update available" card. Stays on Home until the user installs the new version,
                  even after "Maybe later" on the pop-up. Driven by AppUpdatePrompt. -->
@@ -725,8 +727,10 @@
                             android:includeFontPadding="false"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                android:minHeight="56dp"
+                android:minHeight="52dp"
                             android:layout_marginTop="18dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
                             android:text="@string/btn_sync_contacts"
                             android:textAllCaps="true"
                             android:letterSpacing="0.02"
@@ -735,7 +739,7 @@
                             app:icon="@drawable/ic_sync"
                             app:iconTint="@color/white"
                             app:iconGravity="textStart"
-                            app:cornerRadius="16dp" />
+                            app:cornerRadius="999dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -752,7 +756,7 @@
                 android:includeFontPadding="false"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-        android:minHeight="56dp"
+        android:minHeight="52dp"
                 android:layout_marginBottom="12dp"
                 android:text="@string/btn_buy_viewers"
                 android:textAllCaps="true"
@@ -762,7 +766,7 @@
                 app:icon="@drawable/ic_viewers"
                 app:iconTint="@color/white"
                 app:iconGravity="textStart"
-                app:cornerRadius="16dp" />
+                app:cornerRadius="999dp" />
 
             <Button
                 android:textAppearance="@style/TextAppearance.VG.Button"
@@ -770,7 +774,7 @@
                 android:includeFontPadding="false"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-        android:minHeight="56dp"
+        android:minHeight="52dp"
                 android:text="Join Our Community"
                 android:textAllCaps="true"
                 android:letterSpacing="0.02"
@@ -780,7 +784,7 @@
                 app:icon="@drawable/ic_pending_whatsapp"
                 app:iconTint="@color/vg_green_dark"
                 app:iconGravity="textStart"
-                app:cornerRadius="16dp" />
+                app:cornerRadius="999dp" />
         </LinearLayout>
     </LinearLayout>
 
@@ -926,7 +930,7 @@
                 style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-        android:minHeight="56dp"
+        android:minHeight="52dp"
                 android:gravity="center"
                 android:includeFontPadding="false"
                 android:insetTop="0dp"
@@ -936,7 +940,7 @@
                 android:textAllCaps="true"
                 android:textColor="@color/vg_green_dark"
                 app:backgroundTint="@android:color/white"
-                app:cornerRadius="16dp"
+                app:cornerRadius="999dp"
                 app:icon="@drawable/ic_pending_whatsapp"
                 app:iconGravity="textStart"
                 app:iconPadding="10dp"

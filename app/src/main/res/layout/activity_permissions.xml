@@ -21,8 +21,8 @@
             android:background="@drawable/header_gradient_curve"
             android:paddingTop="48dp"
             android:paddingBottom="36dp"
-            android:paddingStart="24dp"
-            android:paddingEnd="24dp"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
             android:gravity="center">
 
             <TextView
@@ -112,7 +112,7 @@
                 android:id="@+id/stepActionButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-        android:minHeight="56dp"
+        android:minHeight="52dp"
                 android:maxLines="1"
                 android:ellipsize="none"
                 android:letterSpacing="0.02"
@@ -124,7 +124,7 @@
                 app:autoSizeStepGranularity="1sp"
                 android:backgroundTint="@color/vg_green"
                 android:textColor="@color/white"
-                app:cornerRadius="28dp"
+                app:cornerRadius="999dp"
                 tools:text="Allow Notifications" />
 
         </LinearLayout>

@@ -24,8 +24,8 @@
         android:background="@drawable/header_gradient_curve"
         android:paddingTop="40dp"
         android:paddingBottom="24dp"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
+        android:paddingStart="18dp"
+        android:paddingEnd="18dp"
         android:gravity="center">
 
         <TextView
@@ -41,6 +41,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:layout_marginTop="-24dp"
+        android:background="@drawable/body_sheet_curve"
         android:fillViewport="true"
         android:clipToPadding="false"
         android:paddingBottom="140dp">
@@ -319,7 +321,7 @@
             android:id="@+id/sync_frequency_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-        android:minHeight="56dp"
+        android:minHeight="52dp"
             android:layout_marginTop="16dp"
             android:text="Sync every 24 hours"
             android:textAllCaps="false"
@@ -329,7 +331,7 @@
             app:iconGravity="textStart"
             app:strokeColor="@color/vg_green"
             app:strokeWidth="1.5dp"
-            app:cornerRadius="16dp" />
+            app:cornerRadius="999dp" />
 
         <com.google.android.material.button.MaterialButton
             android:textAppearance="@style/TextAppearance.VG.Button"
@@ -338,7 +340,7 @@
             android:id="@+id/delete_contacts_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-        android:minHeight="56dp"
+        android:minHeight="52dp"
             android:layout_marginTop="16dp"
             android:text="Delete My Contacts"
             android:textAllCaps="false"
@@ -348,7 +350,7 @@
             app:iconGravity="textStart"
             app:strokeColor="@color/vg_red"
             app:strokeWidth="1.5dp"
-            app:cornerRadius="16dp" />
+            app:cornerRadius="999dp" />
 
     </LinearLayout>
 

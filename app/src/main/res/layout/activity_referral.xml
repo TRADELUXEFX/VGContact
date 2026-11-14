@@ -24,8 +24,8 @@
             android:background="@drawable/header_gradient_curve"
             android:paddingTop="48dp"
             android:paddingBottom="22dp"
-            android:paddingStart="24dp"
-            android:paddingEnd="24dp"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
             android:gravity="center">
 
             <TextView
@@ -120,6 +120,8 @@
         </LinearLayout>
 
         <ScrollView
+            android:layout_marginTop="-24dp"
+            android:background="@drawable/body_sheet_curve"
             android:id="@+id/referral_content_scroll"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -261,7 +263,7 @@
                             android:textAllCaps="true"
                             android:textColor="@color/white"
                             android:backgroundTint="@color/vg_green"
-                            app:cornerRadius="20dp" />
+                            app:cornerRadius="999dp" />
 
                     </LinearLayout>
 

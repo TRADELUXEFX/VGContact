@@ -243,6 +243,7 @@
                 <com.google.android.material.button.MaterialButton
                     android:textAppearance="@style/TextAppearance.VG.Button"
                     android:includeFontPadding="false"
+                    android:minHeight="52dp"
                     android:id="@+id/register_btn"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -251,7 +252,7 @@
                     android:backgroundTint="@color/vg_green"
                     android:textColor="@color/white"
                     android:gravity="center"
-                    app:cornerRadius="16dp" />
+                    app:cornerRadius="999dp" />
 
                 <ProgressBar
                     android:id="@+id/progressBar"
