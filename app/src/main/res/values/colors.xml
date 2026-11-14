@@ -9,6 +9,14 @@
     <color name="vg_dark">#111B21</color>
     <color name="white">#FFFFFF</color>
     <color name="background">#F5FAF6</color>
+    <!-- Card, popup and sheet surface: white in light mode, dark green-grey in dark mode.
+         (@color/white stays white: text and icons on green.) -->
+    <color name="surface">#FFFFFF</color>
+    <!-- Last-sync pill states on Home. -->
+    <color name="pill_neutral_bg">#EEF1EF</color>
+    <color name="pill_neutral_fg">#5F6B64</color>
+    <color name="pill_warn_bg">#FFF1D6</color>
+    <color name="pill_warn_fg">#8A5A00</color>
 
     <!-- Splash only. Used by Theme.VGContact.Splash's window background
          and nowhere else, so the dark splash never touches any screen. -->

@@ -32,6 +32,10 @@ object Fonts {
                     else -> null
                 }
                 if (res != null) root.typeface = load(root.context, res)
+            } ?: run {
+                // No tag and no font from its textAppearance: Poppins Regular.
+                val tf = root.typeface
+                if (tf == null || tf === Typeface.DEFAULT) root.typeface = regular(root.context)
             }
             root.includeFontPadding = false
         }

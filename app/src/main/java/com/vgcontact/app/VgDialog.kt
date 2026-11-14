@@ -28,7 +28,7 @@ object VgDialog {
 
     class Action(val label: String, val onClick: (() -> Unit)? = null)
 
-    private const val RADIUS_DP = 30
+    private const val RADIUS_DP = 24
     private const val INSET_DP = 20
 
     fun show(
@@ -41,8 +41,7 @@ object VgDialog {
         extra: Action? = null
     ): AlertDialog {
         val root = column(activity)
-        root.addView(iconBadge(activity, tone))
-        root.addView(titleView(activity, title, topMarginDp = 14))
+        root.addView(titleView(activity, title, topMarginDp = 0))
         root.addView(bodyView(activity, message, topMarginDp = 10))
 
         var dialog: AlertDialog? = null
@@ -50,29 +49,19 @@ object VgDialog {
 
         val primaryColor = if (tone == Tone.DANGER) R.color.vg_red else R.color.vg_green
         val buttons = LinearLayout(activity).apply {
-            orientation = if (extra != null) LinearLayout.VERTICAL else LinearLayout.HORIZONTAL
+            orientation = LinearLayout.VERTICAL
             layoutParams = LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-            ).apply { topMargin = activity.dp(22) }
+            ).apply { topMargin = activity.dp(24) }
         }
-        fun add(btn: View, weight: Float) {
-            val lp = if (extra != null)
-                LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, activity.dp(50))
-                    .apply { topMargin = activity.dp(8) }
-            else
-                LinearLayout.LayoutParams(0, activity.dp(50), weight)
-                    .apply { if (buttons.childCount > 0) leftMargin = activity.dp(10) }
-            buttons.addView(btn, lp)
+        // Same as VG RESHARE's confirm card: full-width buttons, main action on top.
+        fun add(btn: View) {
+            buttons.addView(btn, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, activity.dp(52))
+                .apply { if (buttons.childCount > 0) topMargin = activity.dp(10) })
         }
-        // Stacked layout (3 actions): main on top. Side by side: main on the right.
-        if (extra != null) {
-            add(pill(activity, primary.label, filled = true, color = primaryColor) { dismissThen(primary) }, 1f)
-            add(pill(activity, extra.label, filled = false, color = null) { dismissThen(extra) }, 1f)
-            if (secondary != null) add(pill(activity, secondary.label, filled = false, color = null) { dismissThen(secondary) }, 1f)
-        } else {
-            if (secondary != null) add(pill(activity, secondary.label, filled = false, color = null) { dismissThen(secondary) }, 1f)
-            add(pill(activity, primary.label, filled = true, color = primaryColor) { dismissThen(primary) }, 1.3f)
-        }
+        add(pill(activity, primary.label, filled = true, color = primaryColor) { dismissThen(primary) })
+        if (extra != null) add(pill(activity, extra.label, filled = false, color = null) { dismissThen(extra) })
+        if (secondary != null) add(pill(activity, secondary.label, filled = false, color = null) { dismissThen(secondary) })
         root.addView(buttons)
 
         val built = build(activity, root)
@@ -98,6 +87,7 @@ object VgDialog {
         val greenDark = ContextCompat.getColor(activity, R.color.vg_green_dark)
         val tint = ContextCompat.getColor(activity, R.color.vg_green_tint)
         val line = ContextCompat.getColor(activity, R.color.card_border)
+        val surface = ContextCompat.getColor(activity, R.color.surface)
 
         labels.forEachIndexed { i, label ->
             val on = i == selected
@@ -107,7 +97,7 @@ object VgDialog {
                 setPadding(activity.dp(14), 0, activity.dp(14), 0)
                 background = GradientDrawable().apply {
                     cornerRadius = activity.dp(16).toFloat()
-                    setColor(if (on) tint else Color.WHITE)
+                    setColor(if (on) tint else surface)
                     setStroke(activity.dp(2) / 1, if (on) green else line)
                 }
                 isClickable = true
@@ -117,8 +107,8 @@ object VgDialog {
             val radio = View(activity).apply {
                 background = GradientDrawable().apply {
                     shape = GradientDrawable.OVAL
-                    if (on) { setColor(Color.WHITE); setStroke(activity.dp(6), green) }
-                    else { setColor(Color.WHITE); setStroke(activity.dp(2), Color.parseColor("#C5CEC9")) }
+                    if (on) { setColor(surface); setStroke(activity.dp(6), green) }
+                    else { setColor(surface); setStroke(activity.dp(2), line) }
                 }
             }
             tile.addView(radio, LinearLayout.LayoutParams(activity.dp(20), activity.dp(20)))
@@ -162,7 +152,7 @@ object VgDialog {
         dialog.show()
         val d = activity.resources.displayMetrics.density
         val bg = GradientDrawable().apply {
-            setColor(Color.WHITE)
+            setColor(ContextCompat.getColor(activity, R.color.surface))
             cornerRadius = RADIUS_DP * d
         }
         val inset = (INSET_DP * d).toInt()
@@ -172,33 +162,13 @@ object VgDialog {
 
     private fun column(activity: Activity) = LinearLayout(activity).apply {
         orientation = LinearLayout.VERTICAL
-        setPadding(activity.dp(24), activity.dp(26), activity.dp(24), activity.dp(24))
-    }
-
-    private fun iconBadge(activity: Activity, tone: Tone): View {
-        val (bgHex, fgHex, icon) = when (tone) {
-            Tone.DANGER -> Triple("#FBE7E6", "#D9534F", R.drawable.ic_delete)
-            Tone.WARNING -> Triple("#FCF3E3", "#B7791F", R.drawable.ic_info)
-            Tone.INFO -> Triple("#E1F5EB", "#158245", R.drawable.ic_info)
-        }
-        val frame = FrameLayout(activity).apply {
-            background = GradientDrawable().apply {
-                cornerRadius = activity.dp(15).toFloat()
-                setColor(Color.parseColor(bgHex))
-            }
-            layoutParams = LinearLayout.LayoutParams(activity.dp(46), activity.dp(46))
-        }
-        frame.addView(ImageView(activity).apply {
-            setImageResource(icon)
-            imageTintList = ColorStateList.valueOf(Color.parseColor(fgHex))
-        }, FrameLayout.LayoutParams(activity.dp(24), activity.dp(24), Gravity.CENTER))
-        return frame
+        setPadding(activity.dp(24), activity.dp(24), activity.dp(24), activity.dp(24))
     }
 
     private fun titleView(activity: Activity, text: String, topMarginDp: Int) = TextView(activity).apply {
         this.text = text
         textSize = 18f
-        typeface = ResourcesCompat.getFont(activity, R.font.poppins_semibold)
+        typeface = ResourcesCompat.getFont(activity, R.font.poppins_extrabold)
         setTextColor(ContextCompat.getColor(activity, R.color.vg_dark))
         setLineSpacing(0f, 1.05f)
         layoutParams = LinearLayout.LayoutParams(
@@ -212,7 +182,7 @@ object VgDialog {
         this.text = text.replace(Regex("(?<=[.!?]) +(?=\\S)"), "\n")
         textSize = 14f
         typeface = ResourcesCompat.getFont(activity, R.font.poppins)
-        setTextColor(ContextCompat.getColor(activity, R.color.text_primary))
+        setTextColor(ContextCompat.getColor(activity, R.color.text_secondary))
         setLineSpacing(0f, 1.15f)
         layoutParams = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
@@ -226,11 +196,11 @@ object VgDialog {
         color: Int?,
         onClick: () -> Unit
     ): View {
-        val fill = if (filled) ContextCompat.getColor(activity, color!!) else Color.WHITE
+        val fill = if (filled) ContextCompat.getColor(activity, color!!) else ContextCompat.getColor(activity, R.color.surface)
         val shape = GradientDrawable().apply {
-            cornerRadius = activity.dp(25).toFloat()
+            cornerRadius = activity.dp(100).toFloat()
             setColor(fill)
-            if (!filled) setStroke(activity.dp(2) / 1, Color.parseColor("#D5DBD8"))
+            if (!filled) setStroke(activity.dp(2), ContextCompat.getColor(activity, R.color.vg_green))
         }
         val ripple = RippleDrawable(ColorStateList.valueOf(Color.parseColor("#22000000")), shape, null)
         return TextView(activity).apply {
@@ -238,7 +208,7 @@ object VgDialog {
             gravity = Gravity.CENTER
             textSize = 14f
             typeface = ResourcesCompat.getFont(activity, R.font.poppins_extrabold)
-            setTextColor(if (filled) Color.WHITE else ContextCompat.getColor(activity, R.color.vg_dark))
+            setTextColor(if (filled) Color.WHITE else ContextCompat.getColor(activity, R.color.vg_green))
             background = ripple
             isClickable = true
             isFocusable = true

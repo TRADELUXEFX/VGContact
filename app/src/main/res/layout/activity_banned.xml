@@ -56,8 +56,8 @@
                 android:layout_height="0dp"
             android:layout_weight="1"
                 android:orientation="vertical"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
+                android:paddingStart="18dp"
+                android:paddingEnd="18dp"
                 android:paddingTop="24dp"
                 android:paddingBottom="16dp">
 
@@ -218,8 +218,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
             android:paddingTop="8dp"
             android:paddingBottom="20dp">
 
@@ -237,7 +237,7 @@
                 android:backgroundTint="@color/vg_green"
                 android:textColor="@color/white"
                 android:gravity="center"
-                app:cornerRadius="16dp" />
+                app:cornerRadius="999dp" />
 
             <TextView
                 android:textAppearance="@style/TextAppearance.VG.Caption"

@@ -331,7 +331,7 @@
                     android:text="@string/pending_btn_post"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
-                    app:cornerRadius="18dp"
+                    app:cornerRadius="999dp"
                     app:icon="@drawable/ic_pending_send"
                     app:iconGravity="textStart"
                     app:iconPadding="10dp"
@@ -354,7 +354,7 @@
                 android:letterSpacing="0.01"
                 android:textAllCaps="false"
                 android:textColor="@color/vg_green_dark"
-                app:cornerRadius="18dp"
+                app:cornerRadius="999dp"
                 app:strokeColor="@color/vg_green"
                 app:strokeWidth="1.5dp" />
 
@@ -402,7 +402,7 @@
                     android:layout_height="wrap_content"
         android:minHeight="42dp"
                     android:layout_marginStart="10dp"
-                    android:backgroundTint="@color/vg_dark"
+                    android:backgroundTint="@color/splash_background"
                     android:includeFontPadding="false"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
@@ -412,7 +412,7 @@
                     android:stateListAnimator="@null"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
-                    app:cornerRadius="14dp" />
+                    app:cornerRadius="999dp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

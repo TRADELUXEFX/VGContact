@@ -24,8 +24,8 @@
             android:background="@drawable/header_gradient_curve"
             android:paddingTop="48dp"
             android:paddingBottom="26dp"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
             android:gravity="center">
 
             <TextView
@@ -261,7 +261,7 @@
                             android:textAllCaps="true"
                             android:textColor="@color/white"
                             android:backgroundTint="@color/vg_green"
-                            app:cornerRadius="20dp" />
+                            app:cornerRadius="999dp" />
 
                     </LinearLayout>
 

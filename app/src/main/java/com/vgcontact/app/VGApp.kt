@@ -14,6 +14,7 @@ class VGApp : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
+        AppTheme.apply(this)
         FloatingContactHelper.register(this)
         // When the last screen of the app is closed (not just turned by a rotation), the
         // next open counts as a new entry and the update pop-up shows again.

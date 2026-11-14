@@ -41,9 +41,9 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingStart="20dp"
+            android:paddingStart="18dp"
             android:paddingTop="48dp"
-            android:paddingEnd="20dp"
+            android:paddingEnd="18dp"
             android:paddingBottom="46dp">
 
             <ImageView
@@ -99,9 +99,9 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="20dp"
+            android:paddingStart="18dp"
             android:paddingTop="40dp"
-            android:paddingEnd="20dp"
+            android:paddingEnd="18dp"
             android:paddingBottom="28dp"
             android:clipToPadding="false">
 
@@ -384,7 +384,7 @@
                         android:text="@string/pay_btn_proof"
                         android:textAllCaps="false"
                         android:textColor="@color/white"
-                        app:cornerRadius="18dp"
+                        app:cornerRadius="999dp"
                         app:icon="@drawable/ic_pending_whatsapp"
                         app:iconGravity="textStart"
                         app:iconPadding="10dp"

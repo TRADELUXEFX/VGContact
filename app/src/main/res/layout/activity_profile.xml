@@ -24,8 +24,8 @@
         android:background="@drawable/header_gradient_curve"
         android:paddingTop="48dp"
         android:paddingBottom="26dp"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
+        android:paddingStart="18dp"
+        android:paddingEnd="18dp"
         android:gravity="center">
 
         <TextView
@@ -331,7 +331,7 @@
             app:iconGravity="textStart"
             app:strokeColor="@color/vg_green"
             app:strokeWidth="1.5dp"
-            app:cornerRadius="16dp" />
+            app:cornerRadius="999dp" />
 
         <com.google.android.material.button.MaterialButton
         android:insetTop="0dp"
@@ -352,7 +352,7 @@
             app:iconGravity="textStart"
             app:strokeColor="@color/vg_red"
             app:strokeWidth="1.5dp"
-            app:cornerRadius="16dp" />
+            app:cornerRadius="999dp" />
 
     </LinearLayout>
 

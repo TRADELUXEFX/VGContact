@@ -67,6 +67,10 @@ class HomeActivity : BaseActivity() {
             if (PendingPrompt.showGate(this)) return@setOnClickListener
             startActivity(Intent(this, ProfileActivity::class.java))
         }
+        findViewById<ImageView>(R.id.headerThemeIcon).apply {
+            setImageResource(if (AppTheme.isDark(this@HomeActivity)) R.drawable.ic_sun else R.drawable.ic_moon)
+            setOnClickListener { AppTheme.toggle(this@HomeActivity) }
+        }
         findViewById<ImageView>(R.id.headerBellIcon).setOnClickListener {
             if (PendingPrompt.showGate(this)) return@setOnClickListener
             startActivity(Intent(this, NotificationsActivity::class.java))
@@ -458,20 +462,20 @@ class HomeActivity : BaseActivity() {
             else -> "$days days ago"
         }
         val text: String
-        val bg: String
-        val fg: String
+        val bg: Int
+        val fg: Int
         when {
-            SyncPrefs.isPaused(this) -> { text = "Syncing paused"; bg = "#EEF1EF"; fg = "#5F6B64" }
-            last == 0L -> { text = "Not synced yet"; bg = "#EEF1EF"; fg = "#5F6B64" }
-            hours >= 48L -> { text = "Last sync $ago"; bg = "#FFF1D6"; fg = "#8A5A00" }
-            else -> { text = "Synced $ago"; bg = "#E1F5EB"; fg = "#158245" }
+            SyncPrefs.isPaused(this) -> { text = "Syncing paused"; bg = R.color.pill_neutral_bg; fg = R.color.pill_neutral_fg }
+            last == 0L -> { text = "Not synced yet"; bg = R.color.pill_neutral_bg; fg = R.color.pill_neutral_fg }
+            hours >= 48L -> { text = "Last sync $ago"; bg = R.color.pill_warn_bg; fg = R.color.pill_warn_fg }
+            else -> { text = "Synced $ago"; bg = R.color.success_bg; fg = R.color.success_text }
         }
         pill.text = text
-        pill.setTextColor(android.graphics.Color.parseColor(fg))
+        pill.setTextColor(androidx.core.content.ContextCompat.getColor(this, fg))
         pill.compoundDrawableTintList =
-            android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor(fg))
+            android.content.res.ColorStateList.valueOf(androidx.core.content.ContextCompat.getColor(this, fg))
         pill.backgroundTintList =
-            android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor(bg))
+            android.content.res.ColorStateList.valueOf(androidx.core.content.ContextCompat.getColor(this, bg))
     }
 
     // ---------------- lifecycle ----------------

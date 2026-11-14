@@ -19,8 +19,8 @@
         android:background="@drawable/header_gradient_curve"
         android:paddingTop="48dp"
         android:paddingBottom="26dp"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
+        android:paddingStart="18dp"
+        android:paddingEnd="18dp"
         android:gravity="center">
 
         <TextView
@@ -46,7 +46,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp" />
+            android:padding="18dp" />
 
     </ScrollView>
 
@@ -143,7 +143,7 @@
             android:textAllCaps="false"
             android:backgroundTint="@color/vg_green"
             android:textColor="@color/white"
-            app:cornerRadius="16dp" />
+            app:cornerRadius="999dp" />
     </LinearLayout>
 
 </LinearLayout>

@@ -2,6 +2,6 @@
 <!-- White card holding the notice text on the maintenance cover. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
-    <solid android:color="#FFFFFF" />
+    <solid android:color="@color/surface" />
     <corners android:radius="18dp" />
 </shape>

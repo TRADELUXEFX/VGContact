@@ -74,7 +74,6 @@ class NotificationsActivity : BaseActivity() {
             val row = layoutInflater.inflate(R.layout.item_notification, container, false)
             row.findViewById<TextView>(R.id.notification_title).text = notification.title
             row.findViewById<TextView>(R.id.notification_body).text = notification.body
-            row.findViewById<TextView>(R.id.notification_time).text = formatRelativeTime(notification.createdAt)
             row.findViewById<View>(R.id.notification_unread_dot).visibility =
                 if (notification.isRead) View.GONE else View.VISIBLE
             // Unread rows get a different colour (light green with a green border), read rows
@@ -91,29 +90,6 @@ class NotificationsActivity : BaseActivity() {
                 }
             }
             container.addView(row)
-        }
-    }
-
-    // created_at comes back from Supabase as an ISO-8601 timestamp
-    // (e.g. "2026-09-27T10:15:00.123456+00:00"). Falls back to the raw
-    // string if parsing fails rather than crashing the screen over it.
-    private fun formatRelativeTime(isoTimestamp: String): String {
-        return try {
-            // Normalise to "yyyy-MM-ddTHH:mm:ss+00:00": drop fractional
-            // seconds, turn Z into +00:00, assume UTC if no offset.
-            var ts = isoTimestamp.replace(Regex("\\.\\d+"), "").replace("Z", "+00:00")
-            if (!Regex("[+-]\\d{2}:\\d{2}$").containsMatchIn(ts)) ts += "+00:00"
-            val parsed = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", java.util.Locale.US).parse(ts)
-                ?: return isoTimestamp
-            val minutes = (System.currentTimeMillis() - parsed.time) / 60000
-            when {
-                minutes < 1 -> "Just now"
-                minutes < 60 -> "$minutes min ago"
-                minutes < 1440 -> "${minutes / 60}h ago"
-                else -> "${minutes / 1440}d ago"
-            }
-        } catch (e: Throwable) {
-            isoTimestamp
         }
     }
 }

@@ -25,8 +25,8 @@
             android:background="@drawable/header_gradient_curve"
             android:paddingTop="48dp"
             android:paddingBottom="26dp"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
             android:gravity="center">
 
             <TextView
@@ -417,7 +417,7 @@
                     android:textColor="@color/white"
                     app:strokeColor="@color/vg_red"
                     app:strokeWidth="2dp"
-                    app:cornerRadius="16dp"
+                    app:cornerRadius="999dp"
                     app:elevation="0dp" />
 
                 <!-- Buy status viewers: one slim outlined button, no big card -->
@@ -438,7 +438,7 @@
                     app:icon="@drawable/ic_unlock"
                     app:iconTint="@color/vg_green_dark"
                     app:iconGravity="textStart"
-                    app:cornerRadius="16dp" />
+                    app:cornerRadius="999dp" />
 
                 </LinearLayout>
 

@@ -61,8 +61,8 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
+                android:paddingStart="18dp"
+                android:paddingEnd="18dp"
                 android:paddingTop="24dp">
 
                 <LinearLayout
@@ -197,7 +197,7 @@
                         android:textColorHint="@color/text_muted"
                         app:hintTextColor="@color/vg_green_dark"
                         app:boxBackgroundMode="outline"
-                        app:boxBackgroundColor="@color/white"
+                        app:boxBackgroundColor="@color/surface"
                         app:boxStrokeColor="@color/vg_green"
                         app:boxStrokeWidth="1.5dp"
                         app:boxCornerRadiusTopStart="14dp"
@@ -253,7 +253,7 @@
                     android:backgroundTint="@color/vg_green"
                     android:textColor="@color/white"
                     android:gravity="center"
-                    app:cornerRadius="16dp" />
+                    app:cornerRadius="999dp" />
 
                 <ProgressBar
                     android:id="@+id/progressBar"

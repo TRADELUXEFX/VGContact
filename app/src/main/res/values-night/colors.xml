@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dark mode palette. Same names as values/colors.xml; same look as VG RESHARE dark mode. -->
+<resources>
+    <color name="vg_dark">#EDF3F0</color>
+    <color name="background">#0F1814</color>
+    <color name="surface">#15201C</color>
+    <color name="vg_green_tint">#1B3A2C</color>
+    <color name="text_primary">#C9D3CE</color>
+    <color name="text_secondary">#9AA8A1</color>
+    <color name="text_muted">#8F9C96</color>
+    <color name="card_border">#2A3B33</color>
+    <color name="stats_card_fill">#1A2A23</color>
+    <color name="stats_card_border">#2A3B33</color>
+    <color name="success_bg">#1B3A2C</color>
+    <color name="success_text">#7FE3AE</color>
+    <color name="warning_bg">#3A2E14</color>
+    <color name="locked_border">#3A4540</color>
+    <color name="locked_text">#6B7770</color>
+    <color name="locked_bg">#222B27</color>
+    <color name="field_bg">#1A2A23</color>
+    <color name="badge_bg">#1B3A2C</color>
+    <color name="badge_border">#2A3B33</color>
+    <color name="vg_red_dark">#F08A86</color>
+    <color name="gray_light">#2E3A35</color>
+    <color name="tab_track_fill">#2E3A35</color>
+    <color name="locked_chip_border">#3A4540</color>
+    <color name="pending_pill_bg">#3A2E14</color>
+    <color name="pending_pill_text">#F2C36B</color>
+    <color name="pill_neutral_bg">#26302B</color>
+    <color name="pill_neutral_fg">#9AA8A1</color>
+    <color name="pill_warn_bg">#3A2E14</color>
+    <color name="pill_warn_fg">#F2C36B</color>
+</resources>

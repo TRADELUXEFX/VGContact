@@ -17,7 +17,7 @@ object RoundedDialog {
     fun style(dialog: AlertDialog) {
         val d = dialog.context.resources.displayMetrics.density
         val bg = GradientDrawable().apply {
-            setColor(Color.WHITE)
+            setColor(androidx.core.content.ContextCompat.getColor(dialog.context, R.color.surface))
             cornerRadius = RADIUS_DP * d
         }
         val inset = (INSET_DP * d).toInt()

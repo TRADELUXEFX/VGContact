@@ -11,7 +11,7 @@
     android:orientation="horizontal"
     android:background="@drawable/card_background"
     android:padding="14dp"
-    android:layout_marginBottom="12dp">
+    android:layout_marginBottom="10dp">
 
     <View
         android:id="@+id/notification_unread_dot"
@@ -28,7 +28,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:textAppearance="@style/TextAppearance.VG.Subheading"
+            android:textAppearance="@style/TextAppearance.VG.BodySemibold"
             android:includeFontPadding="false"
             android:id="@+id/notification_title"
             android:layout_width="match_parent"
@@ -42,14 +42,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
             android:textColor="@color/text_secondary" />
-
-        <TextView
-            android:textAppearance="@style/TextAppearance.VG.Micro"
-            android:id="@+id/notification_time"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:textColor="@color/text_muted" />
 
     </LinearLayout>
 

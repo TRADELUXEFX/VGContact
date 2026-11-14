@@ -21,8 +21,8 @@
             android:background="@drawable/header_gradient_curve"
             android:paddingTop="48dp"
             android:paddingBottom="26dp"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
             android:gravity="center">
 
             <TextView
@@ -61,8 +61,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
             android:paddingTop="32dp"
             android:gravity="top|center_horizontal">
 
@@ -126,7 +126,7 @@
                 app:autoSizeStepGranularity="1sp"
                 android:backgroundTint="@color/vg_green"
                 android:textColor="@color/white"
-                app:cornerRadius="16dp"
+                app:cornerRadius="999dp"
                 tools:text="Allow Notifications" />
 
         </LinearLayout>
@@ -140,7 +140,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center"
-        android:background="@color/white"
+        android:background="@color/surface"
         android:visibility="gone">
 
         <ProgressBar

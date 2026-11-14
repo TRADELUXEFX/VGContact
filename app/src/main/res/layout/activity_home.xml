@@ -31,8 +31,8 @@
             android:background="@drawable/header_gradient_curve"
             android:paddingTop="48dp"
             android:paddingBottom="26dp"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp">
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -105,6 +105,19 @@
                         android:textColor="@color/white" />
                 </LinearLayout>
             </LinearLayout>
+
+            <ImageView
+                android:id="@+id/headerThemeIcon"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginEnd="8dp"
+                android:padding="14dp"
+                android:src="@drawable/ic_moon"
+                android:background="@drawable/notification_circle_background"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Switch light or dark mode"
+                app:tint="@color/white" />
 
             <FrameLayout
                 android:layout_width="56dp"
@@ -204,7 +217,7 @@
                 android:textAllCaps="false"
                 android:textColor="@color/vg_green_dark"
                 android:backgroundTint="@color/white"
-                app:cornerRadius="10dp" />
+                app:cornerRadius="999dp" />
 
         </LinearLayout>
 
@@ -215,8 +228,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingTop="20dp"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
             android:paddingBottom="8dp">
 
             <!-- Red "update available" card. Stays on Home until the user installs the new version,
@@ -519,9 +532,7 @@
                 android:id="@+id/home_contacts_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/card_background"
-                android:padding="16dp">
+                android:orientation="vertical">
 
                 <FrameLayout
                     android:id="@+id/home_limits_loading"
@@ -620,7 +631,6 @@
                             android:textAppearance="@style/TextAppearance.VG.BodySmallSemibold"
                             android:id="@+id/freeViewersMaxText"
                             android:layout_width="wrap_content"
-                            android:minWidth="40dp"
                             android:layout_height="wrap_content"
                             android:includeFontPadding="false"
                             android:textColor="@color/text_muted"
@@ -668,7 +678,6 @@
                             android:textAppearance="@style/TextAppearance.VG.BodySmallSemibold"
                             android:id="@+id/extraViewersMaxText"
                             android:layout_width="wrap_content"
-                            android:minWidth="40dp"
                             android:layout_height="wrap_content"
                             android:includeFontPadding="false"
                             android:textColor="@color/text_muted"
@@ -713,11 +722,7 @@
                             android:textColor="@color/vg_dark"
                             android:text="0" />
 
-                        <!-- Same width as the "/max" slot above, so all three counts line up. -->
-                        <View
-                            android:layout_width="40dp"
-                            android:layout_height="1dp"
-                            android:visibility="invisible" />
+                        <!-- Counts end flush at the card edge, like the "/max" rows above. -->
 
                     </LinearLayout>
 
@@ -746,15 +751,15 @@
                 app:iconTint="@color/white"
                 app:iconGravity="textStart"
                 app:iconPadding="10dp"
-                app:cornerRadius="16dp" />
+                app:cornerRadius="999dp" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
             android:paddingTop="8dp"
             android:paddingBottom="26dp">
 
@@ -776,7 +781,7 @@
                 app:icon="@drawable/ic_viewers"
                 app:iconTint="@color/white"
                 app:iconGravity="textStart"
-                app:cornerRadius="16dp" />
+                app:cornerRadius="999dp" />
 
             <Button
                 android:textAppearance="@style/TextAppearance.VG.Button"
@@ -796,7 +801,7 @@
                 app:icon="@drawable/ic_pending_whatsapp"
                 app:iconTint="@color/vg_green_dark"
                 app:iconGravity="textStart"
-                app:cornerRadius="16dp" />
+                app:cornerRadius="999dp" />
         </LinearLayout>
     </LinearLayout>
 
@@ -894,8 +899,8 @@
                     android:layout_marginTop="8dp"
                     android:gravity="center"
                     android:includeFontPadding="false"
-                    android:paddingStart="20dp"
-                    android:paddingEnd="20dp"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
                     android:text="We're doing maintenance"
                     android:textColor="@android:color/white" />
 
@@ -903,9 +908,9 @@
                     android:id="@+id/maintenanceMsgCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
+                    android:layout_marginStart="18dp"
                     android:layout_marginTop="16dp"
-                    android:layout_marginEnd="20dp"
+                    android:layout_marginEnd="18dp"
                     android:background="@drawable/maintenance_message_card"
                     android:gravity="center"
                     android:orientation="vertical"
@@ -931,9 +936,9 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:paddingStart="20dp"
+            android:paddingStart="18dp"
             android:paddingTop="8dp"
-            android:paddingEnd="20dp"
+            android:paddingEnd="18dp"
             android:paddingBottom="24dp">
 
             <Button
@@ -952,7 +957,7 @@
                 android:textAllCaps="true"
                 android:textColor="@color/vg_green_dark"
                 app:backgroundTint="@android:color/white"
-                app:cornerRadius="16dp"
+                app:cornerRadius="999dp"
                 app:icon="@drawable/ic_pending_whatsapp"
                 app:iconGravity="textStart"
                 app:iconPadding="10dp"

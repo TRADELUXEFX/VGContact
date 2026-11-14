@@ -9,7 +9,7 @@
     popping the icon in on top of it.
 -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@color/vg_dark" />
+    <item android:drawable="@color/splash_background" />
     <item
         android:width="96dp"
         android:height="96dp"
