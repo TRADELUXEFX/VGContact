@@ -79,7 +79,7 @@
             </LinearLayout>
 
         <EditText
-            android:textAppearance="@style/TextAppearance.VG.Lead"
+            android:textAppearance="@style/TextAppearance.VG.BodySmall"
             android:id="@+id/referral_search_mine"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -98,7 +98,7 @@
             android:imeOptions="actionDone" />
 
         <EditText
-            android:textAppearance="@style/TextAppearance.VG.Lead"
+            android:textAppearance="@style/TextAppearance.VG.BodySmall"
             android:id="@+id/referral_search_board"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
